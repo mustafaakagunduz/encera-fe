@@ -87,8 +87,8 @@ const PricingSection: React.FC = () => {
                                     </p>
                                 </CardHeader>
 
-                                <CardContent className="pt-0">
-                                    <ul className="space-y-3 mb-6">
+                                <CardContent className="pt-0 flex-1 flex flex-col">
+                                    <ul className="space-y-3 mb-6 flex-1">
                                         {plan.features.map((feature, index) => (
                                             <li key={index} className="flex items-center text-gray-700">
                                                 <svg
@@ -108,7 +108,7 @@ const PricingSection: React.FC = () => {
                                     </ul>
 
                                     <Button
-                                        className="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3"
+                                        className="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 mt-auto"
                                         size="lg"
                                     >
                                         {t('pricing.button')}
