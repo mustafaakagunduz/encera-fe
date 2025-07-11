@@ -71,5 +71,32 @@
   "home.welcome": "Hoş Geldiniz",
   "home.search-placeholder": "Ne arıyorsunuz?",
   "home.featured-listings": "Öne Çıkan İlanlar",
-  "home.recent-listings": "Son İlanlar"
+  "home.recent-listings": "Son İlanlar",
+
+  "hero.title": "Hayalinizdeki Evi Bulun",
+  "hero.subtitle": "En iyi emlak ilanları burada",
+  "hero.search-placeholder": "Şehir veya İlçe",
+  "hero.search-button": "Ara",
+
+  "pricing.title": "İlanınızı Öne Çıkarın",
+  "pricing.basic.title": "Acil İlan",
+  "pricing.basic.price": "199 TL",
+  "pricing.basic.duration": "3 Gün Üst Sırada",
+  "pricing.basic.feature1": "Kırmızı Çerçeve",
+  "pricing.basic.feature2": "Acil İkon",
+  "pricing.premium.title": "Premium Paket",
+  "pricing.premium.price": "399 TL",
+  "pricing.premium.duration": "7 Gün Üst Sırada",
+  "pricing.premium.feature1": "Altın Çerçeve",
+  "pricing.premium.feature2": "Premium İkon",
+  "pricing.premium.feature3": "Sosyal Medya Paylaşımı",
+  "pricing.premium.badge": "En Çok Tercih Edilen",
+  "pricing.vip.title": "VIP İlan",
+  "pricing.vip.price": "799 TL",
+  "pricing.vip.duration": "15 Gün Üst Sırada",
+  "pricing.vip.feature1": "Platin Çerçeve",
+  "pricing.vip.feature2": "VIP İkon",
+  "pricing.vip.feature3": "Sosyal Medya Paylaşımı",
+  "pricing.vip.feature4": "E-posta Bülteni",
+  "pricing.button": "Satın Al"
 }

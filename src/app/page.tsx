@@ -1,15 +1,20 @@
 'use client';
 
-import { useLanguage} from "@/context/LanguageContext";
+import { useLanguage } from "@/context/LanguageContext";
+import HeroSection from "@/components/hero/HeroSection";
+import PricingSection from "@/components/pricing-section/PricingSection";
 
 export default function Home() {
     const { t } = useLanguage();
 
     return (
-        <main className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold">
-                {t('home.welcome')}
-            </h1>
+        <main>
+
+
+            <HeroSection />
+            <PricingSection />
+
+
 
         </main>
     );

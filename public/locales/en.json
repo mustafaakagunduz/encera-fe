@@ -71,5 +71,32 @@
   "home.welcome": "Welcome",
   "home.search-placeholder": "What are you looking for?",
   "home.featured-listings": "Featured Listings",
-  "home.recent-listings": "Recent Listings"
+  "home.recent-listings": "Recent Listings",
+
+  "hero.title": "Find Your Dream Home",
+  "hero.subtitle": "The best real estate listings are here",
+  "hero.search-placeholder": "City or District",
+  "hero.search-button": "Search",
+
+  "pricing.title": "Promote Your Listing",
+  "pricing.basic.title": "Urgent Listing",
+  "pricing.basic.price": "199 TL",
+  "pricing.basic.duration": "3 Days Top Position",
+  "pricing.basic.feature1": "Red Frame",
+  "pricing.basic.feature2": "Urgent Icon",
+  "pricing.premium.title": "Premium Package",
+  "pricing.premium.price": "399 TL",
+  "pricing.premium.duration": "7 Days Top Position",
+  "pricing.premium.feature1": "Gold Frame",
+  "pricing.premium.feature2": "Premium Icon",
+  "pricing.premium.feature3": "Social Media Sharing",
+  "pricing.premium.badge": "Most Preferred",
+  "pricing.vip.title": "VIP Listing",
+  "pricing.vip.price": "799 TL",
+  "pricing.vip.duration": "15 Days Top Position",
+  "pricing.vip.feature1": "Platinum Frame",
+  "pricing.vip.feature2": "VIP Icon",
+  "pricing.vip.feature3": "Social Media Sharing",
+  "pricing.vip.feature4": "Email Newsletter",
+  "pricing.button": "Purchase"
 }
