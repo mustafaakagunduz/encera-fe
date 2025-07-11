@@ -51,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
     };
 
     return (
-        <nav className="bg-blue-800 text-white shadow-lg">
+        <nav className="bg-blue-900 text-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
@@ -67,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
                             <Link
                                 key={item.key}
                                 href={item.href}
-                                className="px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 hover:text-blue-800 hover:scale-105 transition-all duration-200 transform inline-block"
+                                className="px-4 py-2 rounded-md text-m  font-medium hover:bg-blue-200 hover:text-blue-800 hover:scale-105 transition-all duration-200 transform inline-block"
                             >
                                 {t(item.key)}
                             </Link>
