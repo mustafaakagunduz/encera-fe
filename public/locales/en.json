@@ -98,5 +98,10 @@
   "pricing.vip.feature2": "VIP Icon",
   "pricing.vip.feature3": "Social Media Sharing",
   "pricing.vip.feature4": "Email Newsletter",
-  "pricing.button": "Purchase"
+  "pricing.button": "Purchase",
+  "auth.verification-code": "Verification Code",
+  "auth.resend-code": "Resend Code",
+  "auth.verify": "Verify",
+  "auth.new-password": "New Password",
+  "auth.reset-password": "Reset Password"
 }

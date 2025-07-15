@@ -1,20 +1,20 @@
+// src/components/navbar/Navbar.tsx
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import {useLanguage} from "@/context/LanguageContext";
+import { useRouter } from 'next/navigation';
+import { useLanguage } from "@/context/LanguageContext";
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { logout } from '@/store/slices/authSlice';
 import { ChevronDown, User, Globe } from 'lucide-react';
 
-interface NavbarProps {
-    isLoggedIn?: boolean;
-    user?: {
-        firstName: string;
-        lastName: string;
-    };
-}
-
-const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
+const Navbar: React.FC = () => {
     const { language, setLanguage, t } = useLanguage();
+    const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
+    const router = useRouter();
+
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
@@ -50,6 +50,12 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
         setIsLanguageMenuOpen(false);
     };
 
+    const handleLogout = () => {
+        dispatch(logout());
+        setIsUserMenuOpen(false);
+        router.push('/');
+    };
+
     return (
         <nav className="bg-blue-900 text-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -67,7 +73,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
                             <Link
                                 key={item.key}
                                 href={item.href}
-                                className="px-4 py-2 rounded-md text-m  font-medium hover:bg-blue-200 hover:text-blue-800 hover:scale-105 transition-all duration-200 transform inline-block"
+                                className="px-4 py-2 rounded-md text-m font-medium hover:bg-blue-200 hover:text-blue-800 hover:scale-105 transition-all duration-200 transform inline-block"
                             >
                                 {t(item.key)}
                             </Link>
@@ -108,20 +114,20 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
                             )}
                         </div>
 
-                        {isLoggedIn && user ? (
+                        {isAuthenticated && user ? (
                             <>
                                 {/* User Menu */}
                                 <div className="relative" ref={userMenuRef}>
                                     <button
                                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                        className="px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 hover:text-blue-800 transition-colors duration-200"
+                                        className="flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 hover:text-blue-800 transition-colors duration-200"
                                     >
                                         <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full">
                                             <User className="w-4 h-4" />
                                         </div>
                                         <span className="text-sm font-medium">
-                      {user.firstName} {user.lastName}
-                    </span>
+                                            {user.firstName} {user.lastName}
+                                        </span>
                                         <ChevronDown className="w-4 h-4" />
                                     </button>
 
@@ -165,10 +171,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
                                             <hr className="my-1" />
                                             <button
                                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                onClick={() => {
-                                                    setIsUserMenuOpen(false);
-                                                    // Logout logic here
-                                                }}
+                                                onClick={handleLogout}
                                             >
                                                 {t('navbar.logout')}
                                             </button>
@@ -179,7 +182,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
                                 {/* Create Listing Button */}
                                 <Link
                                     href="/create-listing"
-                                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium transition-colors hover:scale-105 transform inline-block duration-200 "
+                                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium transition-colors hover:scale-105 transform inline-block duration-200"
                                 >
                                     {t('navbar.create-listing')}
                                 </Link>
@@ -189,7 +192,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false, user }) => {
                                 {/* Login and Register buttons */}
                                 <Link
                                     href="/authentication"
-                                    className="px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 hover:scale-105 transition-all duration-200 transform inline-block hover:text-blue-800  "
+                                    className="px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 hover:scale-105 transition-all duration-200 transform inline-block hover:text-blue-800"
                                 >
                                     {t('navbar.login')}
                                 </Link>

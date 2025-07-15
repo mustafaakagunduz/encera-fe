@@ -98,5 +98,10 @@
   "pricing.vip.feature2": "VIP İkon",
   "pricing.vip.feature3": "Sosyal Medya Paylaşımı",
   "pricing.vip.feature4": "E-posta Bülteni",
-  "pricing.button": "Satın Al"
+  "pricing.button": "Satın Al",
+  "auth.verification-code": "Doğrulama Kodu",
+  "auth.resend-code": "Kodu Tekrar Gönder",
+  "auth.verify": "Doğrula",
+  "auth.new-password": "Yeni Şifre",
+  "auth.reset-password": "Şifre Sıfırla"
 }
