@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { ChevronDown, User, Globe } from 'lucide-react';
+import './Navbar.css';
 
 const Navbar: React.FC = () => {
     const { language, setLanguage, t } = useLanguage();
@@ -37,8 +38,8 @@ const Navbar: React.FC = () => {
         };
     }, []);
 
-    const navItems = [
-        { key: 'navbar.home', href: '/' },
+    // Orta grup navigasyon öğeleri (Anasayfa kaldırıldı)
+    const centerNavItems = [
         { key: 'navbar.listings', href: '/house' },
         { key: 'navbar.jobs', href: '/commercial' },
         { key: 'navbar.land', href: '/land' },
@@ -57,55 +58,55 @@ const Navbar: React.FC = () => {
     };
 
     return (
-        <nav className="bg-blue-900 text-white shadow-lg">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    {/* Logo */}
-                    <div className="flex-shrink-0">
-                        <Link href="/" className="text-2xl font-bold hover:text-blue-200 hover:scale-110 transition-all duration-300 transform inline-block">
+        <nav className="navbar-container">
+            <div className="navbar-content">
+                <div className="navbar-main-row">
+                    {/* Sol grup - Logo */}
+                    <div className="navbar-left-group">
+                        <Link href="/" className="navbar-logo">
                             {t('navbar.brand')}
                         </Link>
                     </div>
 
-                    {/* Navigation Links */}
-                    <div className="hidden md:flex items-center space-x-1">
-                        {navItems.map((item) => (
+                    {/* Orta grup - Ana navigasyon (Desktop'ta ortalanmış) */}
+                    <div className="navbar-center-group">
+                        {centerNavItems.map((item) => (
                             <Link
                                 key={item.key}
                                 href={item.href}
-                                className="px-4 py-2 rounded-md text-m font-medium hover:bg-blue-200 hover:text-blue-800 hover:scale-105 transition-all duration-200 transform inline-block"
+                                className="navbar-nav-link"
                             >
                                 {t(item.key)}
                             </Link>
                         ))}
                     </div>
 
-                    {/* Right side buttons */}
-                    <div className="flex items-center space-x-3">
-                        {/* Language Selector */}
+                    {/* Sağ grup - Kullanıcı kontrolleri */}
+                    <div className="navbar-right-group">
+                        {/* Dil seçici */}
                         <div className="relative" ref={languageMenuRef}>
                             <button
                                 onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-                                className="px-4 py-2 rounded-md text-sm font-medium hover:scale-105 transition-all duration-200 transform inline-block hover:bg-blue-200 hover:cursor-pointer hover:text-blue-800 transition-colors duration-200"
+                                className="navbar-language-button"
                                 aria-label="Select Language"
                             >
                                 <Globe className="w-5 h-5" />
                             </button>
 
                             {isLanguageMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50">
+                                <div className="navbar-dropdown">
                                     <button
                                         onClick={() => handleLanguageChange('tr')}
-                                        className={`block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
-                                            language === 'tr' ? 'bg-blue-50 text-blue-700' : ''
+                                        className={`navbar-dropdown-item ${
+                                            language === 'tr' ? 'active' : ''
                                         }`}
                                     >
                                         🇹🇷 Türkçe
                                     </button>
                                     <button
                                         onClick={() => handleLanguageChange('en')}
-                                        className={`block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
-                                            language === 'en' ? 'bg-blue-50 text-blue-700' : ''
+                                        className={`navbar-dropdown-item ${
+                                            language === 'en' ? 'active' : ''
                                         }`}
                                     >
                                         🇺🇸 English
@@ -116,13 +117,13 @@ const Navbar: React.FC = () => {
 
                         {isAuthenticated && user ? (
                             <>
-                                {/* User Menu */}
+                                {/* Kullanıcı menüsü */}
                                 <div className="relative" ref={userMenuRef}>
                                     <button
                                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                        className="flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 hover:text-blue-800 transition-colors duration-200"
+                                        className="navbar-user-button"
                                     >
-                                        <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full">
+                                        <div className="navbar-user-avatar">
                                             <User className="w-4 h-4" />
                                         </div>
                                         <span className="text-sm font-medium">
@@ -132,45 +133,45 @@ const Navbar: React.FC = () => {
                                     </button>
 
                                     {isUserMenuOpen && (
-                                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                        <div className="navbar-dropdown user-dropdown">
                                             <Link
                                                 href="/profile"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
                                                 {t('navbar.profile')}
                                             </Link>
                                             <Link
                                                 href="/my-listings"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
                                                 {t('navbar.my-listings')}
                                             </Link>
                                             <Link
                                                 href="/favorites"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
                                                 {t('navbar.favorites')}
                                             </Link>
                                             <Link
                                                 href="/messages"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
                                                 {t('navbar.messages')}
                                             </Link>
                                             <Link
                                                 href="/settings"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
                                                 {t('navbar.settings')}
                                             </Link>
-                                            <hr className="my-1" />
+                                            <div className="navbar-dropdown-divider" />
                                             <button
-                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                className="navbar-dropdown-item"
                                                 onClick={handleLogout}
                                             >
                                                 {t('navbar.logout')}
@@ -179,27 +180,27 @@ const Navbar: React.FC = () => {
                                     )}
                                 </div>
 
-                                {/* Create Listing Button */}
+                                {/* İlan ver butonu */}
                                 <Link
                                     href="/create-listing"
-                                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium transition-colors hover:scale-105 transform inline-block duration-200"
+                                    className="navbar-create-listing-button"
                                 >
                                     {t('navbar.create-listing')}
                                 </Link>
                             </>
                         ) : (
                             <>
-                                {/* Login and Register buttons */}
+                                {/* Giriş ve Kayıt butonları */}
                                 <Link
                                     href="/authentication"
-                                    className="px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 hover:scale-105 transition-all duration-200 transform inline-block hover:text-blue-800"
+                                    className="navbar-auth-link"
                                 >
                                     {t('navbar.login')}
                                 </Link>
 
                                 <Link
                                     href="/create-listing"
-                                    className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                                    className="navbar-create-listing-button"
                                 >
                                     {t('navbar.create-listing')}
                                 </Link>
@@ -209,9 +210,9 @@ const Navbar: React.FC = () => {
                 </div>
             </div>
 
-            {/* Mobile menu (optional - can be added later) */}
-            <div className="md:hidden">
-                {/* Mobile navigation would go here */}
+            {/* Mobil menü placeholder */}
+            <div className="navbar-mobile-placeholder">
+                {/* Mobil navigasyon buraya eklenebilir */}
             </div>
         </nav>
     );

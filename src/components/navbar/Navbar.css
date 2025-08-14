@@ -1,0 +1,249 @@
+/* Navbar.css */
+.navbar-container {
+    background-color: #1e3a8a; /* blue-900 */
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-content {
+    max-width: 100%;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+    display: flex;
+    flex-direction: column; /* Varsayılan olarak column */
+    min-height: 64px; /* h-16 */
+}
+
+.navbar-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px; /* h-16 */
+}
+
+/* Sol grup - Logo */
+.navbar-left-group {
+    flex-shrink: 0;
+}
+
+.navbar-logo {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 700; /* font-bold */
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    transform-origin: left center;
+    display: inline-block;
+}
+
+.navbar-logo:hover {
+    color: #93c5fd; /* blue-200 */
+    transform: scale(1.1);
+}
+
+/* Sağ grup - Kullanıcı kontrolleri */
+.navbar-right-group {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* space-x-3 */
+}
+
+/* Orta grup - Ana navigasyon - Varsayılan olarak aşağıda */
+.navbar-center-group {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* space-x-1 */
+    justify-content: center;
+    padding: 16px 0; /* Üst ve alt padding */
+}
+
+/* 1024px ve üzeri için orta grup ana satırda ortalanmış */
+@media (min-width: 1024px) {
+    .navbar-content {
+        flex-direction: row; /* Desktop'ta tek satır */
+        align-items: center;
+        min-height: 64px;
+    }
+
+    .navbar-main-row {
+        width: 100%;
+        position: relative;
+        flex: 1;
+    }
+
+    .navbar-center-group {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        padding: 0; /* Desktop'ta padding kaldır */
+    }
+}
+
+/* Navigasyon linkleri */
+.navbar-nav-link {
+    padding: 8px 16px; /* px-4 py-2 */
+    border-radius: 6px; /* rounded-md */
+    font-size: 1rem; /* text-m */
+    font-weight: 500; /* font-medium */
+    text-decoration: none;
+    color: white;
+    transition: all 0.2s ease;
+    transform-origin: center;
+    display: inline-block;
+}
+
+.navbar-nav-link:hover {
+    background-color: #93c5fd; /* blue-200 */
+    color: #1e40af; /* blue-800 */
+    transform: scale(1.05);
+}
+
+/* Dil seçici butonu */
+.navbar-language-button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    transform-origin: center;
+    display: inline-flex;
+    align-items: center;
+}
+
+.navbar-language-button:hover {
+    background-color: #93c5fd;
+    color: #1e40af;
+    transform: scale(1.05);
+}
+
+/* Kullanıcı menüsü butonu */
+.navbar-user-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.navbar-user-button:hover {
+    background-color: #93c5fd;
+    color: #1e40af;
+}
+
+.navbar-user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: #2563eb; /* blue-600 */
+    border-radius: 50%;
+}
+
+/* Giriş/Kayıt linkleri */
+.navbar-auth-link {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: white;
+    transition: all 0.2s ease;
+    transform-origin: center;
+    display: inline-block;
+}
+
+.navbar-auth-link:hover {
+    background-color: #93c5fd;
+    color: #1e40af;
+    transform: scale(1.05);
+}
+
+/* İlan ver butonu */
+.navbar-create-listing-button {
+    background-color: #dc2626; /* red-600 */
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: white;
+    transition: all 0.2s ease;
+    transform-origin: center;
+    display: inline-block;
+}
+
+.navbar-create-listing-button:hover {
+    background-color: #b91c1c; /* red-700 */
+    transform: scale(1.05);
+}
+
+/* Dropdown menüler */
+.navbar-dropdown {
+    position: absolute;
+    right: 0;
+    margin-top: 8px;
+    width: 128px; /* w-32 for language, w-48 for user */
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 4px 0;
+    z-index: 50;
+}
+
+.navbar-dropdown.user-dropdown {
+    width: 192px; /* w-48 */
+}
+
+.navbar-dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    color: #374151; /* gray-700 */
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.navbar-dropdown-item:hover {
+    background-color: #f3f4f6; /* gray-100 */
+}
+
+.navbar-dropdown-item.active {
+    background-color: #dbeafe; /* blue-50 */
+    color: #1d4ed8; /* blue-700 */
+}
+
+.navbar-dropdown-divider {
+    height: 1px;
+    background-color: #e5e7eb; /* gray-200 */
+    margin: 4px 0;
+}
+
+/* Responsive için mobil menü gizleme */
+.navbar-mobile-placeholder {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .navbar-mobile-placeholder {
+        display: none;
+    }
+}
