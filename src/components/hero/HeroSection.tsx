@@ -1,11 +1,12 @@
+// src/components/hero/HeroSection.tsx
 'use client';
 
 import React from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { Search } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
-    const { t } = useLanguage();
+    const { t } = useAppTranslation();
 
     return (
         <section className="relative bg-gradient-to-br from-gray-600 via-gray-500 to-gray-700 text-white py-16">

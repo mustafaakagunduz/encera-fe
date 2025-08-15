@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/store/api/authApi';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { Mail, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 
 interface ForgotPasswordFormProps {
@@ -11,6 +12,7 @@ interface ForgotPasswordFormProps {
 }
 
 const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onModeChange }) => {
+    const { t } = useAppTranslation();
     const [forgotPassword] = authApi.useForgotPasswordMutation();
 
     const [email, setEmail] = useState('');
@@ -22,9 +24,9 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onModeChange })
         const newErrors: Record<string, string> = {};
 
         if (!email) {
-            newErrors.email = 'Email adresi gereklidir';
+            newErrors.email = t('auth.errors.email-required');
         } else if (!/\S+@\S+\.\S+/.test(email)) {
-            newErrors.email = 'Geçerli bir email adresi giriniz';
+            newErrors.email = t('auth.errors.email-invalid');
         }
 
         setErrors(newErrors);
@@ -48,7 +50,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onModeChange })
             }
         } catch (error: any) {
             console.error('Forgot password error:', error);
-            const errorMessage = error.data?.message || 'Şifre sıfırlama talebi gönderilirken hata oluştu';
+            const errorMessage = error.data?.message || t('auth.errors.email-required');
             setErrors({ general: errorMessage });
         } finally {
             setIsLoading(false);
@@ -72,18 +74,17 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onModeChange })
                 </div>
                 <div>
                     <h3 className="text-lg font-medium text-green-600 mb-2">
-                        Email Gönderildi!
+                        {t('auth.forgot-password.email-sent-title')}
                     </h3>
                     <p className="text-sm text-gray-600 mb-4">
-                        Eğer <span className="font-medium">{email}</span> adresi sistemde kayıtlı ise,
-                        şifre sıfırlama bağlantısı gönderilmiştir.
+                        {t('auth.forgot-password.email-sent-description', { email })}
                     </p>
                     <p className="text-xs text-gray-500 mb-6">
-                        Email gelmediyse spam klasörünüzü kontrol edin.
+                        {t('auth.forgot-password.check-spam')}
                     </p>
                     <Button onClick={() => onModeChange('login')} variant="outline">
                         <ArrowLeft className="w-4 h-4 mr-2" />
-                        Giriş Sayfasına Dön
+                        {t('auth.forgot-password.back-to-login')}
                     </Button>
                 </div>
             </div>
@@ -97,10 +98,10 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onModeChange })
                     <Mail className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Şifremi Unuttum
+                    {t('auth.forgot-password.title')}
                 </h3>
                 <p className="text-sm text-gray-600">
-                    Email adresinizi girin, size şifre sıfırlama bağlantısı gönderelim.
+                    {t('auth.forgot-password.description')}
                 </p>
             </div>
 
@@ -114,7 +115,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onModeChange })
             {/* Email */}
             <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Adresi
+                    {t('auth.email')}
                 </label>
                 <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -142,7 +143,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onModeChange })
                 className="w-full bg-blue-900 hover:bg-blue-800"
                 disabled={isLoading}
             >
-                {isLoading ? 'Gönderiliyor...' : 'Şifre Sıfırlama Linki Gönder'}
+                {isLoading ? t('auth.forgot-password.sending') : t('auth.forgot-password.send-reset-link')}
             </Button>
 
             {/* Back to Login */}
@@ -153,7 +154,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onModeChange })
                     className="inline-flex items-center text-sm text-blue-600 hover:text-blue-500"
                 >
                     <ArrowLeft className="w-4 h-4 mr-1" />
-                    Giriş sayfasına dön
+                    {t('auth.forgot-password.back-to-login')}
                 </button>
             </div>
         </form>

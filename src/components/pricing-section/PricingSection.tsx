@@ -1,12 +1,13 @@
+// src/components/pricing-section/PricingSection.tsx
 'use client';
 
 import React from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 const PricingSection: React.FC = () => {
-    const { t } = useLanguage();
+    const { t } = useAppTranslation();
 
     const pricingPlans = [
         {

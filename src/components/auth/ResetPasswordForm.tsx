@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/store/api/authApi';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { Eye, EyeOff, Lock, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
 interface ResetPasswordFormProps {
@@ -12,6 +13,7 @@ interface ResetPasswordFormProps {
 }
 
 const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess }) => {
+    const { t } = useAppTranslation();
     const [validateResetToken] = authApi.useLazyValidateResetTokenQuery();
     const [resetPassword] = authApi.useResetPasswordMutation();
 
@@ -53,15 +55,15 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
         const newErrors: Record<string, string> = {};
 
         if (!formData.newPassword) {
-            newErrors.newPassword = 'Yeni şifre gereklidir';
+            newErrors.newPassword = t('auth.errors.password-required');
         } else if (formData.newPassword.length < 6) {
-            newErrors.newPassword = 'Şifre en az 6 karakter olmalıdır';
+            newErrors.newPassword = t('auth.errors.password-min-length');
         }
 
         if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Şifre tekrarı gereklidir';
+            newErrors.confirmPassword = t('auth.errors.password-confirm-required');
         } else if (formData.newPassword !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Şifreler eşleşmiyor';
+            newErrors.confirmPassword = t('auth.errors.passwords-not-match');
         }
 
         setErrors(newErrors);
@@ -89,7 +91,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
             }
         } catch (error: any) {
             console.error('Reset password error:', error);
-            const errorMessage = error.data?.message || 'Şifre sıfırlanırken hata oluştu';
+            const errorMessage = error.data?.message || t('auth.errors.password-required');
             setErrors({ general: errorMessage });
         } finally {
             setIsLoading(false);
@@ -117,7 +119,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
                     <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
                 </div>
                 <p className="text-sm text-gray-600">
-                    Token doğrulanıyor...
+                    {t('auth.reset-password.validating-token')}
                 </p>
             </div>
         );
@@ -132,16 +134,16 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
                 </div>
                 <div>
                     <h3 className="text-lg font-medium text-red-600 mb-2">
-                        Geçersiz Bağlantı
+                        {t('auth.reset-password.invalid-token-title')}
                     </h3>
                     <p className="text-sm text-gray-600 mb-4">
-                        Bu şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.
+                        {t('auth.reset-password.invalid-token-description')}
                     </p>
                     <p className="text-xs text-gray-500 mb-6">
-                        Lütfen yeni bir şifre sıfırlama talebi oluşturun.
+                        {t('auth.reset-password.invalid-token-help')}
                     </p>
                     <Button onClick={() => window.location.href = '/authentication?mode=forgot-password'}>
-                        Yeni Talep Oluştur
+                        {t('auth.reset-password.create-new-request')}
                     </Button>
                 </div>
             </div>
@@ -157,10 +159,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
                 </div>
                 <div>
                     <h3 className="text-lg font-medium text-green-600 mb-2">
-                        Şifre Başarıyla Sıfırlandı!
+                        {t('auth.reset-password.success-title')}
                     </h3>
                     <p className="text-sm text-gray-600">
-                        Şifreniz başarıyla güncellendi. Giriş sayfasına yönlendiriliyorsunuz...
+                        {t('auth.reset-password.success-description')}
                     </p>
                 </div>
             </div>
@@ -174,10 +176,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
                     <Lock className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Yeni Şifre Belirle
+                    {t('auth.reset-password.title')}
                 </h3>
                 <p className="text-sm text-gray-600">
-                    Hesabınız için yeni bir şifre belirleyin.
+                    {t('auth.reset-password.description')}
                 </p>
             </div>
 
@@ -191,7 +193,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
             {/* New Password */}
             <div>
                 <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                    Yeni Şifre
+                    {t('auth.new-password')}
                 </label>
                 <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -223,7 +225,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
             {/* Confirm Password */}
             <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                    Şifre Tekrar
+                    {t('auth.reset-password.password-repeat')}
                 </label>
                 <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -258,7 +260,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token, onSuccess 
                 className="w-full bg-blue-900 hover:bg-blue-800"
                 disabled={isLoading}
             >
-                {isLoading ? 'Şifre güncelleniyor...' : 'Şifreyi Güncelle'}
+                {isLoading ? t('auth.reset-password.updating-password') : t('auth.reset-password.update-password')}
             </Button>
         </form>
     );

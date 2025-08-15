@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
-import { LanguageProvider } from "@/context/LanguageContext";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
+// import '@/lib/i18n'; // Bu satırı kaldırın
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -31,13 +31,11 @@ export default function RootLayout({
         <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-            <LanguageProvider>
-                <Navbar />
-                <main className="min-h-screen">
-                    {children}
-                </main>
-                <Footer />
-            </LanguageProvider>
+            <Navbar />
+            <main className="min-h-screen">
+                {children}
+            </main>
+            <Footer />
         </Providers>
         </body>
         </html>

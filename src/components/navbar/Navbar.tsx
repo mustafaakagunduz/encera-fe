@@ -4,14 +4,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useLanguage } from "@/context/LanguageContext";
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { ChevronDown, User, Globe } from 'lucide-react';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
-    const { language, setLanguage, t } = useLanguage();
+    const { t, language, changeLanguage, isReady } = useAppTranslation();
     const { isAuthenticated, user } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const router = useRouter();
@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
     ];
 
     const handleLanguageChange = (lang: 'tr' | 'en') => {
-        setLanguage(lang);
+        changeLanguage(lang);
         setIsLanguageMenuOpen(false);
     };
 
@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
                     {/* Sol grup - Logo */}
                     <div className="navbar-left-group">
                         <Link href="/" className="navbar-logo">
-                            {t('navbar.brand')}
+                            {isReady ? t('navbar.brand') : 'PAPP'}
                         </Link>
                     </div>
 
@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
                                 href={item.href}
                                 className="navbar-nav-link"
                             >
-                                {t(item.key)}
+                                {isReady ? t(item.key) : getStaticText(item.key)}
                             </Link>
                         ))}
                     </div>
@@ -139,42 +139,42 @@ const Navbar: React.FC = () => {
                                                 className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
-                                                {t('navbar.profile')}
+                                                {isReady ? t('navbar.profile') : 'Profil'}
                                             </Link>
                                             <Link
                                                 href="/my-listings"
                                                 className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
-                                                {t('navbar.my-listings')}
+                                                {isReady ? t('navbar.my-listings') : 'İlanlarım'}
                                             </Link>
                                             <Link
                                                 href="/favorites"
                                                 className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
-                                                {t('navbar.favorites')}
+                                                {isReady ? t('navbar.favorites') : 'Favoriler'}
                                             </Link>
                                             <Link
                                                 href="/messages"
                                                 className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
-                                                {t('navbar.messages')}
+                                                {isReady ? t('navbar.messages') : 'Mesajlar'}
                                             </Link>
                                             <Link
                                                 href="/settings"
                                                 className="navbar-dropdown-item"
                                                 onClick={() => setIsUserMenuOpen(false)}
                                             >
-                                                {t('navbar.settings')}
+                                                {isReady ? t('navbar.settings') : 'Ayarlar'}
                                             </Link>
                                             <div className="navbar-dropdown-divider" />
                                             <button
                                                 className="navbar-dropdown-item"
                                                 onClick={handleLogout}
                                             >
-                                                {t('navbar.logout')}
+                                                {isReady ? t('navbar.logout') : 'Çıkış Yap'}
                                             </button>
                                         </div>
                                     )}
@@ -185,7 +185,7 @@ const Navbar: React.FC = () => {
                                     href="/create-listing"
                                     className="navbar-create-listing-button"
                                 >
-                                    {t('navbar.create-listing')}
+                                    {isReady ? t('navbar.create-listing') : 'İlan Ver'}
                                 </Link>
                             </>
                         ) : (
@@ -195,14 +195,14 @@ const Navbar: React.FC = () => {
                                     href="/authentication"
                                     className="navbar-auth-link"
                                 >
-                                    {t('navbar.login')}
+                                    {isReady ? t('navbar.login') : 'Üye Ol / Giriş Yap'}
                                 </Link>
 
                                 <Link
                                     href="/create-listing"
                                     className="navbar-create-listing-button"
                                 >
-                                    {t('navbar.create-listing')}
+                                    {isReady ? t('navbar.create-listing') : 'İlan Ver'}
                                 </Link>
                             </>
                         )}
@@ -216,6 +216,17 @@ const Navbar: React.FC = () => {
             </div>
         </nav>
     );
+};
+
+// Hydration sırasında kullanılacak static metinler (Türkçe default)
+const getStaticText = (key: string): string => {
+    const staticTexts: Record<string, string> = {
+        'navbar.listings': 'Konut',
+        'navbar.jobs': 'İş Yeri',
+        'navbar.land': 'Arsa',
+        'navbar.rental': 'Günlük Kiralık',
+    };
+    return staticTexts[key] || key;
 };
 
 export default Navbar;

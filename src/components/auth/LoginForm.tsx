@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLanguage } from '@/context/LanguageContext';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/store/api/authApi';
 import { setCredentials, setError, setPendingVerificationEmail } from '@/store/slices/authSlice';
@@ -15,7 +15,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
-    const { t } = useLanguage();
+    const { t, isReady } = useAppTranslation();
     const router = useRouter();
     const dispatch = useAppDispatch();
     const [login] = authApi.useLoginMutation();
@@ -33,13 +33,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
         const newErrors: Record<string, string> = {};
 
         if (!formData.email) {
-            newErrors.email = 'Email adresi gereklidir';
+            newErrors.email = isReady ? t('auth.errors.email-required') : 'Email adresi gereklidir';
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Geçerli bir email adresi giriniz';
+            newErrors.email = isReady ? t('auth.errors.email-invalid') : 'Geçerli bir email adresi giriniz';
         }
 
         if (!formData.password) {
-            newErrors.password = 'Şifre gereklidir';
+            newErrors.password = isReady ? t('auth.errors.password-required') : 'Şifre gereklidir';
         }
 
         setErrors(newErrors);
@@ -74,7 +74,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
                 dispatch(setPendingVerificationEmail(formData.email));
                 onModeChange('verify');
             } else {
-                const errorMessage = error.data?.message || 'Giriş yapılırken hata oluştu';
+                const errorMessage = error.data?.message || (isReady ? t('auth.errors.invalid-verification-code') : 'Giriş yapılırken hata oluştu');
                 dispatch(setError(errorMessage));
                 setErrors({ general: errorMessage });
             }
@@ -108,7 +108,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
             {/* Email */}
             <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('auth.email')}
+                    {isReady ? t('auth.email') : 'E-posta'}
                 </label>
                 <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -133,7 +133,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
             {/* Password */}
             <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('auth.password')}
+                    {isReady ? t('auth.password') : 'Şifre'}
                 </label>
                 <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -164,13 +164,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
 
             {/* Forgot Password */}
             <div className="flex items-center justify-end">
-
                 <button
                     type="button"
                     onClick={() => onModeChange('forgot-password')}
                     className="text-sm text-blue-600 hover:text-blue-500"
                 >
-                    {t('auth.forgot-password')}
+                    {isReady ? t('auth.forgot-password') : 'Şifremi Unuttum'}
                 </button>
             </div>
 
@@ -180,7 +179,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
                 className="w-full bg-blue-900 hover:bg-blue-800"
                 disabled={isLoading}
             >
-                {isLoading ? 'Giriş yapılıyor...' : t('auth.login')}
+                {isLoading ?
+                    (isReady ? 'Giriş yapılıyor...' : 'Giriş yapılıyor...') :
+                    (isReady ? t('auth.login') : 'Giriş Yap')
+                }
             </Button>
 
             {/* Social Login Buttons */}
@@ -227,13 +229,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
             {/* Register Link */}
             <div className="text-center">
                 <span className="text-sm text-gray-600">
-                    {t('auth.dont-have-account')}{' '}
+                    {isReady ? t('auth.dont-have-account') : 'Hesabınız yok mu?'}{' '}
                     <button
                         type="button"
                         onClick={() => onModeChange('register')}
                         className="text-blue-600 hover:text-blue-500 font-medium"
                     >
-                        {t('auth.register')}
+                        {isReady ? t('auth.register') : 'Kayıt Ol'}
                     </button>
                 </span>
             </div>

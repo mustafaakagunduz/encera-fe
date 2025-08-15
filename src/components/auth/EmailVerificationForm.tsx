@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { authApi } from '@/store/api/authApi';
 import { setCredentials, setPendingVerificationEmail } from '@/store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { AlertCircle, CheckCircle, Mail, RefreshCw } from 'lucide-react';
 
 interface EmailVerificationFormProps {
@@ -14,6 +15,7 @@ interface EmailVerificationFormProps {
 }
 
 const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess, onModeChange }) => {
+    const { t } = useAppTranslation();
     const dispatch = useAppDispatch();
     const { pendingVerificationEmail } = useAppSelector((state) => state.auth);
     const [verifyEmail] = authApi.useVerifyEmailMutation();
@@ -83,13 +85,13 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
         const code = verificationCode.join('');
 
         if (!pendingVerificationEmail) {
-            newErrors.general = 'Email adresi bulunamadı. Lütfen tekrar kayıt olun.';
+            newErrors.general = t('auth.email-verification.email-not-found-description');
         }
 
         if (code.length !== 6) {
-            newErrors.verificationCode = 'Doğrulama kodu 6 haneli olmalıdır';
+            newErrors.verificationCode = t('auth.errors.verification-code-length');
         } else if (!/^\d{6}$/.test(code)) {
-            newErrors.verificationCode = 'Doğrulama kodu sadece rakamlardan oluşmalıdır';
+            newErrors.verificationCode = t('auth.errors.verification-code-numeric');
         }
 
         setErrors(newErrors);
@@ -119,7 +121,7 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
             }
         } catch (error: any) {
             console.error('Verification error:', error);
-            const errorMessage = error.data?.message || 'Doğrulama kodunu kontrol ederken hata oluştu';
+            const errorMessage = error.data?.message || t('auth.errors.invalid-verification-code');
             setErrors({ general: errorMessage });
         } finally {
             setIsLoading(false);
@@ -142,7 +144,7 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
             setTimeout(() => setResendSuccess(false), 3000);
         } catch (error: any) {
             console.error('Resend error:', error);
-            const errorMessage = error.data?.message || 'Kod gönderilirken hata oluştu';
+            const errorMessage = error.data?.message || t('auth.errors.invalid-verification-code');
             setErrors({ general: errorMessage });
         } finally {
             setResendLoading(false);
@@ -157,13 +159,13 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
                 </div>
                 <div>
                     <h3 className="text-lg font-medium text-red-600 mb-2">
-                        Email Adresi Bulunamadı
+                        {t('auth.email-verification.email-not-found-title')}
                     </h3>
                     <p className="text-sm text-gray-600 mb-4">
-                        Doğrulama yapabilmek için önce kayıt olmanız gerekiyor.
+                        {t('auth.email-verification.email-not-found-description')}
                     </p>
                     <Button onClick={() => onModeChange('register')}>
-                        Kayıt Ol
+                        {t('auth.register')}
                     </Button>
                 </div>
             </div>
@@ -177,11 +179,10 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
                     <Mail className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Email Doğrulama
+                    {t('auth.email-verification.title')}
                 </h3>
                 <p className="text-sm text-gray-600">
-                    <span className="font-medium">{pendingVerificationEmail}</span> adresine
-                    gönderilen 6 haneli doğrulama kodunu giriniz.
+                    <span className="font-medium">{pendingVerificationEmail}</span> {t('auth.email-verification.description')}
                 </p>
             </div>
 
@@ -195,14 +196,14 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
             {resendSuccess && (
                 <div className="bg-green-50 border border-green-200 rounded-md p-3 flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-green-600">Yeni doğrulama kodu gönderildi!</span>
+                    <span className="text-sm text-green-600">{t('auth.email-verification.new-code-sent')}</span>
                 </div>
             )}
 
             {/* Verification Code Input */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3 text-center">
-                    Doğrulama Kodu
+                    {t('auth.verification-code')}
                 </label>
                 <div className="flex justify-center space-x-2">
                     {verificationCode.map((digit, index) => (
@@ -233,13 +234,13 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
                 className="w-full bg-blue-900 hover:bg-blue-800"
                 disabled={isLoading}
             >
-                {isLoading ? 'Doğrulanıyor...' : 'Doğrula'}
+                {isLoading ? t('auth.email-verification.verifying') : t('auth.verify')}
             </Button>
 
             {/* Resend Code */}
             <div className="text-center">
                 <p className="text-sm text-gray-600 mb-2">
-                    Kod gelmedi mi?
+                    {t('auth.email-verification.code-not-received')}
                 </p>
                 <Button
                     type="button"
@@ -251,12 +252,12 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
                     {resendLoading ? (
                         <>
                             <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                            Gönderiliyor...
+                            {t('auth.email-verification.sending')}
                         </>
                     ) : resendCooldown > 0 ? (
-                        `Tekrar gönder (${resendCooldown}s)`
+                        t('auth.email-verification.resend-cooldown', { seconds: resendCooldown })
                     ) : (
-                        'Kodu Tekrar Gönder'
+                        t('auth.resend-code')
                     )}
                 </Button>
             </div>
@@ -268,7 +269,7 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({ onSuccess
                     onClick={() => onModeChange('login')}
                     className="text-sm text-blue-600 hover:text-blue-500"
                 >
-                    Giriş sayfasına dön
+                    {t('auth.email-verification.back-to-login')}
                 </button>
             </div>
         </form>

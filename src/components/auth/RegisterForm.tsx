@@ -2,12 +2,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/store/api/authApi';
 import { setPendingVerificationEmail } from '@/store/slices/authSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
+import {useAppTranslation} from "@/hooks/useAppTranslation";
 
 interface RegisterFormProps {
     onSuccess: () => void;
@@ -15,7 +15,7 @@ interface RegisterFormProps {
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) => {
-    const { t } = useLanguage();
+    const { t } = useAppTranslation();
     const dispatch = useAppDispatch();
     const [register] = authApi.useRegisterMutation();
 

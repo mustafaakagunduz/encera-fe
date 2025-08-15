@@ -3,7 +3,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useLanguage } from '@/context/LanguageContext';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
@@ -11,11 +10,12 @@ import EmailVerificationForm from '@/components/auth/EmailVerificationForm';
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
 import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
 import { useAppSelector } from '@/store/hooks';
+import {useAppTranslation} from "@/hooks/useAppTranslation";
 
 type AuthMode = 'login' | 'register' | 'verify' | 'forgot-password' | 'reset-password';
 
 const AuthenticationContent: React.FC = () => {
-    const { t } = useLanguage();
+    const { t } = useAppTranslation();
     const router = useRouter();
     const searchParams = useSearchParams();
     const { isAuthenticated, pendingVerificationEmail } = useAppSelector((state) => state.auth);
