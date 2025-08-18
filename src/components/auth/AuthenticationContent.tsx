@@ -10,18 +10,23 @@ import EmailVerificationForm from '@/components/auth/EmailVerificationForm';
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
 import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
 import { useAppSelector } from '@/store/hooks';
-import {useAppTranslation} from "@/hooks/useAppTranslation";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 
 type AuthMode = 'login' | 'register' | 'verify' | 'forgot-password' | 'reset-password';
 
 const AuthenticationContent: React.FC = () => {
-    const { t } = useAppTranslation();
+    const { t, isReady } = useAppTranslation();
     const router = useRouter();
     const searchParams = useSearchParams();
     const { isAuthenticated, pendingVerificationEmail } = useAppSelector((state) => state.auth);
 
     const [mode, setMode] = useState<AuthMode>('login');
     const [resetToken, setResetToken] = useState<string | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
         // Redirect if authenticated
@@ -53,15 +58,31 @@ const AuthenticationContent: React.FC = () => {
     };
 
     const getTitle = () => {
+        // Hydration güvenli fallback değerleri
+        if (!isMounted || !isReady) {
+            switch (mode) {
+                case 'register':
+                    return 'Kayıt Ol';
+                case 'verify':
+                    return 'Email Doğrulama';
+                case 'forgot-password':
+                    return 'Şifremi Unuttum';
+                case 'reset-password':
+                    return 'Şifre Sıfırla';
+                default:
+                    return 'Giriş Yap';
+            }
+        }
+
         switch (mode) {
             case 'register':
                 return t('auth.register');
             case 'verify':
                 return 'Email Doğrulama';
             case 'forgot-password':
-                return t('auth.forgot-password');
+                return t('auth.forgot-password.title');
             case 'reset-password':
-                return 'Şifre Sıfırla';
+                return t('auth.reset-password.title');
             default:
                 return t('auth.login');
         }

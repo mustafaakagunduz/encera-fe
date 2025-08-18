@@ -43,13 +43,19 @@
 
   "auth": {
     "login": "Giriş Yap",
+    "registering": "Kayıt yapılıyor...",
+    "placeholders": {
+      "first-name": "Adınız",
+      "last-name": "Soyadınız",
+      "email": "ornek@email.com"
+    },
     "register": "Kayıt Ol",
     "email": "E-posta",
     "password": "Şifre",
     "confirm-password": "Şifre Tekrar",
     "first-name": "Ad",
     "last-name": "Soyad",
-    "forgot-password": "Şifremi Unuttum",
+    "forgot-password-link": "Şifremi Unuttum",
     "remember-me": "Beni Hatırla",
     "already-have-account": "Zaten hesabınız var mı?",
     "dont-have-account": "Hesabınız yok mu?",
@@ -57,7 +63,7 @@
     "resend-code": "Kodu Tekrar Gönder",
     "verify": "Doğrula",
     "new-password": "Yeni Şifre",
-    "reset-password": "Şifre Sıfırla",
+    "reset-password-link": "Şifre Sıfırla",
     "email-verification": {
       "title": "Email Doğrulama",
       "description": "adresine gönderilen 6 haneli doğrulama kodunu giriniz.",
@@ -97,19 +103,15 @@
       "password-repeat": "Şifre Tekrar"
     },
     "errors": {
+      "first-name-required": "Ad gereklidir",
+      "last-name-required": "Soyad gereklidir",
       "email-required": "Email adresi gereklidir",
       "email-invalid": "Geçerli bir email adresi giriniz",
       "password-required": "Şifre gereklidir",
       "password-min-length": "Şifre en az 6 karakter olmalıdır",
-      "password-confirm-required": "Şifre tekrarı gereklidir",
+      "confirm-password-required": "Şifre tekrarı gereklidir",
       "passwords-not-match": "Şifreler eşleşmiyor",
-      "verification-code-required": "Doğrulama kodu gereklidir",
-      "verification-code-length": "Doğrulama kodu 6 haneli olmalıdır",
-      "verification-code-numeric": "Doğrulama kodu sadece rakamlardan oluşmalıdır",
-      "invalid-verification-code": "Geçersiz doğrulama kodu",
-      "verification-code-expired": "Doğrulama kodunun süresi dolmuş. Yeni kod talep edin.",
-      "too-many-attempts": "Çok fazla hatalı deneme yapıldı. Lütfen 15 dakika sonra tekrar deneyin.",
-      "reset-token-required": "Reset token boş olamaz"
+      "register-failed": "Kayıt olurken hata oluştu"
     }
   },
 

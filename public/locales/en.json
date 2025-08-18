@@ -43,13 +43,19 @@
 
   "auth": {
     "login": "Login",
+    "registering": "Registering...",
+    "placeholders": {
+      "first-name": "Your first name",
+      "last-name": "Your last name",
+      "email": "example@email.com"
+    },
     "register": "Sign Up",
     "email": "Email",
     "password": "Password",
     "confirm-password": "Confirm Password",
     "first-name": "First Name",
     "last-name": "Last Name",
-    "forgot-password": "Forgot Password",
+    "forgot-password-link": "Forgot Password",
     "remember-me": "Remember Me",
     "already-have-account": "Already have an account?",
     "dont-have-account": "Don't have an account?",
@@ -57,7 +63,7 @@
     "resend-code": "Resend Code",
     "verify": "Verify",
     "new-password": "New Password",
-    "reset-password": "Reset Password",
+    "reset-password-link": "Reset Password",
     "email-verification": {
       "title": "Email Verification",
       "description": "Enter the 6-digit verification code sent to",
@@ -97,19 +103,15 @@
       "password-repeat": "Confirm Password"
     },
     "errors": {
-      "email-required": "Email is required",
+      "first-name-required": "First name is required",
+      "last-name-required": "Last name is required",
+      "email-required": "Email address is required",
       "email-invalid": "Please enter a valid email address",
       "password-required": "Password is required",
       "password-min-length": "Password must be at least 6 characters",
-      "password-confirm-required": "Password confirmation is required",
+      "confirm-password-required": "Password confirmation is required",
       "passwords-not-match": "Passwords do not match",
-      "verification-code-required": "Verification code is required",
-      "verification-code-length": "Verification code must be 6 digits",
-      "verification-code-numeric": "Verification code must contain only numbers",
-      "invalid-verification-code": "Invalid verification code",
-      "verification-code-expired": "Verification code has expired. Please request a new code.",
-      "too-many-attempts": "Too many failed attempts. Please try again in 15 minutes.",
-      "reset-token-required": "Reset token cannot be empty"
+      "register-failed": "Registration failed"
     }
   },
 

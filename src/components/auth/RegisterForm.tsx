@@ -1,7 +1,7 @@
 // src/components/auth/RegisterForm.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/store/api/authApi';
 import { setPendingVerificationEmail } from '@/store/slices/authSlice';
@@ -15,7 +15,7 @@ interface RegisterFormProps {
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) => {
-    const { t } = useAppTranslation();
+    const { t, isReady } = useAppTranslation();
     const dispatch = useAppDispatch();
     const [register] = authApi.useRegisterMutation();
 
@@ -31,34 +31,39 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
 
         if (!formData.firstName.trim()) {
-            newErrors.firstName = 'Ad gereklidir';
+            newErrors.firstName = isReady ? t('auth.errors.first-name-required') : 'Ad gereklidir';
         }
 
         if (!formData.lastName.trim()) {
-            newErrors.lastName = 'Soyad gereklidir';
+            newErrors.lastName = isReady ? t('auth.errors.last-name-required') : 'Soyad gereklidir';
         }
 
         if (!formData.email) {
-            newErrors.email = 'Email adresi gereklidir';
+            newErrors.email = isReady ? t('auth.errors.email-required') : 'Email adresi gereklidir';
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Geçerli bir email adresi giriniz';
+            newErrors.email = isReady ? t('auth.errors.email-invalid') : 'Geçerli bir email adresi giriniz';
         }
 
         if (!formData.password) {
-            newErrors.password = 'Şifre gereklidir';
+            newErrors.password = isReady ? t('auth.errors.password-required') : 'Şifre gereklidir';
         } else if (formData.password.length < 6) {
-            newErrors.password = 'Şifre en az 6 karakter olmalıdır';
+            newErrors.password = isReady ? t('auth.errors.password-min-length') : 'Şifre en az 6 karakter olmalıdır';
         }
 
         if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Şifre tekrarı gereklidir';
+            newErrors.confirmPassword = isReady ? t('auth.errors.confirm-password-required') : 'Şifre tekrarı gereklidir';
         } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Şifreler eşleşmiyor';
+            newErrors.confirmPassword = isReady ? t('auth.errors.passwords-not-match') : 'Şifreler eşleşmiyor';
         }
 
         setErrors(newErrors);
@@ -89,7 +94,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
 
         } catch (error: any) {
             console.error('Register error:', error);
-            const errorMessage = error.data?.message || 'Kayıt olurken hata oluştu';
+            const errorMessage = error.data?.message || (isReady ? t('auth.errors.register-failed') : 'Kayıt olurken hata oluştu');
             setErrors({ general: errorMessage });
         } finally {
             setIsLoading(false);
@@ -117,11 +122,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
                 </div>
                 <div>
                     <h3 className="text-lg font-medium text-green-600 mb-2">
-                        Kayıt Başarılı!
+                        {isReady ? t('auth.email-verification.success-title') : 'Kayıt Başarılı!'}
                     </h3>
                     <p className="text-sm text-gray-600">
-                        Email adresinize doğrulama kodu gönderildi.
-                        Email doğrulama sayfasına yönlendiriliyorsunuz...
+                        {isReady ? t('auth.email-verification.success-description') : 'Email adresinize doğrulama kodu gönderildi. Email doğrulama sayfasına yönlendiriliyorsunuz...'}
                     </p>
                 </div>
             </div>
@@ -140,7 +144,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             {/* First Name */}
             <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('auth.first-name')}
+                    {isReady ? t('auth.first-name') : 'Ad'}
                 </label>
                 <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -154,7 +158,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
                         className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                             errors.firstName ? 'border-red-300' : 'border-gray-300'
                         }`}
-                        placeholder="Adınız"
+                        placeholder={isReady ? t('auth.placeholders.first-name') : 'Adınız'}
                     />
                 </div>
                 {errors.firstName && (
@@ -165,7 +169,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             {/* Last Name */}
             <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('auth.last-name')}
+                    {isReady ? t('auth.last-name') : 'Soyad'}
                 </label>
                 <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -179,7 +183,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
                         className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                             errors.lastName ? 'border-red-300' : 'border-gray-300'
                         }`}
-                        placeholder="Soyadınız"
+                        placeholder={isReady ? t('auth.placeholders.last-name') : 'Soyadınız'}
                     />
                 </div>
                 {errors.lastName && (
@@ -190,7 +194,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             {/* Email */}
             <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('auth.email')}
+                    {isReady ? t('auth.email') : 'E-posta'}
                 </label>
                 <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -204,7 +208,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
                         className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                             errors.email ? 'border-red-300' : 'border-gray-300'
                         }`}
-                        placeholder="ornek@email.com"
+                        placeholder={isReady ? t('auth.placeholders.email') : 'ornek@email.com'}
                     />
                 </div>
                 {errors.email && (
@@ -215,7 +219,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             {/* Password */}
             <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('auth.password')}
+                    {isReady ? t('auth.password') : 'Şifre'}
                 </label>
                 <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -247,7 +251,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             {/* Confirm Password */}
             <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('auth.confirm-password')}
+                    {isReady ? t('auth.confirm-password') : 'Şifre Tekrar'}
                 </label>
                 <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -282,19 +286,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
                 className="w-full bg-blue-900 hover:bg-blue-800"
                 disabled={isLoading}
             >
-                {isLoading ? 'Kayıt yapılıyor...' : t('auth.register')}
+                {isLoading ?
+                    (isReady ? t('auth.registering') : 'Kayıt yapılıyor...') :
+                    (isReady ? t('auth.register') : 'Kayıt Ol')
+                }
             </Button>
 
             {/* Login Link */}
             <div className="text-center">
                 <span className="text-sm text-gray-600">
-                    {t('auth.already-have-account')}{' '}
+                    {isReady ? t('auth.already-have-account') : 'Zaten hesabınız var mı?'}{' '}
                     <button
                         type="button"
                         onClick={() => onModeChange('login')}
                         className="text-blue-600 hover:text-blue-500 font-medium"
                     >
-                        {t('auth.login')}
+                        {isReady ? t('auth.login') : 'Giriş Yap'}
                     </button>
                 </span>
             </div>

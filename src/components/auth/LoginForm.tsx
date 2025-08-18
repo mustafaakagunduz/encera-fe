@@ -169,7 +169,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
                     onClick={() => onModeChange('forgot-password')}
                     className="text-sm text-blue-600 hover:text-blue-500"
                 >
-                    {isReady ? t('auth.forgot-password') : 'Şifremi Unuttum'}
+                    {isReady ? t('auth.forgot-password-link') : 'Şifremi Unuttum'}
                 </button>
             </div>
 
