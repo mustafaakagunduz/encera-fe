@@ -16,6 +16,16 @@ const Navbar: React.FC = () => {
     const dispatch = useAppDispatch();
     const router = useRouter();
 
+    const handleCreateListing = () => {
+        if (!isAuthenticated) {
+            // Giriş yapılmamışsa authentication sayfasına yönlendir
+            router.push('/authentication');
+        } else {
+            // Giriş yapılmışsa create-listing sayfasına yönlendir
+            router.push('/create-listing');
+        }
+    };
+
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
@@ -181,12 +191,12 @@ const Navbar: React.FC = () => {
                                 </div>
 
                                 {/* İlan ver butonu */}
-                                <Link
-                                    href="/create-listing"
+                                <button
+                                    onClick={handleCreateListing}
                                     className="navbar-create-listing-button"
                                 >
                                     {isReady ? t('navbar.create-listing') : 'İlan Ver'}
-                                </Link>
+                                </button>
                             </>
                         ) : (
                             <>
@@ -198,12 +208,12 @@ const Navbar: React.FC = () => {
                                     {isReady ? t('navbar.login') : 'Üye Ol / Giriş Yap'}
                                 </Link>
 
-                                <Link
-                                    href="/create-listing"
+                                <button
+                                    onClick={handleCreateListing}
                                     className="navbar-create-listing-button"
                                 >
                                     {isReady ? t('navbar.create-listing') : 'İlan Ver'}
-                                </Link>
+                                </button>
                             </>
                         )}
                     </div>
