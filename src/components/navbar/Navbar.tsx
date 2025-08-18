@@ -12,19 +12,9 @@ import './Navbar.css';
 
 const Navbar: React.FC = () => {
     const { t, language, changeLanguage, isReady } = useAppTranslation();
-    const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, user, isHydrated } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const router = useRouter();
-
-    const handleCreateListing = () => {
-        if (!isAuthenticated) {
-            // Giriş yapılmamışsa authentication sayfasına yönlendir
-            router.push('/authentication');
-        } else {
-            // Giriş yapılmışsa create-listing sayfasına yönlendir
-            router.push('/create-listing');
-        }
-    };
 
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
@@ -65,6 +55,14 @@ const Navbar: React.FC = () => {
         dispatch(logout());
         setIsUserMenuOpen(false);
         router.push('/');
+    };
+
+    const handleCreateListing = () => {
+        if (!isAuthenticated) {
+            router.push('/authentication');
+        } else {
+            router.push('/create-listing');
+        }
     };
 
     return (
@@ -125,95 +123,116 @@ const Navbar: React.FC = () => {
                             )}
                         </div>
 
-                        {isAuthenticated && user ? (
+                        {!isHydrated ? (
+                            // Redux store henüz hydrate olmadı - static rendering
                             <>
-                                {/* Kullanıcı menüsü */}
-                                <div className="relative" ref={userMenuRef}>
-                                    <button
-                                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                        className="navbar-user-button"
-                                    >
-                                        <div className="navbar-user-avatar">
-                                            <User className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-sm font-medium">
-                                            {user.firstName} {user.lastName}
-                                        </span>
-                                        <ChevronDown className="w-4 h-4" />
-                                    </button>
-
-                                    {isUserMenuOpen && (
-                                        <div className="navbar-dropdown user-dropdown">
-                                            <Link
-                                                href="/profile"
-                                                className="navbar-dropdown-item"
-                                                onClick={() => setIsUserMenuOpen(false)}
-                                            >
-                                                {isReady ? t('navbar.profile') : 'Profil'}
-                                            </Link>
-                                            <Link
-                                                href="/my-listings"
-                                                className="navbar-dropdown-item"
-                                                onClick={() => setIsUserMenuOpen(false)}
-                                            >
-                                                {isReady ? t('navbar.my-listings') : 'İlanlarım'}
-                                            </Link>
-                                            <Link
-                                                href="/favorites"
-                                                className="navbar-dropdown-item"
-                                                onClick={() => setIsUserMenuOpen(false)}
-                                            >
-                                                {isReady ? t('navbar.favorites') : 'Favoriler'}
-                                            </Link>
-                                            <Link
-                                                href="/messages"
-                                                className="navbar-dropdown-item"
-                                                onClick={() => setIsUserMenuOpen(false)}
-                                            >
-                                                {isReady ? t('navbar.messages') : 'Mesajlar'}
-                                            </Link>
-                                            <Link
-                                                href="/settings"
-                                                className="navbar-dropdown-item"
-                                                onClick={() => setIsUserMenuOpen(false)}
-                                            >
-                                                {isReady ? t('navbar.settings') : 'Ayarlar'}
-                                            </Link>
-                                            <div className="navbar-dropdown-divider" />
-                                            <button
-                                                className="navbar-dropdown-item"
-                                                onClick={handleLogout}
-                                            >
-                                                {isReady ? t('navbar.logout') : 'Çıkış Yap'}
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* İlan ver butonu */}
-                                <button
-                                    onClick={handleCreateListing}
-                                    className="navbar-create-listing-button"
-                                >
-                                    {isReady ? t('navbar.create-listing') : 'İlan Ver'}
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                {/* Giriş ve Kayıt butonları */}
                                 <Link
                                     href="/authentication"
                                     className="navbar-auth-link"
                                 >
-                                    {isReady ? t('navbar.login') : 'Üye Ol / Giriş Yap'}
+                                    Üye Ol / Giriş Yap
                                 </Link>
-
-                                <button
-                                    onClick={handleCreateListing}
+                                <Link
+                                    href="/create-listing"
                                     className="navbar-create-listing-button"
                                 >
-                                    {isReady ? t('navbar.create-listing') : 'İlan Ver'}
-                                </button>
+                                    İlan Ver
+                                </Link>
+                            </>
+                        ) : (
+                            // Redux store hydrate oldu - dynamic rendering
+                            <>
+                                {isAuthenticated && user ? (
+                                    <>
+                                        {/* Kullanıcı menüsü */}
+                                        <div className="relative" ref={userMenuRef}>
+                                            <button
+                                                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                                                className="navbar-user-button"
+                                            >
+                                                <div className="navbar-user-avatar">
+                                                    <User className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-sm font-medium">
+                                                    {user.firstName} {user.lastName}
+                                                </span>
+                                                <ChevronDown className="w-4 h-4" />
+                                            </button>
+
+                                            {isUserMenuOpen && (
+                                                <div className="navbar-dropdown user-dropdown">
+                                                    <Link
+                                                        href="/profile"
+                                                        className="navbar-dropdown-item"
+                                                        onClick={() => setIsUserMenuOpen(false)}
+                                                    >
+                                                        {isReady ? t('navbar.profile') : 'Profil'}
+                                                    </Link>
+                                                    <Link
+                                                        href="/my-listings"
+                                                        className="navbar-dropdown-item"
+                                                        onClick={() => setIsUserMenuOpen(false)}
+                                                    >
+                                                        {isReady ? t('navbar.my-listings') : 'İlanlarım'}
+                                                    </Link>
+                                                    <Link
+                                                        href="/favorites"
+                                                        className="navbar-dropdown-item"
+                                                        onClick={() => setIsUserMenuOpen(false)}
+                                                    >
+                                                        {isReady ? t('navbar.favorites') : 'Favoriler'}
+                                                    </Link>
+                                                    <Link
+                                                        href="/messages"
+                                                        className="navbar-dropdown-item"
+                                                        onClick={() => setIsUserMenuOpen(false)}
+                                                    >
+                                                        {isReady ? t('navbar.messages') : 'Mesajlar'}
+                                                    </Link>
+                                                    <Link
+                                                        href="/settings"
+                                                        className="navbar-dropdown-item"
+                                                        onClick={() => setIsUserMenuOpen(false)}
+                                                    >
+                                                        {isReady ? t('navbar.settings') : 'Ayarlar'}
+                                                    </Link>
+                                                    <div className="navbar-dropdown-divider" />
+                                                    <button
+                                                        className="navbar-dropdown-item"
+                                                        onClick={handleLogout}
+                                                    >
+                                                        {isReady ? t('navbar.logout') : 'Çıkış Yap'}
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* İlan ver butonu */}
+                                        <button
+                                            onClick={handleCreateListing}
+                                            className="navbar-create-listing-button"
+                                        >
+                                            {isReady ? t('navbar.create-listing') : 'İlan Ver'}
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        {/* Giriş ve Kayıt butonları */}
+                                        <Link
+                                            href="/authentication"
+                                            className="navbar-auth-link"
+                                        >
+                                            {isReady ? t('navbar.login') : 'Üye Ol / Giriş Yap'}
+                                        </Link>
+
+                                        <button
+                                            onClick={handleCreateListing}
+                                            className="navbar-create-listing-button"
+                                        >
+                                            {isReady ? t('navbar.create-listing') : 'İlan Ver'}
+                                        </button>
+                                    </>
+                                )}
                             </>
                         )}
                     </div>

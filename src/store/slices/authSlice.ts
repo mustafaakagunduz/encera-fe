@@ -10,6 +10,7 @@ interface AuthState {
     isLoading: boolean;
     error: string | null;
     pendingVerificationEmail: string | null;
+    isHydrated: boolean;
 }
 
 const initialState: AuthState = {
@@ -20,6 +21,7 @@ const initialState: AuthState = {
     isLoading: false,
     error: null,
     pendingVerificationEmail: null,
+    isHydrated: false,
 };
 
 const authSlice = createSlice({
@@ -35,11 +37,13 @@ const authSlice = createSlice({
             state.error = null;
 
             // Store in localStorage
-            localStorage.setItem('token', token);
-            if (refreshToken) {
-                localStorage.setItem('refreshToken', refreshToken);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('token', token);
+                if (refreshToken) {
+                    localStorage.setItem('refreshToken', refreshToken);
+                }
+                localStorage.setItem('user', JSON.stringify(user));
             }
-            localStorage.setItem('user', JSON.stringify(user));
         },
         logout: (state) => {
             state.user = null;
@@ -50,9 +54,11 @@ const authSlice = createSlice({
             state.pendingVerificationEmail = null;
 
             // Clear localStorage
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('user');
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+            }
         },
         setError: (state, action: PayloadAction<string>) => {
             state.error = action.payload;
@@ -68,17 +74,23 @@ const authSlice = createSlice({
             state.pendingVerificationEmail = action.payload;
         },
         initializeAuth: (state) => {
-            // Initialize from localStorage
-            const token = localStorage.getItem('token');
-            const refreshToken = localStorage.getItem('refreshToken');
-            const user = localStorage.getItem('user');
+            // Check if we're in browser environment
+            if (typeof window !== 'undefined') {
+                // Initialize from localStorage
+                const token = localStorage.getItem('token');
+                const refreshToken = localStorage.getItem('refreshToken');
+                const user = localStorage.getItem('user');
 
-            if (token && user) {
-                state.token = token;
-                state.refreshToken = refreshToken;
-                state.user = JSON.parse(user);
-                state.isAuthenticated = true;
+                if (token && user) {
+                    state.token = token;
+                    state.refreshToken = refreshToken;
+                    state.user = JSON.parse(user);
+                    state.isAuthenticated = true;
+                }
             }
+
+            // Mark as hydrated
+            state.isHydrated = true;
         },
     },
 });
