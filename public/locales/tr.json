@@ -20,7 +20,7 @@
 
   "common": {
     "loading": "Yükleniyor...",
-    "error": "Hata",
+    "error": "Bu alan zorunludur",
     "success": "Başarılı",
     "cancel": "İptal",
     "save": "Kaydet",
@@ -38,7 +38,13 @@
     "back": "Geri",
     "next": "İleri",
     "previous": "Önceki",
-    "continue": "Devam Et"
+    "continue": "Devam Et",
+    "sale": "Satılık",
+    "rent": "Kiralık",
+    "daily-rental": "Günlük Kiralık",
+    "residential": "Konut",
+    "commercial": "İş Yeri",
+    "land": "Arsa"
   },
 
   "auth": {
@@ -84,9 +90,9 @@
       "email-sent-title": "Email Gönderildi!",
       "email-sent-description": "Eğer {{email}} adresi sistemde kayıtlı ise, şifre sıfırlama bağlantısı gönderilmiştir.",
       "check-spam": "Email gelmediyse spam klasörünüzü kontrol edin.",
-      "back-to-login": "Giriş Sayfasına Dön",
+      "back-to-login": "Giriş sayfasına dön",
       "sending": "Gönderiliyor...",
-      "send-reset-link": "Şifre Sıfırlama Linki Gönder"
+      "send-reset-link": "Şifre Sıfırlama Bağlantısı Gönder"
     },
     "reset-password": {
       "title": "Yeni Şifre Belirle",
@@ -163,7 +169,8 @@
       "parking": "Otopark",
       "balcony": "Balkon",
       "security": "Güvenlik",
-      "furnished": "Eşyalı"
+      "furnished": "Eşyalı",
+      "papp-sellable": "Papp ile satılabilsin"
     }
   },
 

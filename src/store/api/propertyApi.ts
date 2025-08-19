@@ -36,6 +36,7 @@ export interface PropertyCreateRequest {
     security?: boolean;
     description?: string;
     furnished?: boolean;
+    pappSellable?: boolean;
     roomConfiguration?: RoomConfiguration;
     monthlyFee?: number;
     deposit?: number;
@@ -126,7 +127,7 @@ export const propertyApi = createApi({
     endpoints: (builder) => ({
         createProperty: builder.mutation<CreatePropertyResponse, PropertyCreateRequest>({
             query: (property) => ({
-                url: '',
+                url: '/user/create',
                 method: 'POST',
                 body: property,
             }),

@@ -15,7 +15,8 @@ import {
     ArrowUp,
     Shield,
     Sofa,
-    Loader2
+    Loader2,
+    Crown
 } from 'lucide-react';
 
 interface FormData extends Omit<PropertyCreateRequest, 'roomConfiguration'> {
@@ -48,6 +49,7 @@ export const CreateListingForm: React.FC = () => {
         security: false,
         description: '',
         furnished: false,
+        pappSellable: false,
         roomCount: '',
         hallCount: '',
         monthlyFee: undefined,
@@ -148,6 +150,7 @@ export const CreateListingForm: React.FC = () => {
                 security: formData.security,
                 description: formData.description,
                 furnished: formData.furnished,
+                pappSellable: formData.pappSellable,
                 roomConfiguration,
                 monthlyFee: formData.monthlyFee,
                 deposit: formData.deposit,
@@ -308,17 +311,17 @@ export const CreateListingForm: React.FC = () => {
                             {/* Oda Sayısı */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                                    {isReady ? t('listing.create.room-config') : 'Oda Sayısı'}
+                                    {isReady ? t('listing.create.room-config') : 'Oda + Salon'}
                                 </label>
-                                <div className="flex space-x-2">
+                                <div className="flex gap-2">
                                     <input
                                         type="number"
                                         name="roomCount"
                                         value={formData.roomCount}
                                         onChange={handleInputChange}
-                                        placeholder="3"
+                                        placeholder="Oda"
                                         min="0"
-                                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-1/2 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                     <span className="flex items-center text-gray-500">+</span>
                                     <input
@@ -326,9 +329,9 @@ export const CreateListingForm: React.FC = () => {
                                         name="hallCount"
                                         value={formData.hallCount}
                                         onChange={handleInputChange}
-                                        placeholder="1"
+                                        placeholder="Salon"
                                         min="0"
-                                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-1/2 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
                             </div>
@@ -343,7 +346,7 @@ export const CreateListingForm: React.FC = () => {
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {/* Ana Fiyat */}
+                            {/* Fiyat */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
                                     {isReady ? t('listing.create.price-label') : 'Fiyat'} ({isReady ? t('listing.create.currency') : 'TL'})
@@ -353,8 +356,7 @@ export const CreateListingForm: React.FC = () => {
                                     name="price"
                                     value={formData.price || ''}
                                     onChange={handleInputChange}
-                                    min="0"
-                                    step="0.01"
+                                    min="1"
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.price ? 'border-red-500' : 'border-gray-300'
                                     }`}
@@ -373,7 +375,6 @@ export const CreateListingForm: React.FC = () => {
                                     value={formData.monthlyFee || ''}
                                     onChange={handleInputChange}
                                     min="0"
-                                    step="0.01"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -389,13 +390,12 @@ export const CreateListingForm: React.FC = () => {
                                     value={formData.deposit || ''}
                                     onChange={handleInputChange}
                                     min="0"
-                                    step="0.01"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
                         </div>
 
-                        {/* Pazarlığa Açık */}
+                        {/* Pazarlığa açık */}
                         <div className="flex items-center">
                             <input
                                 type="checkbox"
@@ -405,7 +405,7 @@ export const CreateListingForm: React.FC = () => {
                                 onChange={handleInputChange}
                                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             />
-                            <label htmlFor="negotiable" className="ml-2 text-sm text-gray-900">
+                            <label htmlFor="negotiable" className="ml-3 text-sm text-gray-900">
                                 {isReady ? t('listing.create.negotiable') : 'Pazarlığa açık'}
                             </label>
                         </div>
@@ -414,11 +414,11 @@ export const CreateListingForm: React.FC = () => {
                     {/* Özellikler */}
                     <div className="space-y-6">
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                            <Shield className="w-5 h-5 mr-2 text-blue-600" />
+                            <Home className="w-5 h-5 mr-2 text-blue-600" />
                             {isReady ? t('listing.create.amenities') : 'Özellikler'}
                         </h2>
 
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {/* Asansör */}
                             <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
                                 <input
@@ -498,6 +498,22 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.furnished') : 'Eşyalı'}
                                 </label>
                             </div>
+
+                            {/* Papp ile satılabilsin */}
+                            <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input
+                                    type="checkbox"
+                                    id="pappSellable"
+                                    name="pappSellable"
+                                    checked={formData.pappSellable}
+                                    onChange={handleInputChange}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <label htmlFor="pappSellable" className="ml-3 flex items-center text-sm text-gray-900">
+                                    <Crown className="w-4 h-4 mr-2 text-yellow-600" />
+                                    {isReady ? t('listing.create.papp-sellable') : 'Papp ile satılabilsin'}
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -540,3 +556,5 @@ export const CreateListingForm: React.FC = () => {
         </div>
     );
 };
+
+export default CreateListingForm;

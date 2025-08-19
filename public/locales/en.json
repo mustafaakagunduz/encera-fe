@@ -20,7 +20,7 @@
 
   "common": {
     "loading": "Loading...",
-    "error": "Error",
+    "error": "This field is required",
     "success": "Success",
     "cancel": "Cancel",
     "save": "Save",
@@ -38,7 +38,13 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "continue": "Continue"
+    "continue": "Continue",
+    "sale": "For Sale",
+    "rent": "For Rent",
+    "daily-rental": "Daily Rental",
+    "residential": "Property",
+    "commercial": "Commercial",
+    "land": "Land"
   },
 
   "auth": {
@@ -146,7 +152,7 @@
       "submit": "Publish Listing",
       "submitting": "Publishing listing...",
       "listing-title": "Listing Title",
-      "listing-title-placeholder": "E.g. 3+1 apartment for sale in central location",
+      "listing-title-placeholder": "E.g.: 3+1 apartment for sale in central location",
       "listing-type": "Listing Type",
       "property-type": "Property Type",
       "gross-area": "Gross Area (m²)",
@@ -163,7 +169,8 @@
       "parking": "Parking",
       "balcony": "Balcony",
       "security": "Security",
-      "furnished": "Furnished"
+      "furnished": "Furnished",
+      "papp-sellable": "Sellable via Papp"
     }
   },
 
@@ -193,18 +200,18 @@
 
   "pricing": {
     "title": "Promote Your Listing",
-    "button": "Purchase",
+    "button": "Buy",
     "basic": {
       "title": "Urgent Listing",
       "price": "199 TL",
-      "duration": "3 Days Top Position",
+      "duration": "3 Days at Top",
       "feature1": "Red Frame",
       "feature2": "Urgent Icon"
     },
     "premium": {
       "title": "Premium Package",
       "price": "399 TL",
-      "duration": "7 Days Top Position",
+      "duration": "7 Days at Top",
       "feature1": "Gold Frame",
       "feature2": "Premium Icon",
       "feature3": "Social Media Sharing",
@@ -213,7 +220,7 @@
     "vip": {
       "title": "VIP Listing",
       "price": "799 TL",
-      "duration": "15 Days Top Position",
+      "duration": "15 Days at Top",
       "feature1": "Platinum Frame",
       "feature2": "VIP Icon",
       "feature3": "Social Media Sharing",
