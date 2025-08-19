@@ -125,7 +125,46 @@
     "created-at": "Created At",
     "updated-at": "Updated At",
     "contact": "Contact",
-    "contact-owner": "Contact Owner"
+    "contact-owner": "Contact Owner",
+    "location-fields": {
+      "city": "City",
+      "district": "District",
+      "neighborhood": "Neighborhood",
+      "select-city": "Select city",
+      "select-district": "Select district",
+      "select-neighborhood": "Select neighborhood",
+      "search-city": "Search city...",
+      "search-district": "Search district...",
+      "search-neighborhood": "Search neighborhood..."
+    },
+    "create": {
+      "title": "Create Listing",
+      "basic-info": "Basic Information",
+      "property-details": "Property Details",
+      "amenities": "Amenities",
+      "pricing": "Pricing Information",
+      "submit": "Publish Listing",
+      "submitting": "Publishing listing...",
+      "listing-title": "Listing Title",
+      "listing-title-placeholder": "E.g. 3+1 apartment for sale in central location",
+      "listing-type": "Listing Type",
+      "property-type": "Property Type",
+      "gross-area": "Gross Area (m²)",
+      "net-area": "Net Area (m²)",
+      "room-config": "Room Configuration",
+      "price-label": "Price",
+      "currency": "TL",
+      "negotiable": "Negotiable",
+      "monthly-fee": "Monthly Fee",
+      "deposit": "Deposit",
+      "description": "Description",
+      "description-placeholder": "Write your listing description in detail...",
+      "elevator": "Elevator",
+      "parking": "Parking",
+      "balcony": "Balcony",
+      "security": "Security",
+      "furnished": "Furnished"
+    }
   },
 
   "user": {

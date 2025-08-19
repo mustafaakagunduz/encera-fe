@@ -125,7 +125,46 @@
     "created-at": "Oluşturulma Tarihi",
     "updated-at": "Güncellenme Tarihi",
     "contact": "İletişim",
-    "contact-owner": "İlan Sahibi ile İletişime Geç"
+    "contact-owner": "İlan Sahibi ile İletişime Geç",
+    "location-fields": {
+      "city": "İl",
+      "district": "İlçe",
+      "neighborhood": "Mahalle",
+      "select-city": "İl seçiniz",
+      "select-district": "İlçe seçiniz",
+      "select-neighborhood": "Mahalle seçiniz",
+      "search-city": "İl ara...",
+      "search-district": "İlçe ara...",
+      "search-neighborhood": "Mahalle ara..."
+    },
+    "create": {
+      "title": "İlan Ver",
+      "basic-info": "Temel Bilgiler",
+      "property-details": "İlan Detayları",
+      "amenities": "Özellikler",
+      "pricing": "Fiyat Bilgileri",
+      "submit": "İlanı Yayınla",
+      "submitting": "İlan yayınlanıyor...",
+      "listing-title": "İlan Başlığı",
+      "listing-title-placeholder": "Örn: Merkezi konumda satılık 3+1 daire",
+      "listing-type": "İlan Tipi",
+      "property-type": "Emlak Tipi",
+      "gross-area": "Brüt Alan (m²)",
+      "net-area": "Net Alan (m²)",
+      "room-config": "Oda Sayısı",
+      "price-label": "Fiyat",
+      "currency": "TL",
+      "negotiable": "Pazarlığa açık",
+      "monthly-fee": "Aidat",
+      "deposit": "Depozito",
+      "description": "Açıklama",
+      "description-placeholder": "İlan açıklamanızı detaylı bir şekilde yazınız...",
+      "elevator": "Asansör",
+      "parking": "Otopark",
+      "balcony": "Balkon",
+      "security": "Güvenlik",
+      "furnished": "Eşyalı"
+    }
   },
 
   "user": {
