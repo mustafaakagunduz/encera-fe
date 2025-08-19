@@ -170,7 +170,11 @@
       "balcony": "Balcony",
       "security": "Security",
       "furnished": "Furnished",
-      "papp-sellable": "Sellable via Papp"
+      "papp-sellable": "Sellable via Papp",
+      "papp-sellable-description": "Get professional support for your listing through Papp's sales process.",
+      "success": "Listing created successfully!",
+      "error": "An error occurred while creating the listing. Please try again.",
+      "validation-error": "Please fill in all required fields."
     }
   },
 

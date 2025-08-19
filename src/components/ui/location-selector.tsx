@@ -1,7 +1,7 @@
 // src/components/ui/location-selector.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, MapPin, Loader2 } from 'lucide-react';
 import { locationService, City, District, Neighborhood } from '@/services/locationService';
@@ -50,6 +50,31 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     const [districtSearch, setDistrictSearch] = useState('');
     const [neighborhoodSearch, setNeighborhoodSearch] = useState('');
 
+    // Refs for outside click detection
+    const cityDropdownRef = useRef<HTMLDivElement>(null);
+    const districtDropdownRef = useRef<HTMLDivElement>(null);
+    const neighborhoodDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Outside click handler
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target as Node)) {
+                setShowCityDropdown(false);
+            }
+            if (districtDropdownRef.current && !districtDropdownRef.current.contains(event.target as Node)) {
+                setShowDistrictDropdown(false);
+            }
+            if (neighborhoodDropdownRef.current && !neighborhoodDropdownRef.current.contains(event.target as Node)) {
+                setShowNeighborhoodDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     // İlleri yükle
     useEffect(() => {
         const loadCities = async () => {
@@ -67,48 +92,80 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         loadCities();
     }, []);
 
-    // İl seçildiğinde ilçeleri yükle
-    const handleCitySelect = async (city: City) => {
+    // İl değişikliğinde ilçeleri yükle
+    useEffect(() => {
+        if (selectedCity) {
+            const loadDistricts = async () => {
+                setLoadingDistricts(true);
+                try {
+                    const selectedCityData = cities.find(city => city.name === selectedCity);
+                    if (selectedCityData) {
+                        const districtsData = await locationService.getDistricts(selectedCityData.id);
+                        setDistricts(districtsData);
+                    }
+                } catch (error) {
+                    console.error('Districts loading error:', error);
+                } finally {
+                    setLoadingDistricts(false);
+                }
+            };
+
+            loadDistricts();
+        } else {
+            setDistricts([]);
+            setNeighborhoods([]);
+        }
+    }, [selectedCity, cities]);
+
+    // İlçe değişikliğinde mahalleleri yükle
+    useEffect(() => {
+        if (selectedDistrict) {
+            const loadNeighborhoods = async () => {
+                setLoadingNeighborhoods(true);
+                try {
+                    const selectedDistrictData = districts.find(district => district.name === selectedDistrict);
+                    if (selectedDistrictData) {
+                        const neighborhoodsData = await locationService.getNeighborhoods(selectedDistrictData.id);
+                        setNeighborhoods(neighborhoodsData);
+                    }
+                } catch (error) {
+                    console.error('Neighborhoods loading error:', error);
+                } finally {
+                    setLoadingNeighborhoods(false);
+                }
+            };
+
+            loadNeighborhoods();
+        } else {
+            setNeighborhoods([]);
+        }
+    }, [selectedDistrict, districts]);
+
+    // İl seçimi
+    const handleCitySelect = (city: City) => {
         console.log('[CityChange]', { cityId: city.id, cityName: city.name });
 
-        // Önce state'i temizle
-        setDistricts([]);
-        setNeighborhoods([]);
-        setShowCityDropdown(false);
-
-        console.log('[Reset district & neighborhood]');
-
-        // Location callback'i ile parent'ı güncelle (ilçe ve mahalle boş)
+        // Location callback'i ile parent'ı güncelle (ilçe ve mahalle sıfırla)
         onLocationChange({
             city: city.name,
             district: '',
             neighborhood: ''
         });
 
-        // Sonra ilçeleri yükle
-        setLoadingDistricts(true);
-        try {
-            const districtsData = await locationService.getDistricts(city.id);
-            setDistricts(districtsData);
-        } catch (error) {
-            console.error('Districts loading error:', error);
-        } finally {
-            setLoadingDistricts(false);
-        }
+        setShowCityDropdown(false);
+        setCitySearch('');
+
+        console.log('[Reset district & neighborhood]');
     };
 
-    // İlçe seçildiğinde mahalleleri yükle
+    // İlçe seçimi
     const handleDistrictSelect = async (district: District) => {
         console.log('[DistrictChange]', {
             districtId: district.id,
             typeofDistrictId: typeof district.id,
             districtName: district.name,
-            selectedCity
+            selectedCity: selectedCity
         });
-
-        // Önce mahalle state'ini temizle
-        setNeighborhoods([]);
-        setShowDistrictDropdown(false);
 
         // Location callback'i ile parent'ı güncelle (mahalle boş)
         onLocationChange({
@@ -116,6 +173,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             district: district.name,
             neighborhood: ''
         });
+
+        setShowDistrictDropdown(false);
+        setDistrictSearch('');
 
         // Sonra mahalleleri yükle
         setLoadingNeighborhoods(true);
@@ -137,6 +197,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             neighborhood: neighborhood.name
         });
         setShowNeighborhoodDropdown(false);
+        setNeighborhoodSearch('');
     };
 
     // Filtrelenmiş listeler
@@ -155,7 +216,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     return (
         <div className="space-y-6">
             {/* İl Seçimi */}
-            <div className="relative">
+            <div className="relative" ref={cityDropdownRef}>
                 <label className="flex items-center text-sm font-medium text-gray-900 mb-2">
                     <MapPin className="w-4 h-4 mr-2 text-blue-600" />
                     {isReady ? t('listing.location-fields.city') : 'İl'}
@@ -172,9 +233,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                                 : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                         } ${selectedCity ? 'text-gray-900' : 'text-gray-500'}`}
                     >
-            <span className="truncate">
-              {selectedCity || (isReady ? t('listing.location-fields.select-city') : 'İl seçiniz')}
-            </span>
+                        <span className="truncate">
+                            {selectedCity || (isReady ? t('listing.location-fields.select-city') : 'İl seçiniz')}
+                        </span>
                         {loadingCities ? (
                             <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
                         ) : (
@@ -182,7 +243,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                         )}
                     </Button>
 
-                    {showCityDropdown && (
+                    {showCityDropdown && cities.length > 0 && (
                         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-hidden">
                             <div className="p-3 border-b border-gray-100">
                                 <input
@@ -209,14 +270,12 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                     )}
                 </div>
                 {errors?.city && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center">
-                        <span className="ml-1">{errors.city}</span>
-                    </p>
+                    <p className="mt-1 text-sm text-red-600">{errors.city}</p>
                 )}
             </div>
 
             {/* İlçe Seçimi */}
-            <div className="relative">
+            <div className="relative" ref={districtDropdownRef}>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
                     {isReady ? t('listing.location-fields.district') : 'İlçe'}
                 </label>
@@ -232,9 +291,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                                 : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                         } ${selectedDistrict ? 'text-gray-900' : 'text-gray-500'}`}
                     >
-            <span className="truncate">
-              {selectedDistrict || (isReady ? t('listing.location-fields.select-district') : 'İlçe seçiniz')}
-            </span>
+                        <span className="truncate">
+                            {selectedDistrict || (isReady ? t('listing.location-fields.select-district') : 'İlçe seçiniz')}
+                        </span>
                         {loadingDistricts ? (
                             <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
                         ) : (
@@ -274,7 +333,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             </div>
 
             {/* Mahalle Seçimi */}
-            <div className="relative">
+            <div className="relative" ref={neighborhoodDropdownRef}>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
                     {isReady ? t('listing.location-fields.neighborhood') : 'Mahalle'}
                 </label>
@@ -290,9 +349,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                                 : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                         } ${selectedNeighborhood ? 'text-gray-900' : 'text-gray-500'}`}
                     >
-            <span className="truncate">
-              {selectedNeighborhood || (isReady ? t('listing.location-fields.select-neighborhood') : 'Mahalle seçiniz')}
-            </span>
+                        <span className="truncate">
+                            {selectedNeighborhood || (isReady ? t('listing.location-fields.select-neighborhood') : 'Mahalle seçiniz')}
+                        </span>
                         {loadingNeighborhoods ? (
                             <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
                         ) : (

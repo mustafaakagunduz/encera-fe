@@ -2,8 +2,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LocationSelector } from '@/components/ui/location-selector';
+import { Toast } from '@/components/ui/toast';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useCreatePropertyMutation, PropertyCreateRequest, ListingType, PropertyType, RoomConfiguration } from '@/store/api/propertyApi';
 import {
@@ -31,6 +33,18 @@ interface FormErrors {
 export const CreateListingForm: React.FC = () => {
     const { t, isReady } = useAppTranslation();
     const [createProperty, { isLoading }] = useCreatePropertyMutation();
+    const router = useRouter();
+
+    // Toast state
+    const [toast, setToast] = useState<{
+        show: boolean;
+        message: string;
+        type: 'success' | 'error';
+    }>({
+        show: false,
+        message: '',
+        type: 'success'
+    });
 
     const [formData, setFormData] = useState<FormData>({
         title: '',
@@ -57,6 +71,14 @@ export const CreateListingForm: React.FC = () => {
     });
 
     const [errors, setErrors] = useState<FormErrors>({});
+
+    const showToast = (message: string, type: 'success' | 'error') => {
+        setToast({ show: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast(prev => ({ ...prev, show: false }));
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -116,6 +138,10 @@ export const CreateListingForm: React.FC = () => {
             newErrors.price = isReady ? t('common.error') : 'Bu alan zorunludur';
         }
 
+        if (!formData.description?.trim()) {
+            newErrors.description = isReady ? t('common.error') : 'Bu alan zorunludur';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -124,6 +150,11 @@ export const CreateListingForm: React.FC = () => {
         e.preventDefault();
 
         if (!validateForm()) {
+            // Validation error toast
+            showToast(
+                isReady ? t('listing.create.validation-error') : 'Lütfen tüm zorunlu alanları doldurun.',
+                'error'
+            );
             return;
         }
 
@@ -157,10 +188,26 @@ export const CreateListingForm: React.FC = () => {
             };
 
             await createProperty(submitData).unwrap();
-            // TODO: Success handling
+
+            // Success toast and redirect
+            showToast(
+                isReady ? t('listing.create.success') : 'İlan başarıyla oluşturuldu!',
+                'success'
+            );
+
+            // Redirect after short delay to show toast
+            setTimeout(() => {
+                router.push('/my-listings');
+            }, 1500);
+
         } catch (error) {
             console.error('Form submission error:', error);
-            // TODO: Error handling
+
+            // Error toast
+            showToast(
+                isReady ? t('listing.create.error') : 'İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.',
+                'error'
+            );
         }
     };
 
@@ -498,22 +545,34 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.furnished') : 'Eşyalı'}
                                 </label>
                             </div>
+                        </div>
+                    </div>
 
-                            {/* Papp ile satılabilsin */}
-                            <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    {/* Papp ile Satılabilsin - Ayrı Section */}
+                    <div className="space-y-6">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                            <Crown className="w-5 h-5 mr-2 text-yellow-600" />
+                            PAPP Premium
+                        </h2>
+
+                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-6">
+                            <div className="flex items-center">
                                 <input
                                     type="checkbox"
                                     id="pappSellable"
                                     name="pappSellable"
                                     checked={formData.pappSellable}
                                     onChange={handleInputChange}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    className="w-5 h-5 text-yellow-600 border-yellow-300 rounded focus:ring-yellow-500"
                                 />
-                                <label htmlFor="pappSellable" className="ml-3 flex items-center text-sm text-gray-900">
-                                    <Crown className="w-4 h-4 mr-2 text-yellow-600" />
+                                <label htmlFor="pappSellable" className="ml-4 flex items-center text-base font-medium text-gray-900">
+                                    <Crown className="w-5 h-5 mr-2 text-yellow-600" />
                                     {isReady ? t('listing.create.papp-sellable') : 'Papp ile satılabilsin'}
                                 </label>
                             </div>
+                            <p className="mt-2 ml-9 text-sm text-gray-600">
+                                {isReady ? t('listing.create.papp-sellable-description') : 'İlanınızı Papp üzerinden satış sürecinde profesyonel destek alabilirsiniz.'}
+                            </p>
                         </div>
                     </div>
 
@@ -529,8 +588,11 @@ export const CreateListingForm: React.FC = () => {
                                 onChange={handleInputChange}
                                 rows={6}
                                 placeholder={isReady ? t('listing.create.description-placeholder') : 'İlan açıklamanızı detaylı bir şekilde yazınız...'}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
+                                    errors.description ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             />
+                            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
                         </div>
                     </div>
 
@@ -539,7 +601,7 @@ export const CreateListingForm: React.FC = () => {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-red-600 hover:bg-red-700 text-white py-4 text-lg font-semibold"
+                            className="w-full bg-blue-900 hover:bg-blue-600 text-white py-4 text-lg font-semibold"
                         >
                             {isLoading ? (
                                 <>
@@ -553,6 +615,14 @@ export const CreateListingForm: React.FC = () => {
                     </div>
                 </form>
             </div>
+
+            {/* Toast Notification */}
+            <Toast
+                show={toast.show}
+                message={toast.message}
+                type={toast.type}
+                onClose={hideToast}
+            />
         </div>
     );
 };

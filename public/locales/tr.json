@@ -45,6 +45,7 @@
     "residential": "Konut",
     "commercial": "İş Yeri",
     "land": "Arsa"
+
   },
 
   "auth": {
@@ -170,7 +171,11 @@
       "balcony": "Balkon",
       "security": "Güvenlik",
       "furnished": "Eşyalı",
-      "papp-sellable": "Papp ile satılabilsin"
+      "papp-sellable": "Papp ile satılabilsin",
+      "papp-sellable-description": "İlanınızı Papp üzerinden satış sürecinde profesyonel destek alabilirsiniz.",
+      "success": "İlan başarıyla oluşturuldu!",
+      "error": "İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.",
+      "validation-error": "Lütfen tüm zorunlu alanları doldurun."
     }
   },
 
