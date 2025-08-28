@@ -123,6 +123,26 @@
   },
 
   "listing": {
+    "preview": {
+      "title": "İlan Önizlemesi",
+      "review-before-publish": "Yayınlamadan önce inceleyin",
+      "no-image": "Henüz görsel yüklenmedi",
+      "add-images-later": "İlan yayınlandıktan sonra görsel ekleyebilirsiniz",
+      "edit": "Düzenle",
+      "confirm": "Onayla ve Yayınla",
+      "note": "İlanınız onaylandıktan sonra yayınlanacak ve \"İlanlarım\" bölümünde görünecektir.",
+      "edit-info": "İlanınız yayınlandıktan sonra düzenlenebilir ve silinebilir"
+    },
+    "features": "Özellikler",
+    "details": "Detaylar",
+    "basic-info": "Temel Bilgiler",
+    "area": "Alan",
+    "room-count": "Oda Sayısı",
+    "monthly-fee": "Aidat",
+    "deposit": "Depozito",
+    "publishing": "Yayınlanıyor...",
+    "confirm-publish": "Onayla ve Yayınla",
+    "negotiable": "Pazarlık Edilebilir",
     "title": "İlan Başlığı",
     "description": "Açıklama",
     "price": "Fiyat",

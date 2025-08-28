@@ -122,6 +122,26 @@
   },
 
   "listing": {
+    "preview": {
+      "title": "Listing Preview",
+      "review-before-publish": "Review before publishing",
+      "no-image": "No images uploaded yet",
+      "add-images-later": "You can add images after publishing the listing",
+      "edit": "Edit",
+      "confirm": "Confirm and Publish",
+      "note": "Your listing will be published after approval and will appear in \"My Listings\" section.",
+      "edit-info": "Your listing can be edited and deleted after publishing"
+    },
+    "features": "Features",
+    "details": "Details",
+    "negotiable": "Negotiable",
+    "basic-info": "Basic Information",
+    "area": "Area",
+    "room-count": "Room Count",
+    "monthly-fee": "Monthly Fee",
+    "deposit": "Deposit",
+    "publishing": "Publishing...",
+    "confirm-publish": "Confirm and Publish",
     "title": "Listing Title",
     "description": "Description",
     "price": "Price",

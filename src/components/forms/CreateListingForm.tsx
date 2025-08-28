@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { LocationSelector } from '@/components/ui/location-selector';
 import { Toast } from '@/components/ui/toast';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
+import {selectListingPreviewData, setListingPreviewData} from '@/store/slices/listingPreviewSlice';
 import { useCreatePropertyMutation, PropertyCreateRequest, ListingType, PropertyType, RoomConfiguration } from '@/store/api/propertyApi';
 import {
     Home,
@@ -34,6 +36,7 @@ export const CreateListingForm: React.FC = () => {
     const { t, isReady } = useAppTranslation();
     const [createProperty, { isLoading }] = useCreatePropertyMutation();
     const router = useRouter();
+    const dispatch = useAppDispatch();
 
     // Toast state
     const [toast, setToast] = useState<{
@@ -71,6 +74,36 @@ export const CreateListingForm: React.FC = () => {
     });
 
     const [errors, setErrors] = useState<FormErrors>({});
+
+    const previewData = useAppSelector(selectListingPreviewData);
+
+    React.useEffect(() => {
+        if (previewData) {
+            setFormData({
+                title: previewData.title,
+                listingType: previewData.listingType,
+                propertyType: previewData.propertyType,
+                city: previewData.city,
+                district: previewData.district,
+                neighborhood: previewData.neighborhood,
+                price: previewData.price,
+                negotiable: previewData.negotiable || false,
+                grossArea: previewData.grossArea,
+                netArea: previewData.netArea,
+                elevator: previewData.elevator || false,
+                parking: previewData.parking || false,
+                balcony: previewData.balcony || false,
+                security: previewData.security || false,
+                description: previewData.description || '',
+                furnished: previewData.furnished || false,
+                pappSellable: previewData.pappSellable || false,
+                roomCount: previewData.roomConfiguration?.roomCount?.toString() || '',
+                hallCount: previewData.roomConfiguration?.hallCount?.toString() || '',
+                monthlyFee: previewData.monthlyFee,
+                deposit: previewData.deposit,
+            });
+        }
+    }, [previewData]);
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setToast({ show: true, message, type });
@@ -158,57 +191,40 @@ export const CreateListingForm: React.FC = () => {
             return;
         }
 
-        try {
-            const roomConfiguration: RoomConfiguration | undefined =
-                formData.roomCount && formData.hallCount
-                    ? { roomCount: Number(formData.roomCount), hallCount: Number(formData.hallCount) }
-                    : undefined;
+        // Form verisini hazırla
+        const roomConfiguration: RoomConfiguration | undefined =
+            formData.roomCount && formData.hallCount
+                ? { roomCount: Number(formData.roomCount), hallCount: Number(formData.hallCount) }
+                : undefined;
 
-            const submitData: PropertyCreateRequest = {
-                title: formData.title,
-                listingType: formData.listingType,
-                propertyType: formData.propertyType,
-                city: formData.city,
-                district: formData.district,
-                neighborhood: formData.neighborhood,
-                price: formData.price,
-                negotiable: formData.negotiable,
-                grossArea: formData.grossArea,
-                netArea: formData.netArea,
-                elevator: formData.elevator,
-                parking: formData.parking,
-                balcony: formData.balcony,
-                security: formData.security,
-                description: formData.description,
-                furnished: formData.furnished,
-                pappSellable: formData.pappSellable,
-                roomConfiguration,
-                monthlyFee: formData.monthlyFee,
-                deposit: formData.deposit,
-            };
+        const submitData: PropertyCreateRequest = {
+            title: formData.title,
+            listingType: formData.listingType,
+            propertyType: formData.propertyType,
+            city: formData.city,
+            district: formData.district,
+            neighborhood: formData.neighborhood,
+            price: formData.price,
+            negotiable: formData.negotiable,
+            grossArea: formData.grossArea,
+            netArea: formData.netArea,
+            elevator: formData.elevator,
+            parking: formData.parking,
+            balcony: formData.balcony,
+            security: formData.security,
+            description: formData.description,
+            furnished: formData.furnished,
+            pappSellable: formData.pappSellable,
+            roomConfiguration,
+            monthlyFee: formData.monthlyFee,
+            deposit: formData.deposit,
+        };
 
-            await createProperty(submitData).unwrap();
+        // Form verisini Redux store'a kaydet
+        dispatch(setListingPreviewData(submitData));
 
-            // Success toast and redirect
-            showToast(
-                isReady ? t('listing.create.success') : 'İlan başarıyla oluşturuldu!',
-                'success'
-            );
-
-            // Redirect after short delay to show toast
-            setTimeout(() => {
-                router.push('/my-listings');
-            }, 1500);
-
-        } catch (error) {
-            console.error('Form submission error:', error);
-
-            // Error toast
-            showToast(
-                isReady ? t('listing.create.error') : 'İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.',
-                'error'
-            );
-        }
+        // Preview sayfasına yönlendir
+        router.push('/listing-preview');
     };
 
     return (

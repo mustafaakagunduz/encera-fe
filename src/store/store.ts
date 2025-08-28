@@ -3,21 +3,23 @@ import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { authApi } from './api/authApi';
 import { propertyApi } from './api/propertyApi';
-import { adminApi } from './api/adminApi'; // Admin API eklendi
+import { adminApi } from './api/adminApi';
 import authReducer from './slices/authSlice';
+import listingPreviewReducer from './slices/listingPreviewSlice'; // Yeni slice import
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
+        listingPreview: listingPreviewReducer, // Yeni slice eklendi
         [authApi.reducerPath]: authApi.reducer,
         [propertyApi.reducerPath]: propertyApi.reducer,
-        [adminApi.reducerPath]: adminApi.reducer, // Admin API reducer eklendi
+        [adminApi.reducerPath]: adminApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
             authApi.middleware,
             propertyApi.middleware,
-            adminApi.middleware // Admin API middleware eklendi
+            adminApi.middleware
         ),
 });
 
