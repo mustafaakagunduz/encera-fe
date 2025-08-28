@@ -196,6 +196,26 @@ const Navbar: React.FC = () => {
                                                     >
                                                         {isReady ? t('navbar.settings') : 'Ayarlar'}
                                                     </Link>
+
+                                                    {/* Admin Panel Link - Sadece admin kullanıcılar için */}
+                                                    {user?.role === 'ADMIN' && (
+                                                        <>
+                                                            <div className="navbar-dropdown-divider" />
+                                                            <Link
+                                                                href="/admin/dashboard"
+                                                                className="navbar-dropdown-item"
+                                                                onClick={() => setIsUserMenuOpen(false)}
+                                                                style={{
+                                                                    backgroundColor: '#dbeafe',
+                                                                    color: '#1d4ed8',
+                                                                    fontWeight: '600'
+                                                                }}
+                                                            >
+                                                                🛡️ Admin Panel
+                                                            </Link>
+                                                        </>
+                                                    )}
+
                                                     <div className="navbar-dropdown-divider" />
                                                     <button
                                                         className="navbar-dropdown-item"
