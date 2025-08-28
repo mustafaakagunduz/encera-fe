@@ -200,10 +200,34 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         setNeighborhoodSearch('');
     };
 
+    // Popüler şehirler listesi
+    const popularCities = ['İstanbul', 'Ankara', 'İzmir', 'Bursa'];
+    
     // Filtrelenmiş listeler
-    const filteredCities = cities.filter(city =>
-        city.name.toLowerCase().includes(citySearch.toLowerCase())
-    );
+    const filteredCities = cities
+        .filter(city => city.name.toLowerCase().includes(citySearch.toLowerCase()))
+        .sort((a, b) => {
+            const aIndex = popularCities.indexOf(a.name);
+            const bIndex = popularCities.indexOf(b.name);
+            
+            // Her ikisi de popüler şehirlerde varsa, popüler listesindeki sıralarına göre sırala
+            if (aIndex !== -1 && bIndex !== -1) {
+                return aIndex - bIndex;
+            }
+            
+            // Sadece a popüler şehirlerdeyse, a'yı öne al
+            if (aIndex !== -1) {
+                return -1;
+            }
+            
+            // Sadece b popüler şehirlerdeyse, b'yi öne al
+            if (bIndex !== -1) {
+                return 1;
+            }
+            
+            // İkisi de popüler değilse, alfabetik sırala
+            return a.name.localeCompare(b.name, 'tr-TR');
+        });
 
     const filteredDistricts = districts.filter(district =>
         district.name.toLowerCase().includes(districtSearch.toLowerCase())
