@@ -311,6 +311,7 @@
       "total": "Total Listings",
       "approved": "Approved",
       "pending": "Pending",
+      "inactive": "Inactive",
       "views": "Total Views"
     }
   }

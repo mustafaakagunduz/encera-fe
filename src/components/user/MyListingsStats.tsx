@@ -10,7 +10,8 @@ import {
     CheckCircle,
     Clock,
     Eye,
-    TrendingUp
+    TrendingUp,
+    XCircle
 } from 'lucide-react';
 
 interface MyListingsStatsProps {
@@ -21,8 +22,9 @@ export const MyListingsStats: React.FC<MyListingsStatsProps> = ({ properties }) 
     const { t, isReady } = useAppTranslation();
 
     const totalProperties = properties.length;
-    const approvedProperties = properties.filter(p => p.approved).length;
-    const pendingProperties = properties.filter(p => !p.approved).length;
+    const approvedProperties = properties.filter(p => p.approved && p.active).length;
+    const pendingProperties = properties.filter(p => !p.approved && p.active).length;
+    const inactiveProperties = properties.filter(p => !p.active).length;
     const totalViews = properties.reduce((sum, p) => sum + p.viewCount, 0);
 
     const stats = [
@@ -48,6 +50,13 @@ export const MyListingsStats: React.FC<MyListingsStatsProps> = ({ properties }) 
             bgColor: 'bg-yellow-50'
         },
         {
+            title: isReady ? t('my-listings.stats.inactive') : 'Pasif',
+            value: inactiveProperties,
+            icon: XCircle,
+            color: 'text-red-600',
+            bgColor: 'bg-red-50'
+        },
+        {
             title: isReady ? t('my-listings.stats.views') : 'Toplam Görüntülenme',
             value: totalViews,
             icon: Eye,
@@ -57,7 +66,7 @@ export const MyListingsStats: React.FC<MyListingsStatsProps> = ({ properties }) 
     ];
 
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             {stats.map((stat, index) => (
                 <div key={index} className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
                     <div className="flex items-center">

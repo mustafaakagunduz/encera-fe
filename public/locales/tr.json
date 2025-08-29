@@ -312,6 +312,7 @@
       "total": "Toplam İlan",
       "approved": "Onaylanmış",
       "pending": "Beklemede",
+      "inactive": "Pasif",
       "views": "Toplam Görüntülenme"
     }
   }
