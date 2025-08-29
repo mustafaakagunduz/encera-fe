@@ -6,6 +6,7 @@ import { PropertyResponse } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { MyListingsRow } from './MyListingsRow';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {MyListingsMobileCard} from "@/components/user/MyListingsMobileCard";
 
 interface MyListingsTableProps {
     properties: PropertyResponse[];
@@ -67,7 +68,7 @@ export const MyListingsTable: React.FC<MyListingsTableProps> = ({
             {/* Mobile Cards */}
             <div className="lg:hidden divide-y divide-gray-200">
                 {properties.map((property) => (
-                    <MyListingsRow key={property.id} property={property} />
+                    <MyListingsMobileCard key={property.id} property={property} />
                 ))}
             </div>
 
