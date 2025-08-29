@@ -22,6 +22,7 @@
     "loading": "Yükleniyor...",
     "error": "Bu alan zorunludur",
     "success": "Başarılı",
+    "common.error-occurred": "Bir hata oluştu. Lütfen sayfayı yenileyin.",
     "cancel": "İptal",
     "save": "Kaydet",
     "delete": "Sil",
@@ -250,6 +251,68 @@
       "feature2": "VIP İkon",
       "feature3": "Sosyal Medya Paylaşımı",
       "feature4": "E-posta Bülteni"
+    }
+  },
+
+  "my-listings": {
+    "title": "İlanlarım",
+    "negotiable": "Pazarlık",
+    "subtitle": "Oluşturduğunuz tüm ilanları buradan görüntüleyebilir ve yönetebilirsiniz",
+    "empty-state": {
+      "title": "Henüz hiç ilanınız yok",
+      "description": "İlk ilanınızı oluşturmaya başlayın",
+      "create-button": "İlan Oluştur"
+    },
+    "table": {
+      "title": "Başlık",
+      "type": "Tür",
+      "location": "Konum",
+      "price": "Fiyat",
+      "status": "Durum",
+      "views": "Görüntülenme",
+      "created-date": "Oluşturma Tarihi",
+      "actions": "İşlemler",
+      "views-count": "görüntülenme",
+      "results-showing": "ilan gösteriliyor"
+    },
+    "status": {
+      "pending": "Onay Bekliyor",
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi",
+      "inactive": "Pasif"
+    },
+    "listing-types": {
+      "SALE": "Satılık",
+      "RENT": "Kiralık"
+    },
+    "property-types": {
+      "RESIDENTIAL": "Konut",
+      "COMMERCIAL": "İş Yeri",
+      "LAND": "Arsa",
+      "DAILY_RENTAL": "Günlük Kiralık"
+    },
+    "actions": {
+      "view": "Görüntüle",
+      "edit": "Düzenle",
+      "delete": "Sil",
+      "republish": "Yeniden Yayınla",
+      "activate": "Aktifleştir",
+      "deactivate": "Pasifleştir"
+    },
+    "filters": {
+      "all": "Tümü",
+      "approved": "Onaylanmış",
+      "pending": "Onay Bekleyen",
+      "inactive": "Pasif"
+    },
+    "search": {
+      "placeholder": "İlan ara..."
+    },
+    "stats": {
+      "total": "Toplam İlan",
+      "approved": "Onaylanmış",
+      "pending": "Beklemede",
+      "views": "Toplam Görüntülenme"
     }
   }
 }

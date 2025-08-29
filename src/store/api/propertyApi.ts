@@ -1,10 +1,11 @@
 // src/store/api/propertyApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-// Backend'e tam uyumlu types
+// Backend'e tam uyumlu types - mevcut types ile uyumlu
 export interface RoomConfiguration {
     roomCount: number;
-    hallCount: number;
+    livingRoomCount: number;
+    bathroomCount: number;
 }
 
 export enum ListingType {
@@ -110,6 +111,24 @@ export interface CreatePropertyResponse {
     propertyId?: number;
 }
 
+export interface PropertyStatsResponse {
+    totalProperties: number;
+    approvedProperties: number;
+    pendingProperties: number;
+    activeProperties: number;
+}
+
+export interface PaginatedResponse<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    number: number;
+    size: number;
+    first: boolean;
+    last: boolean;
+    numberOfElements: number;
+}
+
 export const propertyApi = createApi({
     reducerPath: 'propertyApi',
     baseQuery: fetchBaseQuery({
@@ -123,36 +142,189 @@ export const propertyApi = createApi({
             return headers;
         },
     }),
-    tagTypes: ['Property'],
+    tagTypes: ['Property', 'UserProperty', 'PropertyStats'],
     endpoints: (builder) => ({
-        createProperty: builder.mutation<CreatePropertyResponse, PropertyCreateRequest>({
+        // ========== PUBLIC ENDPOINTS ==========
+
+        // Get all public properties (özet format)
+        getAllProperties: builder.query<PaginatedResponse<PropertySummaryResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/public?page=${page}&size=${size}`,
+            providesTags: ['Property'],
+        }),
+
+        // Get property by ID (tam format) - public endpoint olarak düzeltildi
+        getPropertyById: builder.query<PropertyResponse, number>({
+            query: (id) => `/public/${id}`,
+            providesTags: (result, error, id) => [{ type: 'Property', id }],
+        }),
+
+        // Get properties by listing type
+        getPropertiesByListingType: builder.query<PaginatedResponse<PropertySummaryResponse>, {
+            listingType: ListingType;
+            page?: number;
+            size?: number
+        }>({
+            query: ({ listingType, page = 0, size = 20 }) =>
+                `/public/listing-type/${listingType}?page=${page}&size=${size}`,
+            providesTags: ['Property'],
+        }),
+
+        // Get properties by property type
+        getPropertiesByPropertyType: builder.query<PaginatedResponse<PropertySummaryResponse>, {
+            propertyType: PropertyType;
+            page?: number;
+            size?: number
+        }>({
+            query: ({ propertyType, page = 0, size = 20 }) =>
+                `/public/property-type/${propertyType}?page=${page}&size=${size}`,
+            providesTags: ['Property'],
+        }),
+
+        // ========== USER ENDPOINTS ==========
+
+        // Create new property
+        createProperty: builder.mutation<PropertyResponse, PropertyCreateRequest>({
             query: (property) => ({
                 url: '/user/create',
                 method: 'POST',
                 body: property,
             }),
-            invalidatesTags: ['Property'],
+            invalidatesTags: ['UserProperty', 'PropertyStats'],
         }),
 
-        getPropertyById: builder.query<PropertyResponse, number>({
-            query: (id) => `/${id}`,
-            providesTags: (result, error, id) => [{ type: 'Property', id }],
+        // Get user's own properties
+        getUserProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/user/my-properties?page=${page}&size=${size}`,
+            providesTags: [
+                'UserProperty',
+                { type: 'UserProperty', id: 'LIST' }
+            ],
         }),
 
-        getAllProperties: builder.query<{
-            content: PropertySummaryResponse[];
-            totalElements: number;
-            totalPages: number;
-            number: number;
-        }, { page?: number; size?: number }>({
-            query: ({ page = 0, size = 20 }) => `?page=${page}&size=${size}`,
-            providesTags: ['Property'],
+        // Get user properties by listing type
+        getUserPropertiesByListingType: builder.query<PaginatedResponse<PropertyResponse>, {
+            listingType: ListingType;
+            page?: number;
+            size?: number
+        }>({
+            query: ({ listingType, page = 0, size = 20 }) =>
+                `/user/by-listing-type/${listingType}?page=${page}&size=${size}`,
+            providesTags: ['UserProperty'],
+        }),
+
+        // Get user's approved properties
+        getUserApprovedProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/user/approved?page=${page}&size=${size}`,
+            providesTags: ['UserProperty'],
+        }),
+
+        // Get user's inactive properties
+        getUserInactiveProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/user/inactive?page=${page}&size=${size}`,
+            providesTags: ['UserProperty'],
+        }),
+
+        // Get user property count
+        getUserPropertyCount: builder.query<number, void>({
+            query: () => '/user/count',
+            providesTags: ['PropertyStats'],
+        }),
+
+        // Get user property stats
+        getUserStats: builder.query<PropertyStatsResponse, void>({
+            query: () => '/user/stats',
+            providesTags: ['PropertyStats'],
+        }),
+
+        // Update property
+        updateProperty: builder.mutation<PropertyResponse, { id: number; data: Partial<PropertyCreateRequest> }>({
+            query: ({ id, data }) => ({
+                url: `/user/${id}`,
+                method: 'PUT',
+                body: data,
+            }),
+            invalidatesTags: (result, error, { id }) => [
+                'UserProperty',
+                'PropertyStats',
+                { type: 'UserProperty', id: 'LIST' },
+                { type: 'Property', id }
+            ],
+        }),
+
+        // Delete property
+        deleteProperty: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/user/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: (result, error, id) => [
+                'UserProperty',
+                'PropertyStats',
+                { type: 'UserProperty', id: 'LIST' },
+                { type: 'Property', id }
+            ],
+        }),
+
+        // Toggle property status (active/inactive)
+        togglePropertyStatus: builder.mutation<PropertyResponse, number>({
+            query: (id) => ({
+                url: `/user/${id}/toggle-status`,
+                method: 'POST',
+            }),
+            invalidatesTags: (result, error, id) => [
+                'UserProperty',
+                'PropertyStats',
+                { type: 'UserProperty', id: 'LIST' },
+                { type: 'Property', id }
+            ],
+        }),
+
+        // Republish property
+        republishProperty: builder.mutation<PropertyResponse, number>({
+            query: (id) => ({
+                url: `/user/${id}/republish`,
+                method: 'POST',
+            }),
+            invalidatesTags: (result, error, id) => [
+                'UserProperty',
+                'PropertyStats',
+                { type: 'UserProperty', id: 'LIST' },
+                { type: 'Property', id }
+            ],
+        }),
+
+        // Report property
+        reportProperty: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `/user/${id}/report`,
+                method: 'POST',
+            }),
+            invalidatesTags: (result, error, id) => [
+                { type: 'Property', id }
+            ],
         }),
     }),
 });
 
+// Export hooks
 export const {
-    useCreatePropertyMutation,
-    useGetPropertyByIdQuery,
+    // Public endpoints
     useGetAllPropertiesQuery,
+    useGetPropertyByIdQuery,
+    useGetPropertiesByListingTypeQuery,
+    useGetPropertiesByPropertyTypeQuery,
+
+    // User property management
+    useCreatePropertyMutation,
+    useGetUserPropertiesQuery,
+    useGetUserPropertiesByListingTypeQuery,
+    useGetUserApprovedPropertiesQuery,
+    useGetUserInactivePropertiesQuery,
+    useGetUserPropertyCountQuery,
+    useGetUserStatsQuery,
+    useUpdatePropertyMutation,
+    useDeletePropertyMutation,
+    useTogglePropertyStatusMutation,
+    useRepublishPropertyMutation,
+    useReportPropertyMutation,
 } = propertyApi;

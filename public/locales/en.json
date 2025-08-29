@@ -22,6 +22,7 @@
     "loading": "Loading...",
     "error": "This field is required",
     "success": "Success",
+    "common.error-occurred": "An error occurred. Please refresh the page.",
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
@@ -249,6 +250,68 @@
       "feature2": "VIP Icon",
       "feature3": "Social Media Sharing",
       "feature4": "Email Newsletter"
+    }
+  },
+
+  "my-listings": {
+    "title": "My Listings",
+    "negotiable": "Negotiable",
+    "subtitle": "View and manage all your created listings",
+    "empty-state": {
+      "title": "You don't have any listings yet",
+      "description": "Start by creating your first listing",
+      "create-button": "Create Listing"
+    },
+    "table": {
+      "title": "Title",
+      "type": "Type",
+      "location": "Location",
+      "price": "Price",
+      "status": "Status",
+      "views": "Views",
+      "created-date": "Created Date",
+      "actions": "Actions",
+      "views-count": "views",
+      "results-showing": "listings showing"
+    },
+    "status": {
+      "pending": "Pending Approval",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "inactive": "Inactive"
+    },
+    "listing-types": {
+      "SALE": "For Sale",
+      "RENT": "For Rent"
+    },
+    "property-types": {
+      "RESIDENTIAL": "Residential",
+      "COMMERCIAL": "Commercial",
+      "LAND": "Land",
+      "DAILY_RENTAL": "Daily Rental"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "republish": "Republish",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "filters": {
+      "all": "All",
+      "approved": "Approved",
+      "pending": "Pending",
+      "inactive": "Inactive"
+    },
+    "search": {
+      "placeholder": "Search listings..."
+    },
+    "stats": {
+      "total": "Total Listings",
+      "approved": "Approved",
+      "pending": "Pending",
+      "views": "Total Views"
     }
   }
 }
