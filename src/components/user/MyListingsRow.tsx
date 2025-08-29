@@ -2,11 +2,13 @@
 'use client';
 
 import React from 'react';
-import { PropertyResponse, ListingType, PropertyType } from '@/store/api/propertyApi';
+import { PropertyResponse, ListingType, PropertyType, useDeletePropertyMutation } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
+import { useRouter } from 'next/navigation';
 import {
     Eye,
-    Edit
+    Edit,
+    Trash2
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -16,6 +18,23 @@ interface MyListingsRowProps {
 
 export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
     const { t, isReady } = useAppTranslation();
+    const [deleteProperty] = useDeletePropertyMutation();
+    const router = useRouter();
+
+    const handleRowClick = () => {
+        router.push(`/property/${property.id}`);
+    };
+
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.confirm(isReady ? t('my-listings.actions.delete-confirm') : 'Bu ilanı silmek istediğinizden emin misiniz?')) {
+            try {
+                await deleteProperty(property.id).unwrap();
+            } catch (error) {
+                console.error('Silme hatası:', error);
+            }
+        }
+    };
 
     const getStatusText = () => {
         if (!property.active) {
@@ -73,7 +92,7 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
 
     // Desktop Row
     const DesktopRow = () => (
-        <tr className="hover:bg-gray-50">
+        <tr className="hover:bg-gray-50 cursor-pointer" onClick={handleRowClick}>
             <td className="px-6 py-4">
                 <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
                     {property.title}
@@ -119,21 +138,30 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
                 {formatDate(property.createdAt)}
             </td>
             <td className="px-6 py-4 text-right">
-                <div className="flex items-center justify-end gap-2">
+                <div className="flex items-center justify-end gap-2 relative z-10">
                     <Link
                         href={`/property/${property.id}`}
-                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        className="text-gray-400 hover:text-blue-600 transition-colors p-1"
                         title={isReady ? t('my-listings.actions.view') : 'Görüntüle'}
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <Eye className="w-4 h-4" />
                     </Link>
                     <Link
                         href={`/create-listing?edit=${property.id}`}
-                        className="text-gray-400 hover:text-green-600 transition-colors"
+                        className="text-gray-400 hover:text-green-600 transition-colors p-1"
                         title={isReady ? t('my-listings.actions.edit') : 'Düzenle'}
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <Edit className="w-4 h-4" />
                     </Link>
+                    <button
+                        onClick={handleDelete}
+                        className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                        title={isReady ? t('my-listings.actions.delete') : 'Sil'}
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
                 </div>
             </td>
         </tr>

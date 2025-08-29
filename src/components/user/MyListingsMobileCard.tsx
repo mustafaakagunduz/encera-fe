@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { PropertyResponse, ListingType, PropertyType } from '@/store/api/propertyApi';
+import { PropertyResponse, ListingType, PropertyType, useDeletePropertyMutation } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import {
     Eye,
@@ -10,7 +10,8 @@ import {
     Calendar,
     MapPin,
     Tag,
-    TrendingUp
+    TrendingUp,
+    Trash2
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -20,6 +21,17 @@ interface MyListingsMobileCardProps {
 
 export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ property }) => {
     const { t, isReady } = useAppTranslation();
+    const [deleteProperty] = useDeletePropertyMutation();
+
+    const handleDelete = async () => {
+        if (window.confirm(isReady ? t('my-listings.actions.delete-confirm') : 'Bu ilanı silmek istediğinizden emin misiniz?')) {
+            try {
+                await deleteProperty(property.id).unwrap();
+            } catch (error) {
+                console.error('Silme hatası:', error);
+            }
+        }
+    };
 
     const getStatusText = () => {
         if (!property.active) {
@@ -131,6 +143,14 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
                         <Edit className="w-3 h-3 mr-1" />
                         {isReady ? t('my-listings.actions.edit') : 'Düzenle'}
                     </Link>
+                    <button
+                        onClick={handleDelete}
+                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
+                        title={isReady ? t('my-listings.actions.delete') : 'Sil'}
+                    >
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        {isReady ? t('my-listings.actions.delete') : 'Sil'}
+                    </button>
                 </div>
                 {property.negotiable && (
                     <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">

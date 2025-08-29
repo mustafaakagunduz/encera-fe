@@ -45,7 +45,8 @@
     "daily-rental": "Günlük Kiralık",
     "residential": "Konut",
     "commercial": "İş Yeri",
-    "land": "Arsa"
+    "land": "Arsa",
+    "phone": "Telefon"
 
   },
 
@@ -295,6 +296,7 @@
       "view": "Görüntüle",
       "edit": "Düzenle",
       "delete": "Sil",
+      "delete-confirm": "Bu ilanı silmek istediğinizden emin misiniz?",
       "republish": "Yeniden Yayınla",
       "activate": "Aktifleştir",
       "deactivate": "Pasifleştir"
