@@ -20,7 +20,7 @@ import {
     useApprovePropertyMutation,
     useRejectPropertyMutation
 } from '@/store/api/adminApi';
-import { PropertyDetailModal } from './PropertyDetailModal';
+import { useRouter } from 'next/navigation';
 
 interface Property {
     id: number;
@@ -61,12 +61,12 @@ interface Property {
 }
 
 export const PendingPropertiesTable: React.FC = () => {
+    const router = useRouter();
     const { data: propertiesData, isLoading, error } = useGetPendingApprovalPropertiesQuery({ page: 0, size: 20 });
     const [approveProperty] = useApprovePropertyMutation();
     const [rejectProperty] = useRejectPropertyMutation();
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
     const [actionDropdown, setActionDropdown] = useState<number | null>(null);
     const [selectedProperties, setSelectedProperties] = useState<number[]>([]);
 
@@ -245,13 +245,16 @@ export const PendingPropertiesTable: React.FC = () => {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                             {filteredProperties.map((property) => (
-                                <tr key={property.id} className="hover:bg-gray-50 transition-colors">
+                                <tr key={property.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => router.push(`/admin/property/${property.id}`)}>
                                     {/* Checkbox */}
                                     <td className="px-4 py-4">
                                         <input
                                             type="checkbox"
                                             checked={selectedProperties.includes(property.id)}
-                                            onChange={() => handleSelectProperty(property.id)}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                handleSelectProperty(property.id);
+                                            }}
                                             className="rounded border-gray-300"
                                         />
                                     </td>
@@ -332,10 +335,13 @@ export const PendingPropertiesTable: React.FC = () => {
 
                                     {/* İşlemler */}
                                     <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
+                                        <div className="flex items-center justify-end gap-2 relative z-10">
                                             {/* Hızlı Onay */}
                                             <button
-                                                onClick={() => handleApprove(property.id)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleApprove(property.id);
+                                                }}
                                                 className="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors"
                                                 title="Onayla"
                                             >
@@ -344,7 +350,10 @@ export const PendingPropertiesTable: React.FC = () => {
 
                                             {/* Hızlı Red */}
                                             <button
-                                                onClick={() => handleReject(property.id)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleReject(property.id);
+                                                }}
                                                 className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
                                                 title="Reddet"
                                             >
@@ -353,7 +362,10 @@ export const PendingPropertiesTable: React.FC = () => {
 
                                             {/* Detay */}
                                             <button
-                                                onClick={() => setSelectedProperty(property)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(`/admin/property/${property.id}`);
+                                                }}
                                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                                                 title="Detayları Görüntüle"
                                             >
@@ -381,15 +393,6 @@ export const PendingPropertiesTable: React.FC = () => {
                 </div>
             </div>
 
-            {/* Property Detail Modal */}
-            {selectedProperty && (
-                <PropertyDetailModal
-                    property={selectedProperty}
-                    onClose={() => setSelectedProperty(null)}
-                    onApprove={() => handleApprove(selectedProperty.id)}
-                    onReject={() => handleReject(selectedProperty.id)}
-                />
-            )}
         </>
     );
 };

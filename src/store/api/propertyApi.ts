@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export interface RoomConfiguration {
     roomCount: number;
     livingRoomCount: number;
-    bathroomCount: number;
+    bathroomCount?: number;
 }
 
 export enum ListingType {

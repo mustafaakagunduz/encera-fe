@@ -4,8 +4,10 @@
 import React, { useState } from 'react';
 import { Search, Building, CheckCircle, Clock, AlertTriangle, Eye } from 'lucide-react';
 import { useGetAllAdminPropertiesQuery } from '@/store/api/adminApi';
+import { useRouter } from 'next/navigation';
 
 export const AllPropertiesTable: React.FC = () => {
+    const router = useRouter();
     const { data: propertiesData, isLoading } = useGetAllAdminPropertiesQuery({ page: 0, size: 50 });
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'reported'>('all');
@@ -97,7 +99,7 @@ export const AllPropertiesTable: React.FC = () => {
                 {filteredProperties.map((property) => {
                     const statusInfo = getStatusInfo(property);
                     return (
-                        <div key={property.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div key={property.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/admin/property/${property.id}`)}>
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center">
                                     <Building className="h-5 w-5 text-gray-400 mr-2" />
@@ -107,7 +109,11 @@ export const AllPropertiesTable: React.FC = () => {
                                     </span>
                                 </div>
                                 <button
-                                    className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        router.push(`/admin/property/${property.id}`);
+                                    }}
+                                    className="p-1 text-gray-400 hover:text-gray-600 rounded relative z-10"
                                     title="Detayları Görüntüle"
                                 >
                                     <Eye className="h-4 w-4" />

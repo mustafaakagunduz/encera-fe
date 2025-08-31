@@ -110,7 +110,7 @@ export const CreateListingForm: React.FC = () => {
                 furnished: previewData.furnished || false,
                 pappSellable: previewData.pappSellable || false,
                 roomCount: previewData.roomConfiguration?.roomCount?.toString() || '',
-                hallCount: previewData.roomConfiguration?.hallCount?.toString() || '',
+                hallCount: (previewData.roomConfiguration as any)?.hallCount?.toString() || previewData.roomConfiguration?.livingRoomCount?.toString() || '',
                 monthlyFee: previewData.monthlyFee,
                 deposit: previewData.deposit,
             });
@@ -139,7 +139,7 @@ export const CreateListingForm: React.FC = () => {
                 furnished: existingProperty.furnished,
                 pappSellable: existingProperty.pappSellable,
                 roomCount: existingProperty.roomConfiguration?.roomCount?.toString() || '',
-                hallCount: existingProperty.roomConfiguration?.livingRoomCount?.toString() || '',
+                hallCount: (existingProperty.roomConfiguration as any)?.hallCount?.toString() || existingProperty.roomConfiguration?.livingRoomCount?.toString() || '',
                 monthlyFee: existingProperty.monthlyFee,
                 deposit: existingProperty.deposit,
             });
@@ -273,7 +273,7 @@ export const CreateListingForm: React.FC = () => {
                 const editSubmitData = {
                     ...submitData,
                     approved: false,
-                    active: true
+                    active: !existingProperty?.active ? true : existingProperty.active
                 };
                 
                 await updateProperty({ 
