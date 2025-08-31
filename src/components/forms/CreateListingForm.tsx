@@ -2,14 +2,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LocationSelector } from '@/components/ui/location-selector';
 import { Toast } from '@/components/ui/toast';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {selectListingPreviewData, setListingPreviewData} from '@/store/slices/listingPreviewSlice';
-import { useCreatePropertyMutation, PropertyCreateRequest, ListingType, PropertyType, RoomConfiguration } from '@/store/api/propertyApi';
+import { useCreatePropertyMutation, useUpdatePropertyMutation, useGetPropertyByIdQuery, PropertyCreateRequest, ListingType, PropertyType, RoomConfiguration, propertyApi } from '@/store/api/propertyApi';
 import {
     Home,
     MapPin,
@@ -34,9 +34,21 @@ interface FormErrors {
 
 export const CreateListingForm: React.FC = () => {
     const { t, isReady } = useAppTranslation();
-    const [createProperty, { isLoading }] = useCreatePropertyMutation();
+    const [createProperty, { isLoading: isCreating }] = useCreatePropertyMutation();
+    const [updateProperty, { isLoading: isUpdating }] = useUpdatePropertyMutation();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const dispatch = useAppDispatch();
+
+    // Edit mode detection
+    const editId = searchParams.get('edit');
+    const isEditMode = !!editId;
+    
+    // Fetch property data for edit mode
+    const { data: existingProperty, isLoading: isFetchingProperty, error: fetchError } = useGetPropertyByIdQuery(
+        parseInt(editId || '0'), 
+        { skip: !isEditMode }
+    );
 
     // Toast state
     const [toast, setToast] = useState<{
@@ -104,6 +116,35 @@ export const CreateListingForm: React.FC = () => {
             });
         }
     }, [previewData]);
+
+    // Load existing property data for edit mode
+    React.useEffect(() => {
+        if (existingProperty && isEditMode && !previewData) {
+            setFormData({
+                title: existingProperty.title,
+                listingType: existingProperty.listingType,
+                propertyType: existingProperty.propertyType,
+                city: existingProperty.city,
+                district: existingProperty.district,
+                neighborhood: existingProperty.neighborhood,
+                price: existingProperty.price,
+                negotiable: existingProperty.negotiable,
+                grossArea: existingProperty.grossArea,
+                netArea: existingProperty.netArea,
+                elevator: existingProperty.elevator,
+                parking: existingProperty.parking,
+                balcony: existingProperty.balcony,
+                security: existingProperty.security,
+                description: existingProperty.description || '',
+                furnished: existingProperty.furnished,
+                pappSellable: existingProperty.pappSellable,
+                roomCount: existingProperty.roomConfiguration?.roomCount?.toString() || '',
+                hallCount: existingProperty.roomConfiguration?.livingRoomCount?.toString() || '',
+                monthlyFee: existingProperty.monthlyFee,
+                deposit: existingProperty.deposit,
+            });
+        }
+    }, [existingProperty, isEditMode, previewData]);
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setToast({ show: true, message, type });
@@ -194,7 +235,11 @@ export const CreateListingForm: React.FC = () => {
         // Form verisini hazırla
         const roomConfiguration: RoomConfiguration | undefined =
             formData.roomCount && formData.hallCount
-                ? { roomCount: Number(formData.roomCount), hallCount: Number(formData.hallCount) }
+                ? { 
+                    roomCount: Number(formData.roomCount), 
+                    livingRoomCount: Number(formData.hallCount),
+                    bathroomCount: existingProperty?.roomConfiguration?.bathroomCount || 1
+                  }
                 : undefined;
 
         const submitData: PropertyCreateRequest = {
@@ -220,11 +265,46 @@ export const CreateListingForm: React.FC = () => {
             deposit: formData.deposit,
         };
 
-        // Form verisini Redux store'a kaydet
-        dispatch(setListingPreviewData(submitData));
+        if (isEditMode && editId) {
+            // Edit mode - update existing property
+            try {
+                // Force property to pending status when edited
+                const editSubmitData = {
+                    ...submitData,
+                    approved: false
+                };
+                
+                await updateProperty({ 
+                    id: parseInt(editId), 
+                    data: editSubmitData 
+                }).unwrap();
+                
+                // Manually invalidate cache to ensure UI updates
+                dispatch(propertyApi.util.invalidateTags(['UserProperty', 'PropertyStats']));
+                
+                showToast(
+                    isReady ? t('listing.update.success') : 'İlan başarıyla güncellendi!',
+                    'success'
+                );
+                
+                // Redirect to my listings after successful update
+                setTimeout(() => {
+                    router.push('/my-listings');
+                }, 1500);
+            } catch (error) {
+                showToast(
+                    isReady ? t('listing.update.error') : 'İlan güncellenirken bir hata oluştu.',
+                    'error'
+                );
+            }
+        } else {
+            // Create mode - existing flow
+            // Form verisini Redux store'a kaydet
+            dispatch(setListingPreviewData(submitData));
 
-        // Preview sayfasına yönlendir
-        router.push('/listing-preview');
+            // Preview sayfasına yönlendir
+            router.push('/listing-preview');
+        }
     };
 
     return (
@@ -233,7 +313,10 @@ export const CreateListingForm: React.FC = () => {
                 <div className="border-b border-gray-200 p-6">
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                         <Home className="w-6 h-6 mr-3 text-blue-600" />
-                        {isReady ? t('listing.create.title') : 'İlan Ver'}
+                        {isEditMode 
+                            ? (isReady ? t('listing.edit.title') : 'İlan Düzenle')
+                            : (isReady ? t('listing.create.title') : 'İlan Ver')
+                        }
                     </h1>
                 </div>
 
@@ -329,7 +412,7 @@ export const CreateListingForm: React.FC = () => {
                                 district: errors.district,
                                 neighborhood: errors.neighborhood,
                             }}
-                            disabled={isLoading}
+                            disabled={isFetchingProperty || isCreating || isUpdating}
                         />
                     </div>
 
@@ -380,7 +463,7 @@ export const CreateListingForm: React.FC = () => {
                                     <input
                                         type="number"
                                         name="roomCount"
-                                        value={formData.roomCount}
+                                        value={formData.roomCount || ''}
                                         onChange={handleInputChange}
                                         placeholder="Oda"
                                         min="0"
@@ -390,7 +473,7 @@ export const CreateListingForm: React.FC = () => {
                                     <input
                                         type="number"
                                         name="hallCount"
-                                        value={formData.hallCount}
+                                        value={formData.hallCount || ''}
                                         onChange={handleInputChange}
                                         placeholder="Salon"
                                         min="0"
@@ -616,16 +699,26 @@ export const CreateListingForm: React.FC = () => {
                     <div className="pt-6 border-t border-gray-200">
                         <Button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={isFetchingProperty || isCreating || isUpdating}
                             className="w-full bg-blue-900 hover:bg-blue-600 text-white py-4 text-lg font-semibold"
                         >
-                            {isLoading ? (
+                            {(isCreating || isUpdating) ? (
                                 <>
                                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                    {isReady ? t('listing.create.submitting') : 'İlan yayınlanıyor...'}
+                                    {isEditMode 
+                                        ? (isReady ? t('listing.update.submitting') : 'İlan güncelleniyor...')
+                                        : (isReady ? t('listing.create.submitting') : 'İlan yayınlanıyor...')
+                                    }
+                                </>
+                            ) : isFetchingProperty ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                    {isReady ? t('listing.edit.loading') : 'İlan yükleniyor...'}
                                 </>
                             ) : (
-                                isReady ? t('listing.create.submit') : 'İlanı Yayınla'
+                                isEditMode
+                                    ? (isReady ? t('listing.update.submit') : 'İlanı Güncelle')
+                                    : (isReady ? t('listing.create.submit') : 'İlanı Yayınla')
                             )}
                         </Button>
                     </div>

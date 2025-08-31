@@ -197,6 +197,16 @@
       "success": "Listing created successfully!",
       "error": "An error occurred while creating the listing. Please try again.",
       "validation-error": "Please fill in all required fields."
+    },
+    "edit": {
+      "title": "Edit Listing",
+      "loading": "Loading listing..."
+    },
+    "update": {
+      "submit": "Update Listing",
+      "submitting": "Updating listing...",
+      "success": "Listing updated successfully!",
+      "error": "An error occurred while updating the listing."
     }
   },
 

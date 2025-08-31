@@ -198,6 +198,16 @@
       "success": "İlan başarıyla oluşturuldu!",
       "error": "İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.",
       "validation-error": "Lütfen tüm zorunlu alanları doldurun."
+    },
+    "edit": {
+      "title": "İlan Düzenle",
+      "loading": "İlan yükleniyor..."
+    },
+    "update": {
+      "submit": "İlanı Güncelle",
+      "submitting": "İlan güncelleniyor...",
+      "success": "İlan başarıyla güncellendi!",
+      "error": "İlan güncellenirken bir hata oluştu."
     }
   },
 
