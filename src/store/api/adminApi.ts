@@ -83,6 +83,7 @@ export interface PropertyUpdateRequest {
     description?: string;
     furnished?: boolean;
     pappSellable?: boolean;
+    approved?: boolean;
 }
 
 export interface PaginatedResponse<T> {

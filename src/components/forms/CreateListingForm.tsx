@@ -269,9 +269,11 @@ export const CreateListingForm: React.FC = () => {
             // Edit mode - update existing property
             try {
                 // Force property to pending status when edited
+                // Also set active: true because editing reactivates the property
                 const editSubmitData = {
                     ...submitData,
-                    approved: false
+                    approved: false,
+                    active: true
                 };
                 
                 await updateProperty({ 
@@ -279,8 +281,16 @@ export const CreateListingForm: React.FC = () => {
                     data: editSubmitData 
                 }).unwrap();
                 
-                // Manually invalidate cache to ensure UI updates
-                dispatch(propertyApi.util.invalidateTags(['UserProperty', 'PropertyStats']));
+                // Force complete cache refresh for user properties
+                dispatch(propertyApi.util.invalidateTags([
+                    'UserProperty', 
+                    'PropertyStats', 
+                    'Property',
+                    { type: 'UserProperty', id: 'LIST' }
+                ]));
+                
+                // Also refetch user properties specifically
+                dispatch(propertyApi.endpoints.getUserProperties.initiate({}, { forceRefetch: true }));
                 
                 showToast(
                     isReady ? t('listing.update.success') : 'İlan başarıyla güncellendi!',

@@ -41,6 +41,32 @@ export interface PropertyCreateRequest {
     roomConfiguration?: RoomConfiguration;
     monthlyFee?: number;
     deposit?: number;
+
+}
+
+export interface PropertyUpdateRequest {
+    title?: string;
+    listingType?: ListingType;
+    propertyType?: PropertyType;
+    city?: string;
+    district?: string;
+    neighborhood?: string;
+    price?: number;
+    negotiable?: boolean;
+    grossArea?: number;
+    netArea?: number;
+    elevator?: boolean;
+    parking?: boolean;
+    balcony?: boolean;
+    security?: boolean;
+    description?: string;
+    furnished?: boolean;
+    pappSellable?: boolean;
+    roomConfiguration?: RoomConfiguration;
+    monthlyFee?: number;
+    deposit?: number;
+    approved?: boolean; // YENİ EKLENEN - İlan editlendiğinde pending durumuna geçmesi için
+    active?: boolean; // YENİ EKLENEN - Pasif ilanların editlendiğinde aktif hale gelmesi için
 }
 
 export interface PropertyResponse {
@@ -237,7 +263,7 @@ export const propertyApi = createApi({
         }),
 
         // Update property
-        updateProperty: builder.mutation<PropertyResponse, { id: number; data: Partial<PropertyCreateRequest> }>({
+        updateProperty: builder.mutation<PropertyResponse, { id: number; data: PropertyUpdateRequest }>({
             query: ({ id, data }) => ({
                 url: `/user/${id}`,
                 method: 'PUT',
