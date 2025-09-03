@@ -69,6 +69,25 @@ export interface PropertyUpdateRequest {
     active?: boolean; // YENİ EKLENEN - Pasif ilanların editlendiğinde aktif hale gelmesi için
 }
 
+export interface PropertySearchFilters {
+    listingType?: ListingType;
+    propertyType?: PropertyType;
+    city?: string;
+    district?: string;
+    neighborhood?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minArea?: number;
+    maxArea?: number;
+    furnished?: boolean;
+    elevator?: boolean;
+    parking?: boolean;
+    balcony?: boolean;
+    security?: boolean;
+    roomCount?: number;
+    sort?: string;
+}
+
 export interface PropertyResponse {
     id: number;
     title: string;
@@ -155,6 +174,30 @@ export interface PaginatedResponse<T> {
     numberOfElements: number;
 }
 
+export interface PropertySearchFilters {
+    listingType?: ListingType;
+    propertyType?: PropertyType;
+    city?: string;
+    district?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minArea?: number;
+    maxArea?: number;
+    furnished?: boolean;
+    elevator?: boolean;
+    parking?: boolean;
+    balcony?: boolean;
+    security?: boolean;
+    roomCount?: number;
+    sort?: string; // 'createdAt-desc', 'price-asc', 'price-desc' vs.
+}
+
+export interface PropertySearchRequest {
+    filters: PropertySearchFilters;
+    page?: number;
+    size?: number;
+}
+
 export const propertyApi = createApi({
     reducerPath: 'propertyApi',
     baseQuery: fetchBaseQuery({
@@ -192,6 +235,36 @@ export const propertyApi = createApi({
         }>({
             query: ({ listingType, page = 0, size = 20 }) =>
                 `/public/listing-type/${listingType}?page=${page}&size=${size}`,
+            providesTags: ['Property'],
+        }),
+
+        searchPropertiesWithFilters: builder.query<
+            PaginatedResponse<PropertySummaryResponse>,
+            PropertySearchFilters & { page?: number; size?: number }
+        >({
+            query: ({ page = 0, size = 20, sort = 'createdAt-desc', ...filters }) => {
+                const params = new URLSearchParams();
+
+                // Pagination
+                params.append('page', page.toString());
+                params.append('size', size.toString());
+
+                // Sorting - backend'e uygun format
+                if (sort) {
+                    const [field, direction] = sort.split('-');
+                    params.append('sort', `${field},${direction}`);
+                }
+
+                // Filters - propertyType, sort, page, size hariç
+                Object.entries(filters).forEach(([key, value]) => {
+                    if (value !== undefined && value !== null && value !== '' &&
+                        key !== 'sort' && key !== 'page' && key !== 'size') {
+                        params.append(key, value.toString());
+                    }
+                });
+
+                return `/public/search?${params.toString()}`;
+            },
             providesTags: ['Property'],
         }),
 
@@ -347,6 +420,7 @@ export const {
     useGetUserApprovedPropertiesQuery,
     useGetUserInactivePropertiesQuery,
     useGetUserPropertyCountQuery,
+    useSearchPropertiesWithFiltersQuery,
     useGetUserStatsQuery,
     useUpdatePropertyMutation,
     useDeletePropertyMutation,
