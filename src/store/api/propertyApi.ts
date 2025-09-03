@@ -255,14 +255,22 @@ export const propertyApi = createApi({
                     params.append('sort', `${field},${direction}`);
                 }
 
-                // Filters - propertyType, sort, page, size hariç
+                // Filters - backend parametreleriyle uyumlu
                 Object.entries(filters).forEach(([key, value]) => {
                     if (value !== undefined && value !== null && value !== '' &&
                         key !== 'sort' && key !== 'page' && key !== 'size') {
-                        params.append(key, value.toString());
+                        
+                        // roomCount'u minRoomCount olarak gönder
+                        if (key === 'roomCount') {
+                            params.append('minRoomCount', value.toString());
+                        } else {
+                            params.append(key, value.toString());
+                        }
                     }
                 });
 
+
+                console.log('Final API URL:', `/public/search?${params.toString()}`);
                 return `/public/search?${params.toString()}`;
             },
             providesTags: ['Property'],

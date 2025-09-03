@@ -26,7 +26,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // URL'den filtreleri al
+    // URL'den filtreleri al (API'ye gönderilecek olan)
     const [filters, setFilters] = useState<PropertySearchFilters>(() => {
         const urlFilters: PropertySearchFilters = { propertyType };
 
@@ -74,6 +74,14 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
         return urlFilters;
     });
 
+    // Geçici filtreler (kullanıcının seçtiği ama henüz uygulanmayan)
+    const [tempFilters, setTempFilters] = useState<PropertySearchFilters>(filters);
+    
+    // filters değiştiğinde tempFilters'ı da güncelle
+    useEffect(() => {
+        setTempFilters(filters);
+    }, [filters]);
+
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize] = useState(20);
     const [viewType, setViewType] = useState<'list'>('list');
@@ -110,14 +118,20 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
     };
 
     const handleFiltersChange = (newFilters: PropertySearchFilters) => {
-        setFilters(newFilters);
+        setTempFilters(newFilters);
+    };
+
+    const applyFilters = (filtersToApply?: PropertySearchFilters) => {
+        const finalFilters = filtersToApply || tempFilters;
+        setFilters(finalFilters);
         setCurrentPage(0);
-        updateURL(newFilters, sortBy, 0);
+        updateURL(finalFilters, sortBy, 0);
     };
 
     const clearFilters = () => {
         const clearedFilters: PropertySearchFilters = { propertyType };
         setFilters(clearedFilters);
+        setTempFilters(clearedFilters);
         setCurrentPage(0);
         updateURL(clearedFilters, 'createdAt-desc', 0);
     };
@@ -171,9 +185,11 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                     onViewTypeChange={setViewType}
                     sortBy={sortBy}
                     onSortChange={handleSortChange}
-                    filters={filters}
+                    filters={tempFilters}
                     onFiltersChange={handleFiltersChange}
                     onClearFilters={clearFilters}
+                    onApplyFilters={applyFilters}
+                    totalElements={searchResult?.totalElements || 0}
                     propertyType={propertyType}
                 />
                 <PropertyErrorState />
@@ -190,15 +206,17 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                 onViewTypeChange={setViewType}
                 sortBy={sortBy}
                 onSortChange={handleSortChange}
-                filters={filters}
+                filters={tempFilters}
                 onFiltersChange={handleFiltersChange}
                 onClearFilters={clearFilters}
+                onApplyFilters={applyFilters}
+                totalElements={searchResult?.totalElements || 0}
                 propertyType={propertyType}
             />
 
             {/* Container */}
             <PropertyListContainer
-                filters={filters}
+                filters={tempFilters}
                 currentPage={currentPage}
                 pagesize={pageSize}
                 sortBy={sortBy}
@@ -211,6 +229,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                 linkPrefix={linkPrefix}
                 onFiltersChange={handleFiltersChange}
                 onClearFilters={clearFilters}
+                onApplyFilters={applyFilters}
                 propertyType={propertyType}
                 emptyTitle={isReady ? 'İlan bulunamadı' : 'No listings found'}
                 emptyDescription={isReady

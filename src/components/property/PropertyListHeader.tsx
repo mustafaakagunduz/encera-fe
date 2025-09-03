@@ -15,6 +15,7 @@ interface PropertyListHeaderProps {
     filters: PropertySearchFilters;
     onFiltersChange: (filters: PropertySearchFilters) => void;
     onClearFilters: () => void;
+    onApplyFilters: (filters?: PropertySearchFilters) => void;
     propertyType: PropertyType;
     totalElements?: number; // Optional yapalım
 }
@@ -28,6 +29,7 @@ export const PropertyListHeader: React.FC<PropertyListHeaderProps> = ({
                                                                           filters,
                                                                           onFiltersChange,
                                                                           onClearFilters,
+                                                                          onApplyFilters,
                                                                           propertyType,
                                                                           totalElements = 0 // Default değer
                                                                       }) => {

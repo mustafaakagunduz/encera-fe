@@ -22,6 +22,7 @@ interface FilterSidebarProps {
     filters: PropertySearchFilters;
     onFiltersChange: (filters: PropertySearchFilters) => void;
     onClearFilters: () => void;
+    onApplyFilters: (filters?: PropertySearchFilters) => void;
     propertyType: PropertyType;
     isMobile?: boolean;
     onClose?: () => void;
@@ -40,6 +41,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                                                 filters,
                                                                 onFiltersChange,
                                                                 onClearFilters,
+                                                                onApplyFilters,
                                                                 propertyType,
                                                                 isMobile = false,
                                                                 onClose
@@ -178,10 +180,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         }
 
         setLocalFilters(newFilters);
-
-        if (!isMobile) {
-            onFiltersChange(newFilters);
-        }
     };
 
     const handlePriceRangeSelect = (range: { min: number; max?: number }) => {
@@ -191,14 +189,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             maxPrice: range.max
         };
         setLocalFilters(newFilters);
-
-        if (!isMobile) {
-            onFiltersChange(newFilters);
-        }
     };
 
     const handleApplyFilters = () => {
         onFiltersChange(localFilters);
+        onApplyFilters(localFilters);
         if (onClose) onClose();
     };
 
@@ -668,16 +663,24 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     </div>
                 )}
 
-                {/* Desktop Clear Button */}
-                {!isMobile && getActiveFiltersCount() > 0 && (
-                    <div className="mt-6">
+                {/* Desktop Actions */}
+                {!isMobile && (
+                    <div className="mt-6 space-y-2">
                         <Button
-                            onClick={handleClearFilters}
-                            variant="outline"
+                            onClick={handleApplyFilters}
                             className="w-full"
                         >
-                            {isReady ? 'Filtreleri Temizle' : 'Clear All Filters'}
+                            {isReady ? 'Filtreleri Uygula' : 'Apply Filters'}
                         </Button>
+                        {getActiveFiltersCount() > 0 && (
+                            <Button
+                                onClick={handleClearFilters}
+                                variant="outline"
+                                className="w-full"
+                            >
+                                {isReady ? 'Filtreleri Temizle' : 'Clear All Filters'}
+                            </Button>
+                        )}
                     </div>
                 )}
             </div>

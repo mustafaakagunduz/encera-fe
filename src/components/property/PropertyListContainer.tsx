@@ -22,6 +22,7 @@ interface PropertyListContainerProps {
     linkPrefix: string;
     onFiltersChange: (filters: PropertySearchFilters) => void;
     onClearFilters: () => void;
+    onApplyFilters: (filters?: PropertySearchFilters) => void;
     propertyType: PropertyType;
     emptyTitle: string;
     emptyDescription: string;
@@ -41,6 +42,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                                                 filters,
                                                                                 onFiltersChange,
                                                                                 onClearFilters,
+                                                                                onApplyFilters,
                                                                                 propertyType,
                                                                                 emptyTitle,
                                                                                 emptyDescription,
@@ -94,6 +96,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                             filters={filters}
                             onFiltersChange={onFiltersChange}
                             onClearFilters={onClearFilters}
+                            onApplyFilters={onApplyFilters}
                             propertyType={propertyType}
                         />
                     </div>
@@ -265,6 +268,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                 filters={filters}
                                                 onFiltersChange={onFiltersChange}
                                                 onClearFilters={onClearFilters}
+                                                onApplyFilters={onApplyFilters}
                                                 propertyType={propertyType}
                                                 isMobile={true}
                                                 onClose={() => setShowMobileFilters(false)}
