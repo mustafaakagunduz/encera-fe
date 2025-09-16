@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "PAPP - Emlak İlanları",
     description: "Emlak sektöründe dijital dönüşüm için PAPP",
 };
-
+//deneme
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
