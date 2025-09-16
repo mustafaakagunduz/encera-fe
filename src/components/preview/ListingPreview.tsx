@@ -25,7 +25,11 @@ import {
     Building,
     Maximize,
     Bed,
-    Bath
+    Bath,
+    Calendar,
+    Layers,
+    Navigation,
+    Thermometer
 } from 'lucide-react';
 
 export const ListingPreview: React.FC = () => {
@@ -142,17 +146,47 @@ export const ListingPreview: React.FC = () => {
 
     // Tüm özellikleri listele
     const allFeatures = [
-        { key: 'elevator', label: 'Asansör', icon: ArrowUp, active: previewData.elevator },
-        { key: 'parking', label: 'Otopark', icon: Car, active: previewData.parking },
-        { key: 'balcony', label: 'Balkon', icon: Building, active: previewData.balcony },
-        { key: 'security', label: 'Güvenlik', icon: Shield, active: previewData.security },
-        { key: 'furnished', label: 'Eşyalı', icon: Sofa, active: previewData.furnished },
-        { key: 'pappSellable', label: 'Papp Satış', icon: Crown, active: previewData.pappSellable },
+        { 
+            key: 'elevator', 
+            label: isReady ? t('listing.create.elevator') : 'Asansör', 
+            icon: ArrowUp, 
+            active: previewData.elevator 
+        },
+        { 
+            key: 'parking', 
+            label: isReady ? t('listing.create.parking') : 'Otopark', 
+            icon: Car, 
+            active: previewData.parking 
+        },
+        { 
+            key: 'balcony', 
+            label: isReady ? t('listing.create.balcony') : 'Balkon', 
+            icon: Building, 
+            active: previewData.balcony 
+        },
+        { 
+            key: 'security', 
+            label: isReady ? t('listing.create.security') : 'Güvenlik', 
+            icon: Shield, 
+            active: previewData.security 
+        },
+        { 
+            key: 'furnished', 
+            label: isReady ? t('listing.create.furnished') : 'Eşyalı', 
+            icon: Sofa, 
+            active: previewData.furnished 
+        },
+        { 
+            key: 'pappSellable', 
+            label: isReady ? t('listing.create.encera-sellable') : 'Ençera ile Satılsın', 
+            icon: Crown, 
+            active: previewData.pappSellable 
+        },
     ];
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
-            <div className="container mx-auto px-4 py-8 max-w-4xl">
+            <div className="container mx-auto px-4 py-8 max-w-none lg:max-w-7xl">
 
                 {/* Header */}
                 <div className="mb-8">
@@ -205,7 +239,7 @@ export const ListingPreview: React.FC = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="p-8">
+                    <div className="p-6 lg:p-12">
 
                         {/* Title and Location */}
                         <div className="mb-8">
@@ -234,115 +268,142 @@ export const ListingPreview: React.FC = () => {
                             </div>
 
                             {/* Price Section */}
-                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-                                <div className="flex items-baseline justify-between flex-wrap gap-2">
-                                    <div>
-                                        <div className="flex items-baseline gap-3">
-                                            <span className="text-4xl font-bold text-blue-700">
-                                                {formatPrice(previewData.price)}
-                                            </span>
-                                            {previewData.negotiable && (
-                                                <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium">
-                                                    {isReady ? t('listing.negotiable') : 'Pazarlık Edilebilir'}
-                                                </span>
-                                            )}
-                                        </div>
+                            <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                                <div className="flex items-baseline gap-3 mb-3">
+                                    <span className="text-3xl font-bold text-blue-700">
+                                        {formatPrice(previewData.price)}
+                                    </span>
+                                    {previewData.negotiable && (
+                                        <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-sm font-medium">
+                                            {isReady ? t('listing.negotiable') : 'Pazarlık Edilebilir'}
+                                        </span>
+                                    )}
+                                </div>
 
-                                        {/* Additional Costs */}
-                                        {(previewData.monthlyFee || previewData.deposit) && (
-                                            <div className="flex gap-6 mt-3">
-                                                {previewData.monthlyFee && (
-                                                    <div className="text-slate-600">
-                                                        <span className="text-sm">{isReady ? t('listing.monthly-fee') : 'Aidat'}: </span>
-                                                        <span className="font-semibold">{formatPrice(previewData.monthlyFee)}</span>
-                                                    </div>
-                                                )}
-                                                {previewData.deposit && (
-                                                    <div className="text-slate-600">
-                                                        <span className="text-sm">{isReady ? t('listing.deposit') : 'Depozito'}: </span>
-                                                        <span className="font-semibold">{formatPrice(previewData.deposit)}</span>
-                                                    </div>
-                                                )}
+                                {/* Additional Costs */}
+                                {(previewData.monthlyFee || previewData.deposit) && (
+                                    <div className="flex flex-wrap gap-4 text-sm">
+                                        {previewData.monthlyFee && (
+                                            <div className="text-slate-600">
+                                                <span>{isReady ? t('listing.monthly-fee') : 'Aidat'}: </span>
+                                                <span className="font-semibold">{formatPrice(previewData.monthlyFee)}</span>
+                                            </div>
+                                        )}
+                                        {previewData.deposit && (
+                                            <div className="text-slate-600">
+                                                <span>{isReady ? t('listing.deposit') : 'Depozito'}: </span>
+                                                <span className="font-semibold">{formatPrice(previewData.deposit)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Property Details Grid - Two Columns on Desktop */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-8">
+
+                            {/* Left Column */}
+                            <div className="space-y-6">
+                                {/* Basic Info */}
+                                <div>
+                                    <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                                        {isReady ? t('listing.basic-info') : 'Temel Bilgiler'}
+                                    </h3>
+                                    <div className="bg-slate-50 rounded-lg p-4 space-y-3">
+                                        {/* Area Info */}
+                                        {(previewData.grossArea || previewData.netArea) && (
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-600">{isReady ? t('listing.area') : 'Alan'}</span>
+                                                <span className="text-slate-900 font-semibold">
+                                                    {previewData.grossArea || previewData.netArea}m²
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {/* Room Config */}
+                                        {getRoomText() !== '-' && (
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-600">{isReady ? t('listing.room-count') : 'Oda Sayısı'}</span>
+                                                <span className="text-slate-900 font-semibold">{getRoomText()}</span>
+                                            </div>
+                                        )}
+
+                                        {/* Building Age */}
+                                        {previewData.buildingAge !== undefined && previewData.buildingAge !== null && (
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-600">{isReady ? t('listing.create.building-age') : 'Bina Yaşı'}</span>
+                                                <span className="text-slate-900 font-semibold">
+                                                    {previewData.buildingAge} {isReady ? t('listing.create.years') : 'yıl'}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {/* Floor Info */}
+                                        {(previewData.currentFloor !== undefined || previewData.totalFloors !== undefined) && (
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-600">{isReady ? t('listing.create.current-floor') : 'Kat Bilgisi'}</span>
+                                                <span className="text-slate-900 font-semibold">
+                                                    {previewData.currentFloor !== undefined && previewData.totalFloors !== undefined 
+                                                        ? `${previewData.currentFloor}/${previewData.totalFloors}`
+                                                        : previewData.currentFloor !== undefined 
+                                                            ? `${previewData.currentFloor}. ${isReady ? t('listing.create.floor') : 'kat'}`
+                                                            : `${previewData.totalFloors} ${isReady ? t('listing.create.floors') : 'katlı'}`
+                                                    }
+                                                </span>
                                             </div>
                                         )}
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        {/* Property Details Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-                            {/* Basic Info */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-slate-900 mb-4">
-                                    {isReady ? t('listing.basic-info') : 'Temel Bilgiler'}
-                                </h3>
-
-                                {/* Area Info */}
-                                {(previewData.grossArea || previewData.netArea) && (
-                                    <div className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
-                                        <div className="flex items-center">
-                                            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mr-3">
-                                                <Maximize className="w-5 h-5 text-blue-600" />
+                                {/* Heating Types */}
+                                {previewData.heatingTypes && previewData.heatingTypes.length > 0 && (
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                                            {isReady ? t('listing.create.heating-types') : 'Isıtma'}
+                                        </h3>
+                                        <div className="bg-slate-50 rounded-lg p-4">
+                                            <div className="flex flex-wrap gap-2">
+                                                {previewData.heatingTypes.map((heatingType, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 border border-blue-200"
+                                                    >
+                                                        {isReady ? t(`heating.options.${heatingType}`) : heatingType}
+                                                    </span>
+                                                ))}
                                             </div>
-                                            <span className="text-slate-700 font-medium">{isReady ? t('listing.area') : 'Alan'}</span>
                                         </div>
-                                        <span className="text-slate-900 font-bold text-lg">
-                                            {previewData.grossArea || previewData.netArea}m²
-                                        </span>
-                                    </div>
-                                )}
-
-                                {/* Room Config */}
-                                {getRoomText() !== '-' && (
-                                    <div className="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
-                                        <div className="flex items-center">
-                                            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mr-3">
-                                                <Home className="w-5 h-5 text-green-600" />
-                                            </div>
-                                            <span className="text-slate-700 font-medium">{isReady ? t('listing.room-count') : 'Oda Sayısı'}</span>
-                                        </div>
-                                        <span className="text-slate-900 font-bold text-lg">
-                                            {getRoomText()}
-                                        </span>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Features */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-slate-900 mb-4">
-                                    {isReady ? t('listing.features') : 'Özellikler'}
-                                </h3>
-
-                                <div className="grid grid-cols-2 gap-3">
-                                    {allFeatures.map((feature) => {
-                                        const IconComponent = feature.icon;
-                                        return (
-                                            <div
-                                                key={feature.key}
-                                                className={`flex items-center p-3 rounded-xl border ${
-                                                    feature.active
-                                                        ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-green-100'
-                                                        : 'bg-gradient-to-r from-red-50 to-rose-50 border-red-100'
-                                                }`}
-                                            >
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${
-                                                    feature.active ? 'bg-green-100' : 'bg-red-100'
-                                                }`}>
-                                                    <IconComponent className={`w-4 h-4 ${
-                                                        feature.active ? 'text-green-600' : 'text-red-600'
-                                                    }`} />
+                            {/* Right Column */}
+                            <div className="space-y-6">
+                                {/* Features */}
+                                <div>
+                                    <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                                        {isReady ? t('listing.features') : 'Özellikler'}
+                                    </h3>
+                                    <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+                                        {allFeatures.map((feature) => {
+                                            const IconComponent = feature.icon;
+                                            return (
+                                                <div
+                                                    key={feature.key}
+                                                    className="flex items-center justify-between"
+                                                >
+                                                    <div className="flex items-center">
+                                                        <IconComponent className="w-4 h-4 text-slate-500 mr-2" />
+                                                        <span className="text-slate-700">{feature.label}</span>
+                                                    </div>
+                                                    <div className={`w-2 h-2 rounded-full ${
+                                                        feature.active ? 'bg-green-500' : 'bg-red-500'
+                                                    }`}></div>
                                                 </div>
-                                                <span className={`font-medium text-sm ${
-                                                    feature.active ? 'text-green-800' : 'text-red-800'
-                                                }`}>
-                                                    {feature.label}
-                                                </span>
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -353,7 +414,7 @@ export const ListingPreview: React.FC = () => {
                                 <h3 className="text-lg font-semibold text-slate-900 mb-4">
                                     {isReady ? t('listing.description') : 'Açıklama'}
                                 </h3>
-                                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                                <div className="bg-slate-50 rounded-lg p-4">
                                     <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
                                         {previewData.description}
                                     </p>
@@ -364,8 +425,8 @@ export const ListingPreview: React.FC = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="sticky bottom-6">
-                    <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 p-6">
+                <div className="mt-8">
+                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
                         <div className="flex gap-4">
                             <Button
                                 onClick={handleEdit}

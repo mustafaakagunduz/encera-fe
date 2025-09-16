@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.idea/encera-fe.iml
+.idea/modules.xml
+.gitignore
+.idea/vcs.xml

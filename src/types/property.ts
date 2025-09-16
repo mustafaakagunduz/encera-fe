@@ -37,6 +37,10 @@ export interface PropertyCreateRequest {
     roomConfiguration?: RoomConfiguration;
     monthlyFee?: number;
     deposit?: number;
+    buildingAge?: number;
+    totalFloors?: number;
+    currentFloor?: number;
+    heatingTypes?: string[];
 }
 
 export interface PropertyResponse extends PropertyCreateRequest {

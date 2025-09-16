@@ -195,6 +195,20 @@
       "furnished": "Eşyalı",
       "papp-sellable": "Papp ile satılabilsin",
       "papp-sellable-description": "İlanınızı Papp üzerinden satış sürecinde profesyonel destek alabilirsiniz.",
+      "building-age": "Bina Yaşı",
+      "total-floors": "Kat Sayısı", 
+      "current-floor": "Bulunduğu Kat",
+      "heating-types": "Isıtma",
+      "heating-placeholder": "Isıtma türlerini seçiniz",
+      "items-selected": "seçim yapıldı",
+      "heating-types-selected": "ısıtma türü seçildi",
+      "years": "yıl",
+      "floor": "kat",
+      "floors": "katlı",
+      "encera-premium": "Ençera Premium",
+      "encera-sellable": "Ençera ile satılsın",
+      "encera-sellable-description": "İlanınızı Ençera üzerinden satış sürecinde profesyonel destek alabilirsiniz.",
+      "deposit-sale-note": "Satılık ilanlar için depozito gerekli değildir.",
       "success": "İlan başarıyla oluşturuldu!",
       "error": "İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.",
       "validation-error": "Lütfen tüm zorunlu alanları doldurun."
@@ -379,6 +393,28 @@
       "approve-confirm": "Bu ilanı onaylamak istediğinizden emin misiniz?",
       "reject-confirm": "Bu ilanı reddetmek istediğinizden emin misiniz?",
       "cancel": "İptal"
+    }
+  },
+
+  "heating": {
+    "options": {
+      "none": "Yok",
+      "stove": "Soba",
+      "natural-gas-stove": "Doğalgaz Sobası",
+      "floor-heating": "Kat Kaloriferi",
+      "central": "Merkezi",
+      "central-share": "Merkezi (Pay Ölçer)",
+      "combi-natural-gas": "Kombi (Doğalgaz)",
+      "combi-electric": "Kombi (Elektrik)",
+      "underfloor-heating": "Yerden Isıtma",
+      "air-conditioning": "Klima",
+      "fancoil": "Fancoil Ünitesi",
+      "solar-energy": "Güneş Enerjisi",
+      "electric-radiator": "Elektrikli Radyatör",
+      "geothermal": "Jeotermal",
+      "fireplace": "Şömine",
+      "vrv": "VRV",
+      "heat-pump": "Isı Pompası"
     }
   }
 }

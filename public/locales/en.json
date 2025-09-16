@@ -194,6 +194,20 @@
       "furnished": "Furnished",
       "papp-sellable": "Sellable via Papp",
       "papp-sellable-description": "Get professional support for your listing through Papp's sales process.",
+      "building-age": "Building Age",
+      "total-floors": "Total Floors",
+      "current-floor": "Current Floor", 
+      "heating-types": "Heating",
+      "heating-placeholder": "Select heating types",
+      "items-selected": "items selected",
+      "heating-types-selected": "heating types selected",
+      "years": "years",
+      "floor": "floor",
+      "floors": "floors",
+      "encera-premium": "Ençera Premium",
+      "encera-sellable": "Sellable via Ençera",
+      "encera-sellable-description": "Get professional support for your listing through Ençera's sales process.",
+      "deposit-sale-note": "Deposit is not required for sale listings.",
       "success": "Listing created successfully!",
       "error": "An error occurred while creating the listing. Please try again.",
       "validation-error": "Please fill in all required fields."
@@ -378,6 +392,28 @@
       "approve-confirm": "Are you sure you want to approve this property?",
       "reject-confirm": "Are you sure you want to reject this property?",
       "cancel": "Cancel"
+    }
+  },
+
+  "heating": {
+    "options": {
+      "none": "None",
+      "stove": "Stove",
+      "natural-gas-stove": "Natural Gas Stove",
+      "floor-heating": "Floor Heating System",
+      "central": "Central",
+      "central-share": "Central (Shared Meter)",
+      "combi-natural-gas": "Combi (Natural Gas)",
+      "combi-electric": "Combi (Electric)",
+      "underfloor-heating": "Underfloor Heating",
+      "air-conditioning": "Air Conditioning",
+      "fancoil": "Fancoil Unit",
+      "solar-energy": "Solar Energy",
+      "electric-radiator": "Electric Radiator",
+      "geothermal": "Geothermal",
+      "fireplace": "Fireplace",
+      "vrv": "VRV",
+      "heat-pump": "Heat Pump"
     }
   }
 }

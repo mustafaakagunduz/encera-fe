@@ -20,7 +20,9 @@ import {
     Shield,
     Sofa,
     Loader2,
-    Crown
+    Crown,
+    ChevronDown,
+    X
 } from 'lucide-react';
 
 interface FormData extends Omit<PropertyCreateRequest, 'roomConfiguration'> {
@@ -83,9 +85,22 @@ export const CreateListingForm: React.FC = () => {
         hallCount: '',
         monthlyFee: undefined,
         deposit: undefined,
+        buildingAge: undefined,
+        totalFloors: undefined,
+        currentFloor: undefined,
+        heatingTypes: [],
     });
 
     const [errors, setErrors] = useState<FormErrors>({});
+    const [heatingDropdownOpen, setHeatingDropdownOpen] = useState(false);
+
+    // Heating options
+    const heatingOptions = [
+        'none', 'stove', 'natural-gas-stove', 'floor-heating', 'central', 
+        'central-share', 'combi-natural-gas', 'combi-electric', 'underfloor-heating', 
+        'air-conditioning', 'fancoil', 'solar-energy', 'electric-radiator', 
+        'geothermal', 'fireplace', 'vrv', 'heat-pump'
+    ];
 
     const previewData = useAppSelector(selectListingPreviewData);
 
@@ -113,6 +128,10 @@ export const CreateListingForm: React.FC = () => {
                 hallCount: (previewData.roomConfiguration as any)?.hallCount?.toString() || previewData.roomConfiguration?.livingRoomCount?.toString() || '',
                 monthlyFee: previewData.monthlyFee,
                 deposit: previewData.deposit,
+                buildingAge: previewData.buildingAge,
+                totalFloors: previewData.totalFloors,
+                currentFloor: previewData.currentFloor,
+                heatingTypes: previewData.heatingTypes || [],
             });
         }
     }, [previewData]);
@@ -142,9 +161,28 @@ export const CreateListingForm: React.FC = () => {
                 hallCount: (existingProperty.roomConfiguration as any)?.hallCount?.toString() || existingProperty.roomConfiguration?.livingRoomCount?.toString() || '',
                 monthlyFee: existingProperty.monthlyFee,
                 deposit: existingProperty.deposit,
+                buildingAge: existingProperty.buildingAge,
+                totalFloors: existingProperty.totalFloors,
+                currentFloor: existingProperty.currentFloor,
+                heatingTypes: existingProperty.heatingTypes || [],
             });
         }
     }, [existingProperty, isEditMode, previewData]);
+
+    // Close dropdown when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('[data-dropdown-container]')) {
+                setHeatingDropdownOpen(false);
+            }
+        };
+
+        if (heatingDropdownOpen) {
+            document.addEventListener('click', handleClickOutside);
+            return () => document.removeEventListener('click', handleClickOutside);
+        }
+    }, [heatingDropdownOpen]);
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setToast({ show: true, message, type });
@@ -186,6 +224,22 @@ export const CreateListingForm: React.FC = () => {
             city: '',
             district: '',
             neighborhood: ''
+        }));
+    };
+
+    const handleHeatingToggle = (heatingType: string) => {
+        setFormData(prev => ({
+            ...prev,
+            heatingTypes: prev.heatingTypes?.includes(heatingType)
+                ? prev.heatingTypes.filter(type => type !== heatingType)
+                : [...(prev.heatingTypes || []), heatingType]
+        }));
+    };
+
+    const removeHeatingType = (heatingType: string) => {
+        setFormData(prev => ({
+            ...prev,
+            heatingTypes: prev.heatingTypes?.filter(type => type !== heatingType) || []
         }));
     };
 
@@ -262,7 +316,11 @@ export const CreateListingForm: React.FC = () => {
             pappSellable: formData.pappSellable,
             roomConfiguration,
             monthlyFee: formData.monthlyFee,
-            deposit: formData.deposit,
+            deposit: formData.listingType === ListingType.SALE ? undefined : formData.deposit,
+            buildingAge: formData.buildingAge,
+            totalFloors: formData.totalFloors,
+            currentFloor: formData.currentFloor,
+            heatingTypes: formData.heatingTypes,
         };
 
         if (isEditMode && editId) {
@@ -318,9 +376,10 @@ export const CreateListingForm: React.FC = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            <div className="bg-white rounded-lg shadow-lg">
-                <div className="border-b border-gray-200 p-6">
+        <div className="max-w-none lg:max-w-7xl mx-auto p-4 lg:p-6">
+            {/* Header */}
+            <div className="bg-white rounded-lg shadow-lg mb-6">
+                <div className="p-6 lg:p-8">
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                         <Home className="w-6 h-6 mr-3 text-blue-600" />
                         {isEditMode 
@@ -329,16 +388,20 @@ export const CreateListingForm: React.FC = () => {
                         }
                     </h1>
                 </div>
+            </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-8">
-                    {/* Temel Bilgiler */}
-                    <div className="space-y-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    {/* Temel Bilgiler Kartı */}
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
                             <FileText className="w-5 h-5 mr-2 text-blue-600" />
                             {isReady ? t('listing.create.basic-info') : 'Temel Bilgiler'}
                         </h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                             {/* İlan Başlığı */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -405,9 +468,9 @@ export const CreateListingForm: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Konum */}
-                    <div className="space-y-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    {/* Konum Kartı */}
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
                             <MapPin className="w-5 h-5 mr-2 text-blue-600" />
                             {isReady ? t('listing.location') : 'Konum'}
                         </h2>
@@ -425,15 +488,20 @@ export const CreateListingForm: React.FC = () => {
                             disabled={isFetchingProperty || isCreating || isUpdating}
                         />
                     </div>
+                
+                </div>
 
-                    {/* Emlak Detayları */}
-                    <div className="space-y-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                {/* İlan Detayları ve Fiyat Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    {/* Emlak Detayları Kartı */}
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
                             <Home className="w-5 h-5 mr-2 text-blue-600" />
                             {isReady ? t('listing.create.property-details') : 'İlan Detayları'}
                         </h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                             {/* Brüt Alan */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -491,17 +559,65 @@ export const CreateListingForm: React.FC = () => {
                                     />
                                 </div>
                             </div>
+
+                            {/* Bina Yaşı */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                    {isReady ? t('listing.create.building-age') : 'Bina Yaşı'}
+                                </label>
+                                <input
+                                    type="number"
+                                    name="buildingAge"
+                                    value={formData.buildingAge || ''}
+                                    onChange={handleInputChange}
+                                    min="0"
+                                    max="200"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+
+                            {/* Kat Sayısı */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                    {isReady ? t('listing.create.total-floors') : 'Kat Sayısı'}
+                                </label>
+                                <input
+                                    type="number"
+                                    name="totalFloors"
+                                    value={formData.totalFloors || ''}
+                                    onChange={handleInputChange}
+                                    min="1"
+                                    max="100"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+
+                            {/* Bulunduğu Kat */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                    {isReady ? t('listing.create.current-floor') : 'Bulunduğu Kat'}
+                                </label>
+                                <input
+                                    type="number"
+                                    name="currentFloor"
+                                    value={formData.currentFloor || ''}
+                                    onChange={handleInputChange}
+                                    min="0"
+                                    max="100"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Fiyat Bilgileri */}
-                    <div className="space-y-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    {/* Fiyat Bilgileri Kartı */}
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
                             <DollarSign className="w-5 h-5 mr-2 text-blue-600" />
                             {isReady ? t('listing.create.pricing') : 'Fiyat Bilgileri'}
                         </h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                             {/* Fiyat */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -535,19 +651,29 @@ export const CreateListingForm: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Depozito */}
+                            {/* Depozito - Satılık ise deaktif */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${formData.listingType === ListingType.SALE ? 'text-gray-400' : 'text-gray-900'}`}>
                                     {isReady ? t('listing.create.deposit') : 'Depozito'} ({isReady ? t('listing.create.currency') : 'TL'})
                                 </label>
                                 <input
                                     type="number"
                                     name="deposit"
-                                    value={formData.deposit || ''}
+                                    value={formData.listingType === ListingType.SALE ? '' : (formData.deposit || '')}
                                     onChange={handleInputChange}
                                     min="0"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    disabled={formData.listingType === ListingType.SALE}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        formData.listingType === ListingType.SALE 
+                                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed' 
+                                            : 'border-gray-300'
+                                    }`}
                                 />
+                                {formData.listingType === ListingType.SALE && (
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        {isReady ? t('listing.create.deposit-sale-note') : 'Satılık ilanlar için depozito gerekli değildir.'}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
@@ -566,15 +692,20 @@ export const CreateListingForm: React.FC = () => {
                             </label>
                         </div>
                     </div>
+                
+                </div>
 
-                    {/* Özellikler */}
-                    <div className="space-y-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                {/* Özellikler ve Premium Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    {/* Özellikler Kartı */}
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
                             <Home className="w-5 h-5 mr-2 text-blue-600" />
                             {isReady ? t('listing.create.amenities') : 'Özellikler'}
                         </h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                             {/* Asansör */}
                             <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
                                 <input
@@ -654,14 +785,78 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.furnished') : 'Eşyalı'}
                                 </label>
                             </div>
+
+                            {/* Isıtma - Çoklu Seçim */}
+                            <div className="md:col-span-3">
+                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                    {isReady ? t('listing.create.heating-types') : 'Isıtma'}
+                                </label>
+                                <div className="relative" data-dropdown-container>
+                                    <button
+                                        type="button"
+                                        onClick={() => setHeatingDropdownOpen(!heatingDropdownOpen)}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between"
+                                    >
+                                        <span className="text-gray-500">
+                                            {formData.heatingTypes && formData.heatingTypes.length > 0 
+                                                ? `${formData.heatingTypes.length} ${isReady ? t('listing.create.items-selected') : 'seçim yapıldı'}`
+                                                : (isReady ? t('listing.create.heating-placeholder') : 'Isıtma türlerini seçiniz')
+                                            }
+                                        </span>
+                                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                                    </button>
+
+                                    {heatingDropdownOpen && (
+                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                            {heatingOptions.map((option) => (
+                                                <label
+                                                    key={option}
+                                                    className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={formData.heatingTypes?.includes(option) || false}
+                                                        onChange={() => handleHeatingToggle(option)}
+                                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3"
+                                                    />
+                                                    <span className="text-sm text-gray-900">
+                                                        {isReady ? t(`heating.options.${option}`) : option}
+                                                    </span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Selected heating types display */}
+                                {formData.heatingTypes && formData.heatingTypes.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                        {formData.heatingTypes.map((type) => (
+                                            <span
+                                                key={type}
+                                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                            >
+                                                {isReady ? t(`heating.options.${type}`) : type}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeHeatingType(type)}
+                                                    className="ml-2 text-blue-600 hover:text-blue-800"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Papp ile Satılabilsin - Ayrı Section */}
-                    <div className="space-y-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    {/* Ençera Premium Kartı */}
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
                             <Crown className="w-5 h-5 mr-2 text-yellow-600" />
-                            PAPP Premium
+                            {isReady ? t('listing.create.encera-premium') : 'Ençera Premium'}
                         </h2>
 
                         <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-6">
@@ -676,64 +871,63 @@ export const CreateListingForm: React.FC = () => {
                                 />
                                 <label htmlFor="pappSellable" className="ml-4 flex items-center text-base font-medium text-gray-900">
                                     <Crown className="w-5 h-5 mr-2 text-yellow-600" />
-                                    {isReady ? t('listing.create.papp-sellable') : 'Papp ile satılabilsin'}
+                                    {isReady ? t('listing.create.encera-sellable') : 'Ençera ile satılsın'}
                                 </label>
                             </div>
                             <p className="mt-2 ml-9 text-sm text-gray-600">
-                                {isReady ? t('listing.create.papp-sellable-description') : 'İlanınızı Papp üzerinden satış sürecinde profesyonel destek alabilirsiniz.'}
+                                {isReady ? t('listing.create.encera-sellable-description') : 'İlanınızı Ençera üzerinden satış sürecinde profesyonel destek alabilirsiniz.'}
                             </p>
                         </div>
                     </div>
+                
+                </div>
 
-                    {/* Açıklama */}
-                    <div className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-900 mb-2">
-                                {isReady ? t('listing.create.description') : 'Açıklama'}
-                            </label>
-                            <textarea
-                                name="description"
-                                value={formData.description}
-                                onChange={handleInputChange}
-                                rows={6}
-                                placeholder={isReady ? t('listing.create.description-placeholder') : 'İlan açıklamanızı detaylı bir şekilde yazınız...'}
-                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
-                                    errors.description ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                            />
-                            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
-                        </div>
-                    </div>
+                {/* Açıklama Kartı */}
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-6">
+                        {isReady ? t('listing.create.description') : 'Açıklama'}
+                    </h2>
+                    <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        rows={6}
+                        placeholder={isReady ? t('listing.create.description-placeholder') : 'İlan açıklamanızı detaylı bir şekilde yazınız...'}
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
+                            errors.description ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    />
+                    {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
+                </div>
 
-                    {/* Submit Button */}
-                    <div className="pt-6 border-t border-gray-200">
-                        <Button
-                            type="submit"
-                            disabled={isFetchingProperty || isCreating || isUpdating}
-                            className="w-full bg-blue-900 hover:bg-blue-600 text-white py-4 text-lg font-semibold"
-                        >
-                            {(isCreating || isUpdating) ? (
-                                <>
-                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                    {isEditMode 
-                                        ? (isReady ? t('listing.update.submitting') : 'İlan güncelleniyor...')
-                                        : (isReady ? t('listing.create.submitting') : 'İlan yayınlanıyor...')
-                                    }
-                                </>
-                            ) : isFetchingProperty ? (
-                                <>
-                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                    {isReady ? t('listing.edit.loading') : 'İlan yükleniyor...'}
-                                </>
-                            ) : (
-                                isEditMode
-                                    ? (isReady ? t('listing.update.submit') : 'İlanı Güncelle')
-                                    : (isReady ? t('listing.create.submit') : 'İlanı Yayınla')
-                            )}
-                        </Button>
-                    </div>
-                </form>
-            </div>
+                {/* Submit Button Kartı */}
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                    <Button
+                        type="submit"
+                        disabled={isFetchingProperty || isCreating || isUpdating}
+                        className="w-full bg-blue-900 hover:bg-blue-600 text-white py-4 text-lg font-semibold"
+                    >
+                        {(isCreating || isUpdating) ? (
+                            <>
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                {isEditMode 
+                                    ? (isReady ? t('listing.update.submitting') : 'İlan güncelleniyor...')
+                                    : (isReady ? t('listing.create.submitting') : 'İlan yayınlanıyor...')
+                                }
+                            </>
+                        ) : isFetchingProperty ? (
+                            <>
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                {isReady ? t('listing.edit.loading') : 'İlan yükleniyor...'}
+                            </>
+                        ) : (
+                            isEditMode
+                                ? (isReady ? t('listing.update.submit') : 'İlanı Güncelle')
+                                : (isReady ? t('listing.create.submit') : 'İlanı Yayınla')
+                        )}
+                    </Button>
+                </div>
+            </form>
 
             {/* Toast Notification */}
             <Toast
@@ -746,4 +940,5 @@ export const CreateListingForm: React.FC = () => {
     );
 };
 
+export { CreateListingForm };
 export default CreateListingForm;
