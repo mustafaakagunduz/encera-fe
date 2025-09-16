@@ -201,7 +201,7 @@ export interface PropertySearchRequest {
 export const propertyApi = createApi({
     reducerPath: 'propertyApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8080/api/properties',
+        baseUrl: 'http://localhost:8081/api/properties',
         prepareHeaders: (headers, { getState }) => {
             const token = (getState() as any).auth.token;
             if (token) {

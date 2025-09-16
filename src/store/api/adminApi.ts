@@ -100,7 +100,7 @@ export interface PaginatedResponse<T> {
 export const adminApi = createApi({
     reducerPath: 'adminApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8080/api',
+        baseUrl: 'http://localhost:8081/api',
         prepareHeaders: (headers, { getState }) => {
             const token = (getState() as any).auth.token;
             if (token) {

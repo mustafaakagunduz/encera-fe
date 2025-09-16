@@ -71,7 +71,7 @@ export interface ErrorResponse {
 export const authApi = createApi({
     reducerPath: 'authApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8080/api/auth',
+        baseUrl: 'http://localhost:8081/api/auth',
         prepareHeaders: (headers, { getState }) => {
             const token = (getState() as any).auth.token;
             if (token) {
