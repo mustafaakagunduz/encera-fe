@@ -52,7 +52,7 @@ interface Property {
     roomConfiguration?: {
         roomCount: number;
         hallCount?: number;
-        livingRoomCount?: number;
+        hallCount?: number;
         bathroomCount?: number;
     };
     owner: {
@@ -204,7 +204,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                                     <div className="bg-white border border-gray-200 rounded-lg p-4">
                                         <h4 className="text-sm font-semibold text-gray-900 mb-2">Oda Bilgisi</h4>
                                         <p className="text-lg font-semibold text-gray-800">
-                                            {property.roomConfiguration.roomCount || 0} + {(property.roomConfiguration.hallCount || property.roomConfiguration.livingRoomCount) || 0}
+                                            {property.roomConfiguration.roomCount || 0} + {(property.roomConfiguration.hallCount || property.roomConfiguration.hallCount) || 0}
                                         </p>
                                         {property.roomConfiguration.bathroomCount && (
                                             <p className="text-sm text-gray-600 mt-1">Banyo: {property.roomConfiguration.bathroomCount}</p>

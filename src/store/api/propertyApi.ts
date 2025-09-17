@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 // Backend'e tam uyumlu types - mevcut types ile uyumlu
 export interface RoomConfiguration {
     roomCount: number;
-    livingRoomCount: number;
+    hallCount: number;
     bathroomCount?: number;
 }
 

@@ -216,7 +216,7 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
                                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                                     <h4 className="font-medium text-gray-900 mb-2">{isReady ? t('admin.property-detail.room-info') : 'Oda + Salon'}</h4>
                                     <p className="text-xl font-bold text-gray-800">
-                                        {property.roomConfiguration.roomCount || 0} + {(property.roomConfiguration as any)?.hallCount || property.roomConfiguration.livingRoomCount || 0}
+                                        {property.roomConfiguration.roomCount || 0} + {(property.roomConfiguration as any)?.hallCount || property.roomConfiguration.hallCount || 0}
                                     </p>
                                 </div>
                             )}

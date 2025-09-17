@@ -125,7 +125,7 @@ export const CreateListingForm: React.FC = () => {
                 furnished: previewData.furnished || false,
                 pappSellable: previewData.pappSellable || false,
                 roomCount: previewData.roomConfiguration?.roomCount?.toString() || '',
-                hallCount: (previewData.roomConfiguration as any)?.hallCount?.toString() || previewData.roomConfiguration?.livingRoomCount?.toString() || '',
+                hallCount: (previewData.roomConfiguration as any)?.hallCount?.toString() || previewData.roomConfiguration?.hallCount?.toString() || '',
                 monthlyFee: previewData.monthlyFee,
                 deposit: previewData.deposit,
                 buildingAge: previewData.buildingAge,
@@ -158,7 +158,7 @@ export const CreateListingForm: React.FC = () => {
                 furnished: existingProperty.furnished,
                 pappSellable: existingProperty.pappSellable,
                 roomCount: existingProperty.roomConfiguration?.roomCount?.toString() || '',
-                hallCount: (existingProperty.roomConfiguration as any)?.hallCount?.toString() || existingProperty.roomConfiguration?.livingRoomCount?.toString() || '',
+                hallCount: (existingProperty.roomConfiguration as any)?.hallCount?.toString() || existingProperty.roomConfiguration?.hallCount?.toString() || '',
                 monthlyFee: existingProperty.monthlyFee,
                 deposit: existingProperty.deposit,
                 buildingAge: existingProperty.buildingAge,
@@ -291,7 +291,7 @@ export const CreateListingForm: React.FC = () => {
             formData.roomCount && formData.hallCount
                 ? { 
                     roomCount: Number(formData.roomCount), 
-                    livingRoomCount: Number(formData.hallCount),
+                    hallCount: Number(formData.hallCount),
                     bathroomCount: existingProperty?.roomConfiguration?.bathroomCount || 1
                   }
                 : undefined;

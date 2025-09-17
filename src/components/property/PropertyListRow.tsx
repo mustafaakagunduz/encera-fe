@@ -70,8 +70,8 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
 
     const getRoomText = () => {
         if (property.roomConfiguration) {
-            const { roomCount, livingRoomCount } = property.roomConfiguration;
-            return `${roomCount}+${livingRoomCount}`;
+            const { roomCount, hallCount } = property.roomConfiguration;
+            return `${roomCount}+${hallCount}`;
         }
         return null;
     };

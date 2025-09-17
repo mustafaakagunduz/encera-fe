@@ -1,7 +1,7 @@
 // src/types/property.ts
 export interface RoomConfiguration {
     roomCount: number;
-    livingRoomCount: number;
+    hallCount: number;
     bathroomCount: number;
 }
 

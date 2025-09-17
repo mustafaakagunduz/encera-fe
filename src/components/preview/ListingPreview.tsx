@@ -106,7 +106,7 @@ export const ListingPreview: React.FC = () => {
 
     const getRoomText = () => {
         if (previewData.roomConfiguration) {
-            return `${previewData.roomConfiguration.roomCount}+${previewData.roomConfiguration.livingRoomCount}`;
+            return `${previewData.roomConfiguration.roomCount}+${previewData.roomConfiguration.hallCount}`;
         }
         return '-';
     };
