@@ -247,11 +247,22 @@
       "title": "Encera Gayrimenkul",
       "subtitle": "12 yıllık deneyimle güvenilir emlak hizmetleri",
       "description": "Türkiye'nin önde gelen emlak şirketlerinden biri olarak, hayalinizdeki evi bulmanız için profesyonel ekibimizle hizmetinizdeyiz.",
+      "badge": "Premium Emlak Deneyimi",
+      "cta-button": "İlanları Keşfet",
       "stats": {
         "experience": "12 Yıllık Deneyim",
         "properties": "5,000+ Aktif İlan",
         "cities": "35 Şehir",
-        "customers": "50,000+ Mutlu Müşteri"
+        "customers": "50,000+ Mutlu Müşteri",
+        "experience-label": "Emlak Sektöründe",
+        "properties-label": "Başarılı İlan",
+        "cities-label": "Türkiye Geneli",
+        "customers-label": "Güvenen Aile"
+      },
+      "trust-indicators": {
+        "licensed": "Lisanslı Emlak Uzmanı",
+        "support": "7/24 Danışmanlık",
+        "satisfaction": "%100 Müşteri Memnuniyeti"
       }
     },
     "properties": {
