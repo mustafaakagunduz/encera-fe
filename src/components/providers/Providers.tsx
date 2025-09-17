@@ -1,18 +1,32 @@
-// src/components/providers/Providers.tsx - Bu değişiklikleri ekleyin
-
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '@/store/store';
 import { initializeAuth } from '@/store/slices/authSlice';
-import { I18nProvider } from './I18nProvider'; // Bu import'u ekleyin
+import { I18nProvider } from './I18nProvider';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+interface ProvidersProps {
+    children: React.ReactNode;
+}
+
+export function Providers({ children }: ProvidersProps) {
+    const [isClient, setIsClient] = useState(false);
+
     useEffect(() => {
-        // Initialize auth state from localStorage
+        setIsClient(true);
+        // Initialize auth state from localStorage on client side only
         store.dispatch(initializeAuth());
     }, []);
+
+    // Server-side rendering için loading göster
+    if (!isClient) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
 
     return (
         <Provider store={store}>

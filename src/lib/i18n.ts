@@ -1,5 +1,3 @@
-'use client';
-
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -16,23 +14,33 @@ const resources = {
     }
 };
 
-if (!i18n.isInitialized) {
-    i18n
-        .use(initReactI18next)
-        .init({
-            debug: false,
-            fallbackLng: 'tr',
-            lng: 'tr', // Default language olarak tr ayarlayalım
-            resources,
+// i18n'i sadece bir kere initialize et
+const initializeI18n = () => {
+    if (!i18n.isInitialized) {
+        i18n
+            .use(initReactI18next)
+            .init({
+                debug: process.env.NODE_ENV === 'development',
+                fallbackLng: 'tr',
+                lng: 'tr',
+                resources,
 
-            interpolation: {
-                escapeValue: false,
-            },
+                interpolation: {
+                    escapeValue: false,
+                },
 
-            react: {
-                useSuspense: false,
-            },
-        });
-}
+                react: {
+                    useSuspense: false,
+                },
 
-export default i18n;
+                // Client-side için ayarlar
+                detection: {
+                    order: ['localStorage', 'navigator'],
+                    caches: ['localStorage'],
+                },
+            });
+    }
+    return i18n;
+};
+
+export default initializeI18n();

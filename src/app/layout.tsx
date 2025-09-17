@@ -18,25 +18,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "PAPP - Emlak İlanları",
+    title: "ENCERA - Emlak İlanları",
     description: "Emlak sektöründe dijital dönüşüm için PAPP",
 };
 //deneme
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+    children,   
+}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="tr">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers>
-            <Navbar />
-            <main className="min-h-screen">
+            <Providers>
+                <Navbar />
                 {children}
-            </main>
-            <Footer />
-        </Providers>
+                <Footer />
+            </Providers>
         </body>
         </html>
     );

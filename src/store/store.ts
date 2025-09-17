@@ -4,6 +4,7 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { authApi } from './api/authApi';
 import { propertyApi } from './api/propertyApi';
 import { adminApi } from './api/adminApi';
+import { userApi } from './api/userApi';
 import authReducer from './slices/authSlice';
 import listingPreviewReducer from './slices/listingPreviewSlice'; // Yeni slice import
 
@@ -14,12 +15,14 @@ export const store = configureStore({
         [authApi.reducerPath]: authApi.reducer,
         [propertyApi.reducerPath]: propertyApi.reducer,
         [adminApi.reducerPath]: adminApi.reducer,
+        [userApi.reducerPath]: userApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
             authApi.middleware,
             propertyApi.middleware,
-            adminApi.middleware
+            adminApi.middleware,
+            userApi.middleware
         ),
 });
 
