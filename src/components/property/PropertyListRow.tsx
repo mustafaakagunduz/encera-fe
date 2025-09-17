@@ -77,12 +77,12 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
     };
 
     return (
-        <Link href={linkHref}>
-            <div className="bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                <div className="p-4 flex gap-4">
+        <Link href={linkHref} className="block w-full">
+            <div className="bg-white hover:bg-gray-50 transition-colors cursor-pointer w-full">
+                <div className="flex flex-col sm:flex-row w-full border-b border-gray-200">
                     {/* Property Image */}
-                    <div className="flex-shrink-0">
-                        <div className="w-48 h-32 bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
+                    <div className="flex-shrink-0 w-full sm:w-48">
+                        <div className="w-full h-48 sm:h-full bg-gray-300 border-r border-gray-200 flex items-center justify-center relative overflow-hidden">
                             {property.coverImageUrl ? (
                                 <img
                                     src={property.coverImageUrl}
@@ -113,7 +113,7 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
                             {property.pappSellable && (
                                 <div className="absolute top-2 right-2">
                                     <div className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                                        PAPP
+                                        ENCERA
                                     </div>
                                 </div>
                             )}
@@ -121,7 +121,7 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
                     </div>
 
                     {/* Property Details */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 p-4 sm:p-6">
                         <div className="flex justify-between items-start mb-2">
                             <div className="flex items-center space-x-2">
                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

@@ -26,7 +26,9 @@ interface PropertyListContainerProps {
     propertyType: PropertyType;
     emptyTitle: string;
     emptyDescription: string;
-    pagesize?: number; // Opsiyonel, default 20
+    pagesize?: number;
+    showMobileFilters: boolean;
+    onCloseMobileFilters: () => void;
 }
 
 export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
@@ -46,32 +48,37 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                                                 propertyType,
                                                                                 emptyTitle,
                                                                                 emptyDescription,
-                                                                                pagesize = 20
+                                                                                pagesize = 20,
+                                                                                showMobileFilters,
+                                                                                onCloseMobileFilters
                                                                             }) => {
     const { t, isReady } = useAppTranslation();
-    const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     if (isLoading) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="flex gap-6">
-                    <div className="hidden lg:block w-80 flex-shrink-0">
-                        <div className="bg-white rounded-lg border p-6">
-                            <div className="animate-pulse space-y-4">
-                                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                <div className="space-y-2">
-                                    <div className="h-3 bg-gray-200 rounded"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+            <div className="flex">
+                <div className="flex w-full">
+                    <div className="hidden lg:block w-80 flex-shrink-0 bg-white border-r min-h-screen fixed left-0 top-16 z-10">
+                        <div className="h-full overflow-y-auto px-6 py-6">
+                            <div className="bg-white rounded-lg border p-6">
+                                <div className="animate-pulse space-y-4">
+                                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                    <div className="space-y-2">
+                                        <div className="h-3 bg-gray-200 rounded"></div>
+                                        <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 space-y-4">
+                    <div className="flex-1 lg:ml-80">
+                        <div className="w-full">
+                            <div className="w-full bg-white">
                         {[...Array(5)].map((_, i) => (
-                            <div key={i} className="bg-white border rounded-lg p-4">
-                                <div className="animate-pulse flex space-x-4">
-                                    <div className="rounded-lg bg-gray-200 h-32 w-48 flex-shrink-0"></div>
-                                    <div className="flex-1 space-y-2 py-1">
+                            <div key={i} className="border-b border-gray-200">
+                                <div className="animate-pulse flex">
+                                    <div className="bg-gray-300 border-r border-gray-200 h-32 w-48 flex-shrink-0"></div>
+                                    <div className="p-4 sm:p-6 flex-1 space-y-2 py-1">
                                         <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                                         <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                                         <div className="h-3 bg-gray-200 rounded w-2/3"></div>
@@ -80,6 +87,8 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                 </div>
                             </div>
                         ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -87,11 +96,11 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex gap-6">
+        <div className="flex">
+            <div className="flex w-full">
                 {/* Filter Sidebar - Desktop */}
-                <div className="hidden lg:block w-80 flex-shrink-0">
-                    <div className="sticky top-6">
+                <div className="hidden lg:block w-80 flex-shrink-0 bg-white border-r min-h-screen fixed left-0 top-16 z-10">
+                    <div className="h-full overflow-y-auto px-6 py-6">
                         <FilterSidebar
                             filters={filters}
                             onFiltersChange={onFiltersChange}
@@ -103,9 +112,10 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 lg:ml-80">
+                    <div className="w-full">
                     {/* Mobile Sort */}
-                    <div className="lg:hidden mb-4">
+                    <div className="lg:hidden mb-4 px-4 sm:px-6">
                         <select className="w-full appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="createdAt-desc">
                                 {isReady ? 'En Yeni' : 'Newest'}
@@ -133,19 +143,20 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                     ) : (
                         <>
                             {/* Property List */}
-                            <div className="space-y-4">
-                                {properties.map((property) => (
-                                    <PropertyListRow
-                                        key={property.id}
-                                        property={property}
-                                        linkHref={`${linkPrefix}/${property.id}`}
-                                    />
+                            <div className="w-full bg-white overflow-hidden">
+                                {properties.map((property, index) => (
+                                    <div key={property.id} className={index === properties.length - 1 ? '[&>a>div>div]:border-b-0' : ''}>
+                                        <PropertyListRow
+                                            property={property}
+                                            linkHref={`${linkPrefix}/${property.id}`}
+                                        />
+                                    </div>
                                 ))}
                             </div>
 
                             {/* Pagination */}
                             {totalPages > 1 && (
-                                <div className="mt-8 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-lg">
+                                <div className="mt-8 mx-4 sm:mx-6 lg:mx-8 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-lg">
                                     <div className="flex flex-1 justify-between sm:hidden">
                                         <button
                                             onClick={() => onPageChange(currentPage - 1)}
@@ -199,7 +210,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                             onClick={() => onPageChange(pageIndex)}
                                                             className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
                                                                 pageIndex === currentPage
-                                                                    ? 'z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                                                                    ? '-z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
                                                                     : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                                                             }`}
                                                         >
@@ -225,6 +236,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                             )}
                         </>
                     )}
+                    </div>
                 </div>
             </div>
 
@@ -236,12 +248,12 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                             {/* Backdrop */}
                             <div
                                 className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
-                                onClick={() => setShowMobileFilters(false)}
+                                onClick={onCloseMobileFilters}
                             />
 
-                            {/* Panel */}
-                            <div className="fixed inset-y-0 right-0 max-w-full flex">
-                                <div className="relative w-screen max-w-md">
+                            {/* Panel - Tüm ekranı kaplayan */}
+                            <div className="fixed inset-0 flex">
+                                <div className="relative w-full">
                                     <div className="h-full flex flex-col bg-white shadow-xl">
                                         {/* Header */}
                                         <div className="px-4 py-6 bg-gray-50 sm:px-6">
@@ -252,7 +264,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                 <button
                                                     type="button"
                                                     className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    onClick={() => setShowMobileFilters(false)}
+                                                    onClick={onCloseMobileFilters}
                                                 >
                                                     <span className="sr-only">Close</span>
                                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -271,7 +283,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                 onApplyFilters={onApplyFilters}
                                                 propertyType={propertyType}
                                                 isMobile={true}
-                                                onClose={() => setShowMobileFilters(false)}
+                                                onClose={onCloseMobileFilters}
                                             />
                                         </div>
                                     </div>

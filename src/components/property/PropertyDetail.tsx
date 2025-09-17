@@ -170,7 +170,11 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                 </div>
 
                 {/* Main Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div className={`grid gap-6 mb-6 ${
+                    isOwner 
+                        ? 'grid-cols-1 lg:grid-cols-2' 
+                        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                }`}>
 
                     {/* Image Gallery - Left Side */}
                     <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
@@ -277,13 +281,58 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             </div>
                         </div>
                     </div>
+
+                    {/* Contact Info - Ilan sahibi değilse iletişim bilgilerini göster */}
+                    {!isOwner && (
+                        <div className="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 className="font-medium text-gray-900 mb-4">
+                                {isReady ? 'İletişim' : 'Contact'}
+                            </h3>
+
+                            <div className="space-y-4">
+                                <div className="flex items-center">
+                                    <UserIcon className="w-5 h-5 mr-3 text-gray-400" />
+                                    <div>
+                                        <div className="text-sm font-medium text-gray-900">
+                                            {property.owner.firstName} {property.owner.lastName}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            {isReady ? 'İlan Sahibi' : 'Property Owner'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center">
+                                    <Phone className="w-5 h-5 mr-3 text-gray-400" />
+                                    <div>
+                                        <div className="text-sm font-medium text-gray-900">
+                                            {property.owner.phoneNumber}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            {isReady ? 'Telefon' : 'Phone'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-6">
+                                <a
+                                    href={`tel:${property.owner.phoneNumber}`}
+                                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                                >
+                                    <Phone className="w-4 h-4 mr-2" />
+                                    {isReady ? 'Ara' : 'Call'}
+                                </a>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Details Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6">
 
                     {/* Property Details */}
-                    <div className="lg:col-span-2">
+                    <div>
                         <div className="bg-white rounded-lg shadow-sm border p-6">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
@@ -365,11 +414,11 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
                             {/* Description */}
                             {property.description && (
-                                <div className="mt-6 pt-6 border-t border-gray-200">
+                                <div className="mt-6 pt-6 border-t border-gray-200 w-full max-w-full overflow-hidden">
                                     <h3 className="font-medium text-gray-900 mb-3">
                                         {isReady ? 'Açıklama' : 'Description'}
                                     </h3>
-                                    <p className="text-gray-600 leading-relaxed">
+                                    <p className="text-gray-600 leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap w-full">
                                         {property.description}
                                     </p>
                                 </div>
@@ -377,52 +426,6 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         </div>
                     </div>
 
-                    {/* Contact Info - Ilan sahibi değilse iletişim bilgilerini göster */}
-                    {!isOwner && (
-                        <div className="lg:col-span-1">
-                            <div className="bg-white rounded-lg shadow-sm border p-6">
-                                <h3 className="font-medium text-gray-900 mb-4">
-                                    {isReady ? 'İletişim' : 'Contact'}
-                                </h3>
-
-                                <div className="space-y-4">
-                                    <div className="flex items-center">
-                                        <UserIcon className="w-5 h-5 mr-3 text-gray-400" />
-                                        <div>
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {property.owner.firstName} {property.owner.lastName}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {isReady ? 'İlan Sahibi' : 'Property Owner'}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center">
-                                        <Phone className="w-5 h-5 mr-3 text-gray-400" />
-                                        <div>
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {property.owner.phoneNumber}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {isReady ? 'Telefon' : 'Phone'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6">
-                                    <a
-                                        href={`tel:${property.owner.phoneNumber}`}
-                                        className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                                    >
-                                        <Phone className="w-4 h-4 mr-2" />
-                                        {isReady ? 'Ara' : 'Call'}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

@@ -239,12 +239,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     );
 
     return (
-        <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-6">
+        <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                         <Filter className="w-5 h-5 mr-2" />
-                        {isReady ? 'Filtreler' : 'Filters'}
+                        {isReady ? t('filters.title') : 'Filters'}
                         {getActiveFiltersCount() > 0 && (
                             <span className="ml-2 bg-blue-600 text-white text-xs rounded-full px-2 py-1">
                                 {getActiveFiltersCount()}
@@ -265,7 +264,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     {/* İlan Türü */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-3">
-                            {isReady ? 'İlan Türü' : 'Listing Type'}
+                            {isReady ? t('filters.listing-type') : 'Listing Type'}
                         </label>
                         <div className="space-y-2">
                             <label className="flex items-center">
@@ -276,7 +275,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     onChange={() => handleFilterChange('listingType', undefined)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-sm text-gray-700">{isReady ? 'Tümü' : 'All'}</span>
+                                <span className="text-sm text-gray-700">{isReady ? t('filters.all') : 'All'}</span>
                             </label>
                             <label className="flex items-center">
                                 <input
@@ -286,7 +285,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     onChange={() => handleFilterChange('listingType', ListingType.SALE)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-sm text-gray-700">{isReady ? 'Satılık' : 'For Sale'}</span>
+                                <span className="text-sm text-gray-700">{isReady ? t('filters.for-sale') : 'For Sale'}</span>
                             </label>
                             <label className="flex items-center">
                                 <input
@@ -296,7 +295,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     onChange={() => handleFilterChange('listingType', ListingType.RENT)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-sm text-gray-700">{isReady ? 'Kiralık' : 'For Rent'}</span>
+                                <span className="text-sm text-gray-700">{isReady ? t('filters.for-rent') : 'For Rent'}</span>
                             </label>
                         </div>
                     </div>
@@ -305,7 +304,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                             <DollarSign className="w-4 h-4 mr-1" />
-                            {isReady ? 'Fiyat Aralığı' : 'Price Range'}
+                            {isReady ? t('filters.price-range') : 'Price Range'}
                         </label>
 
                         {/* Hızlı Fiyat Butonları */}
@@ -329,7 +328,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <label className="block text-xs text-gray-500 mb-1">
-                                    {isReady ? 'Min Fiyat' : 'Min Price'}
+                                    {isReady ? t('filters.min-price') : 'Min Price'}
                                 </label>
                                 <input
                                     type="number"
@@ -341,11 +340,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                             </div>
                             <div>
                                 <label className="block text-xs text-gray-500 mb-1">
-                                    {isReady ? 'Max Fiyat' : 'Max Price'}
+                                    {isReady ? t('filters.max-price') : 'Max Price'}
                                 </label>
                                 <input
                                     type="number"
-                                    placeholder="Sınırsız"
+                                    placeholder={isReady ? t('filters.unlimited') : 'Unlimited'}
                                     value={localFilters.maxPrice || ''}
                                     onChange={(e) => handleFilterChange('maxPrice', e.target.value ? parseInt(e.target.value) : undefined)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -358,19 +357,19 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                             <Sliders className="w-4 h-4 mr-1" />
-                            {isReady ? 'Alan (m²)' : 'Area (m²)'}
+                            {isReady ? t('filters.area') : 'Area (m²)'}
                         </label>
                         <div className="grid grid-cols-2 gap-2">
                             <input
                                 type="number"
-                                placeholder={isReady ? 'Min m²' : 'Min m²'}
+                                placeholder={isReady ? t('filters.min-area') : 'Min m²'}
                                 value={localFilters.minArea || ''}
                                 onChange={(e) => handleFilterChange('minArea', e.target.value ? parseInt(e.target.value) : undefined)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                             <input
                                 type="number"
-                                placeholder={isReady ? 'Max m²' : 'Max m²'}
+                                placeholder={isReady ? t('filters.max-area') : 'Max m²'}
                                 value={localFilters.maxArea || ''}
                                 onChange={(e) => handleFilterChange('maxArea', e.target.value ? parseInt(e.target.value) : undefined)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -383,7 +382,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <Home className="w-4 h-4 mr-1" />
-                                {isReady ? 'Oda Sayısı' : 'Room Count'}
+                                {isReady ? t('filters.room-count') : 'Room Count'}
                             </label>
                             <div className="flex flex-wrap gap-2">
                                 {[1, 2, 3, 4, 5, 6].map((count) => (
@@ -409,7 +408,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                             <MapPin className="w-4 h-4 mr-1" />
-                            {isReady ? 'Konum' : 'Location'}
+                            {isReady ? t('filters.location') : 'Location'}
                         </label>
 
                         <div className="space-y-3">
@@ -425,7 +424,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     }`}
                                 >
                                     <span className="truncate">
-                                        {localFilters.city || (isReady ? t('listing.location-fields.select-city') : 'İl Seçin')}
+                                        {localFilters.city || (isReady ? t('filters.select-city') : 'Select City')}
                                     </span>
                                     {loadingCities ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -441,7 +440,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                                 <input
                                                     type="text"
-                                                    placeholder={isReady ? t('listing.location-fields.search-city') : 'İl ara...'}
+                                                    placeholder={isReady ? t('filters.search-city') : 'Search city...'}
                                                     value={citySearch}
                                                     onChange={(e) => setCitySearch(e.target.value)}
                                                     className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -450,7 +449,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                         </div>
                                         <div className="max-h-48 overflow-y-auto">
                                             {filteredCities.length === 0 ? (
-                                                <div className="p-3 text-sm text-gray-500">İl bulunamadı</div>
+                                                <div className="p-3 text-sm text-gray-500">{isReady ? t('filters.no-city-found') : 'No city found'}</div>
                                             ) : (
                                                 filteredCities.map((city) => (
                                                     <button
@@ -483,7 +482,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     }`}
                                 >
                                     <span className="truncate">
-                                        {localFilters.district || (isReady ? t('listing.location-fields.select-district') : 'İlçe Seçin')}
+                                        {localFilters.district || (isReady ? t('filters.select-district') : 'Select District')}
                                     </span>
                                     {loadingDistricts ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -499,7 +498,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                                 <input
                                                     type="text"
-                                                    placeholder={isReady ? t('listing.location-fields.search-district') : 'İlçe ara...'}
+                                                    placeholder={isReady ? t('filters.search-district') : 'Search district...'}
                                                     value={districtSearch}
                                                     onChange={(e) => setDistrictSearch(e.target.value)}
                                                     className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -508,7 +507,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                         </div>
                                         <div className="max-h-48 overflow-y-auto">
                                             {filteredDistricts.length === 0 ? (
-                                                <div className="p-3 text-sm text-gray-500">İlçe bulunamadı</div>
+                                                <div className="p-3 text-sm text-gray-500">{isReady ? t('filters.no-district-found') : 'No district found'}</div>
                                             ) : (
                                                 filteredDistricts.map((district) => (
                                                     <button
@@ -541,7 +540,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     }`}
                                 >
                                     <span className="truncate">
-                                        {localFilters.neighborhood || (isReady ? t('listing.location-fields.select-neighborhood') : 'Mahalle Seçin')}
+                                        {localFilters.neighborhood || (isReady ? t('filters.select-neighborhood') : 'Select Neighborhood')}
                                     </span>
                                     {loadingNeighborhoods ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -557,7 +556,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                                 <input
                                                     type="text"
-                                                    placeholder={isReady ? t('listing.location-fields.search-neighborhood') : 'Mahalle ara...'}
+                                                    placeholder={isReady ? t('filters.search-neighborhood') : 'Search neighborhood...'}
                                                     value={neighborhoodSearch}
                                                     onChange={(e) => setNeighborhoodSearch(e.target.value)}
                                                     className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -566,7 +565,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                         </div>
                                         <div className="max-h-48 overflow-y-auto">
                                             {filteredNeighborhoods.length === 0 ? (
-                                                <div className="p-3 text-sm text-gray-500">Mahalle bulunamadı</div>
+                                                <div className="p-3 text-sm text-gray-500">{isReady ? t('filters.no-neighborhood-found') : 'No neighborhood found'}</div>
                                             ) : (
                                                 filteredNeighborhoods.map((neighborhood) => (
                                                     <button
@@ -592,7 +591,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     {/* Özellikler */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-3">
-                            {isReady ? 'Özellikler' : 'Features'}
+                            {isReady ? t('filters.features') : 'Features'}
                         </label>
                         <div className="space-y-2">
                             <label className="flex items-center">
@@ -602,7 +601,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     onChange={(e) => handleFilterChange('elevator', e.target.checked || undefined)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-sm text-gray-700">{isReady ? 'Asansör' : 'Elevator'}</span>
+                                <span className="text-sm text-gray-700">{isReady ? t('filters.elevator') : 'Elevator'}</span>
                             </label>
                             <label className="flex items-center">
                                 <input
@@ -611,7 +610,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     onChange={(e) => handleFilterChange('parking', e.target.checked || undefined)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-sm text-gray-700">{isReady ? 'Otopark' : 'Parking'}</span>
+                                <span className="text-sm text-gray-700">{isReady ? t('filters.parking') : 'Parking'}</span>
                             </label>
                             <label className="flex items-center">
                                 <input
@@ -620,7 +619,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     onChange={(e) => handleFilterChange('balcony', e.target.checked || undefined)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-sm text-gray-700">{isReady ? 'Balkon' : 'Balcony'}</span>
+                                <span className="text-sm text-gray-700">{isReady ? t('filters.balcony') : 'Balcony'}</span>
                             </label>
                             <label className="flex items-center">
                                 <input
@@ -629,7 +628,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     onChange={(e) => handleFilterChange('security', e.target.checked || undefined)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-sm text-gray-700">{isReady ? 'Güvenlik' : 'Security'}</span>
+                                <span className="text-sm text-gray-700">{isReady ? t('filters.security') : 'Security'}</span>
                             </label>
                             <label className="flex items-center">
                                 <input
@@ -638,7 +637,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     onChange={(e) => handleFilterChange('furnished', e.target.checked || undefined)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-sm text-gray-700">{isReady ? 'Eşyalı' : 'Furnished'}</span>
+                                <span className="text-sm text-gray-700">{isReady ? t('filters.furnished') : 'Furnished'}</span>
                             </label>
                         </div>
                     </div>
@@ -652,13 +651,13 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                             variant="outline"
                             className="flex-1"
                         >
-                            {isReady ? 'Temizle' : 'Clear'}
+                            {isReady ? t('filters.clear') : 'Clear'}
                         </Button>
                         <Button
                             onClick={handleApplyFilters}
                             className="flex-1"
                         >
-                            {isReady ? 'Uygula' : 'Apply'}
+                            {isReady ? t('filters.apply') : 'Apply'}
                         </Button>
                     </div>
                 )}
@@ -670,7 +669,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                             onClick={handleApplyFilters}
                             className="w-full"
                         >
-                            {isReady ? 'Filtreleri Uygula' : 'Apply Filters'}
+                            {isReady ? t('filters.apply-filters') : 'Apply Filters'}
                         </Button>
                         {getActiveFiltersCount() > 0 && (
                             <Button
@@ -678,12 +677,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                 variant="outline"
                                 className="w-full"
                             >
-                                {isReady ? 'Filtreleri Temizle' : 'Clear All Filters'}
+                                {isReady ? t('filters.clear-all') : 'Clear All Filters'}
                             </Button>
                         )}
                     </div>
                 )}
-            </div>
         </div>
     );
 };

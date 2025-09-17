@@ -414,8 +414,8 @@ export const ListingPreview: React.FC = () => {
                                 <h3 className="text-lg font-semibold text-slate-900 mb-4">
                                     {isReady ? t('listing.description') : 'Açıklama'}
                                 </h3>
-                                <div className="bg-slate-50 rounded-lg p-4">
-                                    <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
+                                <div className="bg-slate-50 rounded-lg p-4 w-full max-w-full overflow-hidden">
+                                    <p className="text-slate-700 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere w-full">
                                         {previewData.description}
                                     </p>
                                 </div>

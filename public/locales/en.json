@@ -415,5 +415,41 @@
       "vrv": "VRV",
       "heat-pump": "Heat Pump"
     }
+  },
+
+  "filters": {
+    "title": "Filters",
+    "listing-type": "Listing Type",
+    "all": "All",
+    "for-sale": "For Sale",
+    "for-rent": "For Rent",
+    "price-range": "Price Range",
+    "min-price": "Min Price",
+    "max-price": "Max Price",
+    "unlimited": "Unlimited",
+    "area": "Area (m²)",
+    "min-area": "Min m²",
+    "max-area": "Max m²",
+    "room-count": "Room Count",
+    "location": "Location",
+    "select-city": "Select City",
+    "select-district": "Select District",
+    "select-neighborhood": "Select Neighborhood",
+    "search-city": "Search city...",
+    "search-district": "Search district...",
+    "search-neighborhood": "Search neighborhood...",
+    "no-city-found": "No city found",
+    "no-district-found": "No district found",
+    "no-neighborhood-found": "No neighborhood found",
+    "features": "Features",
+    "elevator": "Elevator",
+    "parking": "Parking",
+    "balcony": "Balcony",
+    "security": "Security",
+    "furnished": "Furnished",
+    "clear": "Clear",
+    "apply": "Apply",
+    "apply-filters": "Apply Filters",
+    "clear-all": "Clear All Filters"
   }
 }

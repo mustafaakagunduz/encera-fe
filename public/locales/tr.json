@@ -416,5 +416,41 @@
       "vrv": "VRV",
       "heat-pump": "Isı Pompası"
     }
+  },
+
+  "filters": {
+    "title": "Filtreler",
+    "listing-type": "İlan Türü",
+    "all": "Tümü",
+    "for-sale": "Satılık",
+    "for-rent": "Kiralık",
+    "price-range": "Fiyat Aralığı",
+    "min-price": "Min Fiyat",
+    "max-price": "Max Fiyat",
+    "unlimited": "Sınırsız",
+    "area": "Alan (m²)",
+    "min-area": "Min m²",
+    "max-area": "Max m²",
+    "room-count": "Oda Sayısı",
+    "location": "Konum",
+    "select-city": "İl Seçin",
+    "select-district": "İlçe Seçin",
+    "select-neighborhood": "Mahalle Seçin",
+    "search-city": "İl ara...",
+    "search-district": "İlçe ara...",
+    "search-neighborhood": "Mahalle ara...",
+    "no-city-found": "İl bulunamadı",
+    "no-district-found": "İlçe bulunamadı",
+    "no-neighborhood-found": "Mahalle bulunamadı",
+    "features": "Özellikler",
+    "elevator": "Asansör",
+    "parking": "Otopark",
+    "balcony": "Balkon",
+    "security": "Güvenlik",
+    "furnished": "Eşyalı",
+    "clear": "Temizle",
+    "apply": "Uygula",
+    "apply-filters": "Filtreleri Uygula",
+    "clear-all": "Filtreleri Temizle"
   }
 }

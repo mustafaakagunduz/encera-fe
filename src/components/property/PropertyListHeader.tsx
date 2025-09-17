@@ -17,7 +17,8 @@ interface PropertyListHeaderProps {
     onClearFilters: () => void;
     onApplyFilters: (filters?: PropertySearchFilters) => void;
     propertyType: PropertyType;
-    totalElements?: number; // Optional yapalım
+    totalElements?: number;
+    onShowMobileFilters?: () => void;
 }
 
 export const PropertyListHeader: React.FC<PropertyListHeaderProps> = ({
@@ -31,10 +32,10 @@ export const PropertyListHeader: React.FC<PropertyListHeaderProps> = ({
                                                                           onClearFilters,
                                                                           onApplyFilters,
                                                                           propertyType,
-                                                                          totalElements = 0 // Default değer
+                                                                          totalElements = 0,
+                                                                          onShowMobileFilters
                                                                       }) => {
     const { t, isReady } = useAppTranslation();
-    const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     const getIcon = () => {
         switch (propertyType) {
@@ -63,19 +64,21 @@ export const PropertyListHeader: React.FC<PropertyListHeaderProps> = ({
     return (
         <>
             <div className="bg-white border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                            {getIcon()}
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-900">
-                                    {title}
-                                </h1>
-                                <p className="text-gray-600 mt-1">
-                                    {getResultText()}
-                                </p>
-                            </div>
-                        </div>
+                <div className="flex">
+                    <div className="lg:ml-80 flex-1">
+                        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                <div className="flex items-center">
+                                    {getIcon()}
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-gray-900">
+                                            {title}
+                                        </h1>
+                                        <p className="text-gray-600 mt-1">
+                                            {getResultText()}
+                                        </p>
+                                    </div>
+                                </div>
 
                         {/* Desktop Controls */}
                         <div className="hidden lg:flex items-center space-x-4">
@@ -123,7 +126,7 @@ export const PropertyListHeader: React.FC<PropertyListHeaderProps> = ({
                         {/* Mobile Filter Button */}
                         <div className="lg:hidden">
                             <button
-                                onClick={() => setShowMobileFilters(true)}
+                                onClick={onShowMobileFilters}
                                 className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             >
                                 <SlidersHorizontal className="h-4 w-4 mr-2" />
@@ -134,6 +137,8 @@ export const PropertyListHeader: React.FC<PropertyListHeaderProps> = ({
                                     </span>
                                 )}
                             </button>
+                        </div>
+                            </div>
                         </div>
                     </div>
                 </div>

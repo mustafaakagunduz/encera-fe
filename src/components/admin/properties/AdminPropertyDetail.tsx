@@ -261,10 +261,10 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
 
                     {/* Açıklama */}
                     {property.description && (
-                        <div className="bg-white rounded-lg shadow-sm border p-6">
+                        <div className="bg-white rounded-lg shadow-sm border p-6 w-full max-w-full overflow-hidden">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">{isReady ? t('admin.property-detail.description') : 'İlan Açıklaması'}</h3>
-                            <div className="prose prose-sm max-w-none">
-                                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                            <div className="prose prose-sm max-w-none w-full">
+                                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed break-words overflow-wrap-anywhere w-full">
                                     {property.description}
                                 </p>
                             </div>

@@ -88,6 +88,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
     const [sortBy, setSortBy] = useState(() =>
         searchParams.get('sort') || 'createdAt-desc'
     );
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     // URL'i güncellemek için
     const updateURL = (newFilters: PropertySearchFilters, newSort?: string, newPage?: number) => {
@@ -212,6 +213,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                 onApplyFilters={applyFilters}
                 totalElements={searchResult?.totalElements || 0}
                 propertyType={propertyType}
+                onShowMobileFilters={() => setShowMobileFilters(true)}
             />
 
             {/* Container */}
@@ -236,6 +238,8 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                     ? 'Aradığınız kriterlere uygun ilan bulunmuyor.'
                     : 'No listings match your criteria.'
                 }
+                showMobileFilters={showMobileFilters}
+                onCloseMobileFilters={() => setShowMobileFilters(false)}
             />
         </div>
     );

@@ -77,7 +77,7 @@ export const MyListings: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
-            <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+            <div className="container mx-auto px-4 py-6 sm:py-8">
 
                 {/* Header */}
                 <div className="mb-6 sm:mb-8">

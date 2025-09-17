@@ -215,10 +215,10 @@ export const PendingPropertiesTable: React.FC = () => {
                 {/* Table */}
                 <div className="overflow-hidden border border-gray-200 rounded-lg">
                     <div className="overflow-x-auto">
-                        <table className="w-full divide-y divide-gray-200">
+                        <table className="w-full divide-y divide-gray-200 table-fixed">
                             <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-4 py-3 text-left">
+                                <th className="w-12 px-4 py-3 text-left">
                                     <input
                                         type="checkbox"
                                         checked={selectedProperties.length === filteredProperties.length && filteredProperties.length > 0}
@@ -226,19 +226,19 @@ export const PendingPropertiesTable: React.FC = () => {
                                         className="rounded border-gray-300"
                                     />
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="w-2/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     İlan Bilgileri
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="w-1/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Konum & Fiyat
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Sahibi
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Tarih
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="w-32 px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     İşlemler
                                 </th>
                             </tr>
@@ -262,11 +262,8 @@ export const PendingPropertiesTable: React.FC = () => {
                                     {/* İlan Bilgileri */}
                                     <td className="px-6 py-4">
                                         <div className="flex items-start">
-                                            <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                <Building className="h-6 w-6 text-blue-600" />
-                                            </div>
-                                            <div className="ml-3 min-w-0 flex-1">
-                                                <div className="text-sm font-medium text-gray-900 truncate">
+                                            <div className="min-w-0 flex-1">
+                                                <div className="text-sm font-medium text-gray-900 break-words">
                                                     {property.title}
                                                 </div>
                                                 <div className="flex items-center mt-1 space-x-2">
@@ -334,7 +331,7 @@ export const PendingPropertiesTable: React.FC = () => {
                                     </td>
 
                                     {/* İşlemler */}
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="w-32 px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2 relative z-10">
                                             {/* Hızlı Onay */}
                                             <button
