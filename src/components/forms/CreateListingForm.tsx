@@ -198,7 +198,7 @@ export const CreateListingForm: React.FC = () => {
         if (type === 'checkbox') {
             const checked = (e.target as HTMLInputElement).checked;
             setFormData(prev => ({ ...prev, [name]: checked }));
-        } else if (type === 'number') {
+        } else if (['grossArea', 'netArea', 'price', 'monthlyFee', 'deposit', 'buildingAge', 'totalFloors', 'currentFloor', 'roomCount', 'hallCount'].includes(name)) {
             setFormData(prev => ({ ...prev, [name]: value ? Number(value) : undefined }));
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
@@ -508,11 +508,10 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.gross-area') : 'Brüt Alan (m²)'}
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="grossArea"
                                     value={formData.grossArea || ''}
                                     onChange={handleInputChange}
-                                    min="1"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -523,11 +522,10 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.net-area') : 'Net Alan (m²)'}
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="netArea"
                                     value={formData.netArea || ''}
                                     onChange={handleInputChange}
-                                    min="1"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -539,22 +537,20 @@ export const CreateListingForm: React.FC = () => {
                                 </label>
                                 <div className="flex gap-2">
                                     <input
-                                        type="number"
+                                        type="text"
                                         name="roomCount"
                                         value={formData.roomCount || ''}
                                         onChange={handleInputChange}
                                         placeholder="Oda"
-                                        min="0"
                                         className="w-1/2 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                     <span className="flex items-center text-gray-500">+</span>
                                     <input
-                                        type="number"
+                                        type="text"
                                         name="hallCount"
                                         value={formData.hallCount || ''}
                                         onChange={handleInputChange}
                                         placeholder="Salon"
-                                        min="0"
                                         className="w-1/2 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
@@ -566,12 +562,10 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.building-age') : 'Bina Yaşı'}
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="buildingAge"
                                     value={formData.buildingAge || ''}
                                     onChange={handleInputChange}
-                                    min="0"
-                                    max="200"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -582,12 +576,10 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.total-floors') : 'Kat Sayısı'}
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="totalFloors"
                                     value={formData.totalFloors || ''}
                                     onChange={handleInputChange}
-                                    min="1"
-                                    max="100"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -598,12 +590,10 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.current-floor') : 'Bulunduğu Kat'}
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="currentFloor"
                                     value={formData.currentFloor || ''}
                                     onChange={handleInputChange}
-                                    min="0"
-                                    max="100"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -624,11 +614,10 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.price-label') : 'Fiyat'} ({isReady ? t('listing.create.currency') : 'TL'})
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="price"
                                     value={formData.price || ''}
                                     onChange={handleInputChange}
-                                    min="1"
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.price ? 'border-red-500' : 'border-gray-300'
                                     }`}
@@ -642,11 +631,10 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.monthly-fee') : 'Aidat'} ({isReady ? t('listing.create.currency') : 'TL'})
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="monthlyFee"
                                     value={formData.monthlyFee || ''}
                                     onChange={handleInputChange}
-                                    min="0"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -657,11 +645,10 @@ export const CreateListingForm: React.FC = () => {
                                     {isReady ? t('listing.create.deposit') : 'Depozito'} ({isReady ? t('listing.create.currency') : 'TL'})
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     name="deposit"
                                     value={formData.listingType === ListingType.SALE ? '' : (formData.deposit || '')}
                                     onChange={handleInputChange}
-                                    min="0"
                                     disabled={formData.listingType === ListingType.SALE}
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         formData.listingType === ListingType.SALE 
