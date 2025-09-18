@@ -204,6 +204,35 @@ export const CreateListingForm: React.FC = () => {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
 
+        // Property type değiştiğinde ilgili alanları temizle
+        if (name === 'propertyType') {
+            setFormData(prev => {
+                const newData = { ...prev, [name]: value };
+
+                // Arsa seçildiğinde bu alanları temizle
+                if (value === PropertyType.LAND) {
+                    newData.roomCount = '';
+                    newData.hallCount = '';
+                    newData.buildingAge = undefined;
+                    newData.totalFloors = undefined;
+                    newData.currentFloor = undefined;
+                    newData.monthlyFee = undefined;
+                    newData.elevator = false;
+                    newData.balcony = false;
+                    newData.furnished = false;
+                    newData.heatingTypes = [];
+                }
+                // İş yeri seçildiğinde bu alanları temizle
+                else if (value === PropertyType.COMMERCIAL) {
+                    newData.roomCount = '';
+                    newData.hallCount = '';
+                    newData.furnished = false;
+                }
+
+                return newData;
+            });
+        }
+
         // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
@@ -460,9 +489,6 @@ export const CreateListingForm: React.FC = () => {
                                     <option value={PropertyType.LAND}>
                                         {isReady ? t('common.land') : 'Arsa'}
                                     </option>
-                                    <option value={PropertyType.DAILY_RENTAL}>
-                                        {isReady ? t('common.daily-rental') : 'Günlük Kiralık'}
-                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -530,72 +556,119 @@ export const CreateListingForm: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Oda Sayısı */}
+                            {/* Oda Sayısı - Konut için aktif */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-900'}`}>
                                     {isReady ? t('listing.create.room-config') : 'Oda + Salon'}
                                 </label>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
                                         name="roomCount"
-                                        value={formData.roomCount || ''}
+                                        value={formData.propertyType !== PropertyType.RESIDENTIAL ? '' : (formData.roomCount || '')}
                                         onChange={handleInputChange}
                                         placeholder="Oda"
-                                        className="w-1/2 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
+                                        className={`w-1/2 px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                            formData.propertyType !== PropertyType.RESIDENTIAL
+                                                ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                                                : 'border-gray-300'
+                                        }`}
                                     />
-                                    <span className="flex items-center text-gray-500">+</span>
+                                    <span className={`flex items-center ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-500'}`}>+</span>
                                     <input
                                         type="text"
                                         name="hallCount"
-                                        value={formData.hallCount || ''}
+                                        value={formData.propertyType !== PropertyType.RESIDENTIAL ? '' : (formData.hallCount || '')}
                                         onChange={handleInputChange}
                                         placeholder="Salon"
-                                        className="w-1/2 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
+                                        className={`w-1/2 px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                            formData.propertyType !== PropertyType.RESIDENTIAL
+                                                ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                                                : 'border-gray-300'
+                                        }`}
                                     />
                                 </div>
+                                {formData.propertyType !== PropertyType.RESIDENTIAL && (
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        {formData.propertyType === PropertyType.COMMERCIAL
+                                            ? 'İş yeri için uygulanmaz.'
+                                            : 'Arsa için uygulanmaz.'}
+                                    </p>
+                                )}
                             </div>
 
-                            {/* Bina Yaşı */}
+                            {/* Bina Yaşı - Arsa için deaktif */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     {isReady ? t('listing.create.building-age') : 'Bina Yaşı'}
                                 </label>
                                 <input
                                     type="text"
                                     name="buildingAge"
-                                    value={formData.buildingAge || ''}
+                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.buildingAge || '')}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    disabled={formData.propertyType === PropertyType.LAND}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        formData.propertyType === PropertyType.LAND
+                                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                                            : 'border-gray-300'
+                                    }`}
                                 />
+                                {formData.propertyType === PropertyType.LAND && (
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Arsa için uygulanmaz.
+                                    </p>
+                                )}
                             </div>
 
-                            {/* Kat Sayısı */}
+                            {/* Kat Sayısı - Arsa için deaktif */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     {isReady ? t('listing.create.total-floors') : 'Kat Sayısı'}
                                 </label>
                                 <input
                                     type="text"
                                     name="totalFloors"
-                                    value={formData.totalFloors || ''}
+                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.totalFloors || '')}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    disabled={formData.propertyType === PropertyType.LAND}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        formData.propertyType === PropertyType.LAND
+                                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                                            : 'border-gray-300'
+                                    }`}
                                 />
+                                {formData.propertyType === PropertyType.LAND && (
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Arsa için uygulanmaz.
+                                    </p>
+                                )}
                             </div>
 
-                            {/* Bulunduğu Kat */}
+                            {/* Bulunduğu Kat - Arsa için deaktif */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     {isReady ? t('listing.create.current-floor') : 'Bulunduğu Kat'}
                                 </label>
                                 <input
                                     type="text"
                                     name="currentFloor"
-                                    value={formData.currentFloor || ''}
+                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.currentFloor || '')}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    disabled={formData.propertyType === PropertyType.LAND}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        formData.propertyType === PropertyType.LAND
+                                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                                            : 'border-gray-300'
+                                    }`}
                                 />
+                                {formData.propertyType === PropertyType.LAND && (
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Arsa için uygulanmaz.
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -625,18 +698,28 @@ export const CreateListingForm: React.FC = () => {
                                 {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
                             </div>
 
-                            {/* Aidat */}
+                            {/* Aidat - Arsa için deaktif */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     {isReady ? t('listing.create.monthly-fee') : 'Aidat'} ({isReady ? t('listing.create.currency') : 'TL'})
                                 </label>
                                 <input
                                     type="text"
                                     name="monthlyFee"
-                                    value={formData.monthlyFee || ''}
+                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.monthlyFee || '')}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    disabled={formData.propertyType === PropertyType.LAND}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        formData.propertyType === PropertyType.LAND
+                                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                                            : 'border-gray-300'
+                                    }`}
                                 />
+                                {formData.propertyType === PropertyType.LAND && (
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Arsa için uygulanmaz.
+                                    </p>
+                                )}
                             </div>
 
                             {/* Depozito - Satılık ise deaktif */}
@@ -693,18 +776,19 @@ export const CreateListingForm: React.FC = () => {
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                            {/* Asansör */}
-                            <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                            {/* Asansör - Arsa için deaktif */}
+                            <div className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType === PropertyType.LAND ? 'bg-gray-50' : 'hover:bg-gray-50'}`}>
                                 <input
                                     type="checkbox"
                                     id="elevator"
                                     name="elevator"
-                                    checked={formData.elevator}
+                                    checked={formData.propertyType === PropertyType.LAND ? false : formData.elevator}
                                     onChange={handleInputChange}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    disabled={formData.propertyType === PropertyType.LAND}
+                                    className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${formData.propertyType === PropertyType.LAND ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label htmlFor="elevator" className="ml-3 flex items-center text-sm text-gray-900">
-                                    <ArrowUp className="w-4 h-4 mr-2 text-gray-600" />
+                                <label htmlFor="elevator" className={`ml-3 flex items-center text-sm ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
+                                    <ArrowUp className={`w-4 h-4 mr-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.elevator') : 'Asansör'}
                                 </label>
                             </div>
@@ -725,18 +809,19 @@ export const CreateListingForm: React.FC = () => {
                                 </label>
                             </div>
 
-                            {/* Balkon */}
-                            <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                            {/* Balkon - Arsa için deaktif */}
+                            <div className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType === PropertyType.LAND ? 'bg-gray-50' : 'hover:bg-gray-50'}`}>
                                 <input
                                     type="checkbox"
                                     id="balcony"
                                     name="balcony"
-                                    checked={formData.balcony}
+                                    checked={formData.propertyType === PropertyType.LAND ? false : formData.balcony}
                                     onChange={handleInputChange}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    disabled={formData.propertyType === PropertyType.LAND}
+                                    className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${formData.propertyType === PropertyType.LAND ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label htmlFor="balcony" className="ml-3 flex items-center text-sm text-gray-900">
-                                    <Home className="w-4 h-4 mr-2 text-gray-600" />
+                                <label htmlFor="balcony" className={`ml-3 flex items-center text-sm ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
+                                    <Home className={`w-4 h-4 mr-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.balcony') : 'Balkon'}
                                 </label>
                             </div>
@@ -757,43 +842,51 @@ export const CreateListingForm: React.FC = () => {
                                 </label>
                             </div>
 
-                            {/* Eşyalı */}
-                            <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                            {/* Eşyalı - Arsa ve işyeri için deaktif */}
+                            <div className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'bg-gray-50' : 'hover:bg-gray-50'}`}>
                                 <input
                                     type="checkbox"
                                     id="furnished"
                                     name="furnished"
-                                    checked={formData.furnished}
+                                    checked={formData.propertyType !== PropertyType.RESIDENTIAL ? false : formData.furnished}
                                     onChange={handleInputChange}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
+                                    className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label htmlFor="furnished" className="ml-3 flex items-center text-sm text-gray-900">
-                                    <Sofa className="w-4 h-4 mr-2 text-gray-600" />
+                                <label htmlFor="furnished" className={`ml-3 flex items-center text-sm ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-900'}`}>
+                                    <Sofa className={`w-4 h-4 mr-2 ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.furnished') : 'Eşyalı'}
                                 </label>
                             </div>
 
-                            {/* Isıtma - Çoklu Seçim */}
+                            {/* Isıtma - Çoklu Seçim - Arsa için deaktif */}
                             <div className="md:col-span-3">
-                                <label className="block text-sm font-medium text-gray-900 mb-2">
+                                <label className={`block text-sm font-medium mb-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     {isReady ? t('listing.create.heating-types') : 'Isıtma'}
                                 </label>
                                 <div className="relative" data-dropdown-container>
                                     <button
                                         type="button"
-                                        onClick={() => setHeatingDropdownOpen(!heatingDropdownOpen)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between"
+                                        onClick={() => formData.propertyType !== PropertyType.LAND && setHeatingDropdownOpen(!heatingDropdownOpen)}
+                                        disabled={formData.propertyType === PropertyType.LAND}
+                                        className={`w-full px-4 py-3 border rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between ${
+                                            formData.propertyType === PropertyType.LAND
+                                                ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                                                : 'border-gray-300 bg-white'
+                                        }`}
                                     >
-                                        <span className="text-gray-500">
-                                            {formData.heatingTypes && formData.heatingTypes.length > 0 
-                                                ? `${formData.heatingTypes.length} ${isReady ? t('listing.create.items-selected') : 'seçim yapıldı'}`
-                                                : (isReady ? t('listing.create.heating-placeholder') : 'Isıtma türlerini seçiniz')
+                                        <span className={formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-500'}>
+                                            {formData.propertyType === PropertyType.LAND
+                                                ? 'Arsa için uygulanmaz'
+                                                : (formData.heatingTypes && formData.heatingTypes.length > 0
+                                                    ? `${formData.heatingTypes.length} ${isReady ? t('listing.create.items-selected') : 'seçim yapıldı'}`
+                                                    : (isReady ? t('listing.create.heating-placeholder') : 'Isıtma türlerini seçiniz'))
                                             }
                                         </span>
-                                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                                        <ChevronDown className={`w-5 h-5 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-400'}`} />
                                     </button>
 
-                                    {heatingDropdownOpen && (
+                                    {heatingDropdownOpen && formData.propertyType !== PropertyType.LAND && (
                                         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                             {heatingOptions.map((option) => (
                                                 <label
@@ -815,8 +908,8 @@ export const CreateListingForm: React.FC = () => {
                                     )}
                                 </div>
 
-                                {/* Selected heating types display */}
-                                {formData.heatingTypes && formData.heatingTypes.length > 0 && (
+                                {/* Selected heating types display - Sadece arsa değilse göster */}
+                                {formData.heatingTypes && formData.heatingTypes.length > 0 && formData.propertyType !== PropertyType.LAND && (
                                     <div className="mt-2 flex flex-wrap gap-2">
                                         {formData.heatingTypes.map((type) => (
                                             <span
