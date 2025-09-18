@@ -58,7 +58,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
         return (
             <div className="flex">
                 <div className="flex w-full">
-                    <div className="hidden lg:block w-80 flex-shrink-0 bg-white border-r min-h-screen fixed left-0 top-16 z-10">
+                    <div className="hidden lg:block w-80 flex-shrink-0 bg-white border-r fixed left-0 top-16 bottom-0 z-10">
                         <div className="h-full overflow-y-auto px-6 py-6">
                             <div className="bg-white rounded-lg border p-6">
                                 <div className="animate-pulse space-y-4">
@@ -99,7 +99,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
         <div className="flex">
             <div className="flex w-full">
                 {/* Filter Sidebar - Desktop */}
-                <div className="hidden lg:block w-80 flex-shrink-0 bg-white border-r min-h-screen fixed left-0 top-16 z-10">
+                <div className="hidden lg:block w-80 flex-shrink-0 bg-white border-r fixed left-0 top-16 bottom-0 z-10">
                     <div className="h-full overflow-y-auto px-6 py-6">
                         <FilterSidebar
                             filters={filters}
