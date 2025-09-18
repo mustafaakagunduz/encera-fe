@@ -43,7 +43,6 @@ const Navbar: React.FC = () => {
         { key: 'navbar.listings', href: '/house' },
         { key: 'navbar.jobs', href: '/commercial' },
         { key: 'navbar.land', href: '/land' },
-        { key: 'navbar.rental', href: '/daily-rental' },
     ];
 
     const handleLanguageChange = (lang: 'tr' | 'en') => {
@@ -273,7 +272,6 @@ const getStaticText = (key: string): string => {
         'navbar.listings': 'Konut',
         'navbar.jobs': 'İş Yeri',
         'navbar.land': 'Arsa',
-        'navbar.rental': 'Günlük Kiralık',
     };
     return staticTexts[key] || key;
 };
