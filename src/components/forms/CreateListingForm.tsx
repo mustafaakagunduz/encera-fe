@@ -233,6 +233,23 @@ export const CreateListingForm: React.FC = () => {
             });
         }
 
+        // Listing type değiştiğinde ilgili alanları temizle
+        if (name === 'listingType') {
+            setFormData(prev => {
+                const newData = { ...prev, [name]: value };
+
+                // Satılık seçildiğinde aidat ve depozito temizle
+                if (value === ListingType.SALE) {
+                    if (prev.propertyType === PropertyType.RESIDENTIAL) {
+                        newData.monthlyFee = undefined;
+                    }
+                    newData.deposit = undefined;
+                }
+
+                return newData;
+            });
+        }
+
         // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
@@ -698,26 +715,41 @@ export const CreateListingForm: React.FC = () => {
                                 {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
                             </div>
 
-                            {/* Aidat - Arsa için deaktif */}
+                            {/* Aidat - Arsa için veya satılık konut için deaktif */}
                             <div>
-                                <label className={`block text-sm font-medium mb-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <label className={`block text-sm font-medium mb-2 ${
+                                    formData.propertyType === PropertyType.LAND ||
+                                    (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
+                                        ? 'text-gray-400' : 'text-gray-900'
+                                }`}>
                                     {isReady ? t('listing.create.monthly-fee') : 'Aidat'} ({isReady ? t('listing.create.currency') : 'TL'})
                                 </label>
                                 <input
                                     type="text"
                                     name="monthlyFee"
-                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.monthlyFee || '')}
+                                    value={
+                                        formData.propertyType === PropertyType.LAND ||
+                                        (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
+                                            ? '' : (formData.monthlyFee || '')
+                                    }
                                     onChange={handleInputChange}
-                                    disabled={formData.propertyType === PropertyType.LAND}
+                                    disabled={
+                                        formData.propertyType === PropertyType.LAND ||
+                                        (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
+                                    }
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                        formData.propertyType === PropertyType.LAND
+                                        formData.propertyType === PropertyType.LAND ||
+                                        (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
                                             ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
                                             : 'border-gray-300'
                                     }`}
                                 />
-                                {formData.propertyType === PropertyType.LAND && (
+                                {(formData.propertyType === PropertyType.LAND ||
+                                  (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)) && (
                                     <p className="mt-1 text-xs text-gray-500">
-                                        Arsa için uygulanmaz.
+                                        {formData.propertyType === PropertyType.LAND
+                                            ? 'Arsa için uygulanmaz.'
+                                            : 'Satılık konut için uygulanmaz.'}
                                     </p>
                                 )}
                             </div>

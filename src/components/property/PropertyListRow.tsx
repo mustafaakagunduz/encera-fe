@@ -79,10 +79,10 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
     return (
         <Link href={linkHref} className="block w-full">
             <div className="bg-white hover:bg-gray-50 transition-colors cursor-pointer w-full">
-                <div className="flex flex-col sm:flex-row w-full border-b border-gray-200">
+                <div className="flex flex-row w-full border-b border-gray-200 min-h-[100px] items-center">
                     {/* Property Image */}
-                    <div className="flex-shrink-0 w-full sm:w-48">
-                        <div className="w-full h-48 sm:h-full bg-gray-300 border-r border-gray-200 flex items-center justify-center relative overflow-hidden">
+                    <div className="flex-shrink-0 w-32 sm:w-48 self-stretch">
+                        <div className="w-full h-full bg-gray-300 border-r border-gray-200 flex items-center justify-center relative overflow-hidden">
                             {property.coverImageUrl ? (
                                 <img
                                     src={property.coverImageUrl}
@@ -101,7 +101,7 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
 
                             {/* Featured Badge */}
                             {property.featured && (
-                                <div className="absolute top-2 left-2">
+                                <div className="absolute top-2 right-2">
                                     <div className="flex items-center bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-medium">
                                         <Star className="w-3 h-3 mr-1" />
                                         VIP
@@ -111,7 +111,7 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
 
                             {/* PAPP Sellable Badge */}
                             {property.pappSellable && (
-                                <div className="absolute top-2 right-2">
+                                <div className="absolute top-2 left-2">
                                     <div className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
                                         ENCERA
                                     </div>
@@ -120,92 +120,105 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
                         </div>
                     </div>
 
-                    {/* Property Details */}
-                    <div className="flex-1 min-w-0 p-4 sm:p-6">
-                        <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center space-x-2">
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {/* Property Title */}
+                    <div className="flex-1 min-w-0 p-2 sm:p-4">
+                        {/* Title and Status - Mobile */}
+                        <div className="sm:hidden mb-2">
+                            <div className="mb-1">
+                                <span className="text-xs font-medium text-blue-600">
                                     {getListingTypeText(property.listingType)}
                                 </span>
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    {getPropertyTypeText(property.propertyType)}
-                                </span>
                             </div>
-                            <div className="text-right">
-                                <div className="text-2xl font-bold text-gray-900">
-                                    {formatPrice(property.price)}
-                                </div>
-                                {property.negotiable && (
-                                    <div className="text-xs text-orange-600 font-medium">
-                                        {isReady ? 'Pazarlık' : 'Negotiable'}
+                            <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">
+                                {property.title}
+                            </h3>
+                        </div>
+
+                        {/* Desktop Title */}
+                        <div className="hidden sm:block">
+                            <h3 className="text-base font-semibold text-gray-900 line-clamp-3">
+                                {property.title}
+                            </h3>
+                        </div>
+
+                        {/* Mobile Simple Layout */}
+                        <div className="sm:hidden space-y-1 text-xs text-gray-600">
+                            <div className="flex items-center">
+                                <MapPin className="w-3 h-3 mr-1 text-gray-400" />
+                                <span>{property.district}, {property.city}</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                {getRoomText() && (
+                                    <div className="flex items-center">
+                                        <Home className="w-3 h-3 mr-1 text-gray-400" />
+                                        <span>{getRoomText()}</span>
+                                    </div>
+                                )}
+                                {property.grossArea && (
+                                    <div className="flex items-center">
+                                        <Briefcase className="w-3 h-3 mr-1 text-gray-400" />
+                                        <span>{property.grossArea} m²</span>
                                     </div>
                                 )}
                             </div>
                         </div>
+                    </div>
 
-                        {/* Title */}
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                            {property.title}
-                        </h3>
+                    {/* Property Data Columns */}
+                    <div className="hidden sm:block flex-1 min-w-0 p-2 sm:p-4">
+                        <div className="grid grid-cols-5 gap-4 text-sm h-full items-center">
+                            {/* Status */}
+                            <div className="text-gray-600 flex items-center">
+                                <span>{getListingTypeText(property.listingType)}</span>
+                            </div>
 
-                        {/* Location */}
-                        <div className="flex items-center text-gray-600 mb-3">
-                            <MapPin className="w-4 h-4 mr-1 text-gray-400" />
-                            <span className="text-sm">
-                                {property.district}, {property.city}
-                            </span>
-                        </div>
-
-                        {/* Property Features */}
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
-                            {/* Room Count */}
-                            {getRoomText() && (
-                                <div className="flex items-center">
-                                    <Home className="w-4 h-4 mr-1 text-gray-400" />
-                                    <span>{getRoomText()}</span>
+                            {/* Location */}
+                            <div className="text-gray-600 flex items-center">
+                                <div className="leading-tight">
+                                    <div className="truncate">{property.district}</div>
+                                    <div className="truncate text-xs text-gray-500">{property.city}</div>
                                 </div>
-                            )}
+                            </div>
+
+                            {/* Room Count */}
+                            <div className="text-gray-600 flex items-center">
+                                {getRoomText() ? (
+                                    <span>{getRoomText()}</span>
+                                ) : (
+                                    <span className="text-gray-400">-</span>
+                                )}
+                            </div>
 
                             {/* Area */}
-                            {property.grossArea && (
-                                <div className="flex items-center">
-                                    <Briefcase className="w-4 h-4 mr-1 text-gray-400" />
+                            <div className="text-gray-600 flex items-center">
+                                {property.grossArea ? (
                                     <span>{property.grossArea} m²</span>
-                                </div>
-                            )}
+                                ) : (
+                                    <span className="text-gray-400">-</span>
+                                )}
+                            </div>
 
-                            {/* Features */}
-                            {property.elevator && (
-                                <span className="text-green-600 text-xs">
-                                    {isReady ? 'Asansör' : 'Elevator'}
-                                </span>
-                            )}
-
-                            {property.parking && (
-                                <div className="flex items-center text-green-600">
-                                    <Car className="w-3 h-3 mr-1" />
-                                    <span className="text-xs">
-                                        {isReady ? 'Otopark' : 'Parking'}
-                                    </span>
-                                </div>
-                            )}
-
-                            {property.furnished && (
-                                <span className="text-green-600 text-xs">
-                                    {isReady ? 'Eşyalı' : 'Furnished'}
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Bottom Info */}
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                            <div className="flex items-center">
-                                <Calendar className="w-4 h-4 mr-1" />
+                            {/* Date */}
+                            <div className="text-gray-600 flex items-center">
                                 <span>{formatDate(property.createdAt)}</span>
                             </div>
-                            <div className="flex items-center">
-                                <Eye className="w-4 h-4 mr-1" />
-                                <span>{property.viewCount} {isReady ? 'görüntülenme' : 'views'}</span>
+                        </div>
+                    </div>
+
+                    {/* Price Column */}
+                    <div className="flex-shrink-0 w-24 sm:w-32 p-2 sm:p-4 flex flex-col justify-center">
+                        <div className="text-right">
+                            <div className="text-lg sm:text-xl font-bold text-gray-900">
+                                {formatPrice(property.price)}
+                            </div>
+                            {property.negotiable && (
+                                <div className="text-xs text-orange-600 font-medium">
+                                    {isReady ? t('listing.negotiable') : 'Negotiable'}
+                                </div>
+                            )}
+                            <div className="flex items-center justify-end mt-1 text-xs text-gray-500">
+                                <Eye className="w-3 h-3 mr-1" />
+                                <span>{property.viewCount}</span>
                             </div>
                         </div>
                     </div>

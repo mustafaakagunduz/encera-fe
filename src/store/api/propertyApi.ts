@@ -85,6 +85,7 @@ export interface PropertySearchFilters {
     balcony?: boolean;
     security?: boolean;
     roomCount?: number;
+    hallCount?: number;
     sort?: string;
 }
 

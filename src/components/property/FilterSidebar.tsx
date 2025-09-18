@@ -335,7 +335,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     placeholder="0"
                                     value={localFilters.minPrice || ''}
                                     onChange={(e) => handleFilterChange('minPrice', e.target.value ? parseInt(e.target.value) : undefined)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                             </div>
                             <div>
@@ -347,7 +347,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                     placeholder={isReady ? t('filters.unlimited') : 'Unlimited'}
                                     value={localFilters.maxPrice || ''}
                                     onChange={(e) => handleFilterChange('maxPrice', e.target.value ? parseInt(e.target.value) : undefined)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                             </div>
                         </div>
@@ -365,41 +365,54 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                                 placeholder={isReady ? t('filters.min-area') : 'Min m²'}
                                 value={localFilters.minArea || ''}
                                 onChange={(e) => handleFilterChange('minArea', e.target.value ? parseInt(e.target.value) : undefined)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                             <input
                                 type="number"
                                 placeholder={isReady ? t('filters.max-area') : 'Max m²'}
                                 value={localFilters.maxArea || ''}
                                 onChange={(e) => handleFilterChange('maxArea', e.target.value ? parseInt(e.target.value) : undefined)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                         </div>
                     </div>
 
-                    {/* Oda Sayısı - Sadece konut için */}
+                    {/* Oda ve Salon Sayısı - Sadece konut için */}
                     {propertyType === PropertyType.RESIDENTIAL && (
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
                                 <Home className="w-4 h-4 mr-1" />
-                                {isReady ? t('filters.room-count') : 'Room Count'}
+                                {isReady ? t('filters.room-hall-count') : 'Oda + Salon'}
                             </label>
-                            <div className="flex flex-wrap gap-2">
-                                {[1, 2, 3, 4, 5, 6].map((count) => (
-                                    <button
-                                        key={count}
-                                        onClick={() => handleFilterChange('roomCount',
-                                            localFilters.roomCount === count ? undefined : count
-                                        )}
-                                        className={`px-3 py-1 text-sm rounded-md border transition-colors ${
-                                            localFilters.roomCount === count
-                                                ? 'bg-blue-50 border-blue-200 text-blue-700'
-                                                : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                                        }`}
-                                    >
-                                        {count}+
-                                    </button>
-                                ))}
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">
+                                        {isReady ? t('filters.room-count') : 'Oda'}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        placeholder="Oda"
+                                        min="0"
+                                        max="10"
+                                        value={localFilters.roomCount || ''}
+                                        onChange={(e) => handleFilterChange('roomCount', e.target.value ? parseInt(e.target.value) : undefined)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">
+                                        {isReady ? t('filters.hall-count') : 'Salon'}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        placeholder="Salon"
+                                        min="0"
+                                        max="5"
+                                        value={localFilters.hallCount || ''}
+                                        onChange={(e) => handleFilterChange('hallCount', e.target.value ? parseInt(e.target.value) : undefined)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    />
+                                </div>
                             </div>
                         </div>
                     )}
@@ -655,7 +668,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                         </Button>
                         <Button
                             onClick={handleApplyFilters}
-                            className="flex-1"
+                            className="flex-1 bg-blue-900 hover:bg-blue-800 text-white"
                         >
                             {isReady ? t('filters.apply') : 'Apply'}
                         </Button>
@@ -667,7 +680,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     <div className="mt-6 space-y-2">
                         <Button
                             onClick={handleApplyFilters}
-                            className="w-full"
+                            className="w-full bg-blue-900 hover:bg-blue-800 text-white"
                         >
                             {isReady ? t('filters.apply-filters') : 'Apply Filters'}
                         </Button>

@@ -143,15 +143,47 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                     ) : (
                         <>
                             {/* Property List */}
-                            <div className="w-full bg-white overflow-hidden">
-                                {properties.map((property, index) => (
-                                    <div key={property.id} className={index === properties.length - 1 ? '[&>a>div>div]:border-b-0' : ''}>
-                                        <PropertyListRow
-                                            property={property}
-                                            linkHref={`${linkPrefix}/${property.id}`}
-                                        />
+                            <div className="w-full bg-white">
+                                {/* Column Headers */}
+                                <div className="hidden sm:block bg-gray-50 border-b border-gray-200">
+                                    <div className="flex flex-row w-full py-2 items-center">
+                                        {/* Image Space (No Header) */}
+                                        <div className="flex-shrink-0 w-32 sm:w-48"></div>
+
+                                        {/* Title Space (No Header) */}
+                                        <div className="flex-1 min-w-0 px-2 sm:px-4"></div>
+
+                                        {/* Data Column Headers */}
+                                        <div className="flex-1 min-w-0 px-2 sm:px-4">
+                                            <div className="grid grid-cols-5 gap-4 text-xs sm:text-sm font-medium text-gray-700">
+                                                <div>{isReady ? t('filters.status') : 'Status'}</div>
+                                                <div>{isReady ? t('filters.location') : 'Location'}</div>
+                                                <div>{isReady ? t('filters.room-hall-count') : 'Rooms'}</div>
+                                                <div>{isReady ? t('filters.area') : 'Area'}</div>
+                                                <div>{isReady ? t('filters.date') : 'Date'}</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Price Column Header */}
+                                        <div className="flex-shrink-0 w-24 sm:w-32 px-2 sm:px-4">
+                                            <div className="text-xs sm:text-sm font-medium text-gray-700 text-right">
+                                                {isReady ? t('filters.price') : 'Price'}
+                                            </div>
+                                        </div>
                                     </div>
-                                ))}
+                                </div>
+
+                                {/* Property Rows */}
+                                <div>
+                                    {properties.map((property, index) => (
+                                        <div key={property.id} className={index === properties.length - 1 ? '[&>a>div>div]:border-b-0' : ''}>
+                                            <PropertyListRow
+                                                property={property}
+                                                linkHref={`${linkPrefix}/${property.id}`}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* Pagination */}

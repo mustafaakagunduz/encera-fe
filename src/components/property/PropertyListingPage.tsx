@@ -55,6 +55,9 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
         if (searchParams.get('roomCount')) {
             urlFilters.roomCount = parseInt(searchParams.get('roomCount')!);
         }
+        if (searchParams.get('hallCount')) {
+            urlFilters.hallCount = parseInt(searchParams.get('hallCount')!);
+        }
         if (searchParams.get('elevator') === 'true') {
             urlFilters.elevator = true;
         }
