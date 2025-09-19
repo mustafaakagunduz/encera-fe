@@ -84,9 +84,14 @@ export interface PropertySearchFilters {
     parking?: boolean;
     balcony?: boolean;
     security?: boolean;
+    negotiable?: boolean;
+    featured?: boolean;
+    pappSellable?: boolean;
     roomCount?: number;
+    maxRoomCount?: number;
     hallCount?: number;
     sort?: string;
+    keyword?: string;
 }
 
 export interface PropertyResponse {
@@ -175,24 +180,6 @@ export interface PaginatedResponse<T> {
     numberOfElements: number;
 }
 
-export interface PropertySearchFilters {
-    listingType?: ListingType;
-    propertyType?: PropertyType;
-    city?: string;
-    district?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    minArea?: number;
-    maxArea?: number;
-    furnished?: boolean;
-    elevator?: boolean;
-    parking?: boolean;
-    balcony?: boolean;
-    security?: boolean;
-    roomCount?: number;
-    sort?: string; // 'createdAt-desc', 'price-asc', 'price-desc' vs.
-}
-
 export interface PropertySearchRequest {
     filters: PropertySearchFilters;
     page?: number;
@@ -260,10 +247,12 @@ export const propertyApi = createApi({
                 Object.entries(filters).forEach(([key, value]) => {
                     if (value !== undefined && value !== null && value !== '' &&
                         key !== 'sort' && key !== 'page' && key !== 'size') {
-                        
+
                         // roomCount'u minRoomCount olarak gönder
                         if (key === 'roomCount') {
                             params.append('minRoomCount', value.toString());
+                        } else if (key === 'maxRoomCount') {
+                            params.append('maxRoomCount', value.toString());
                         } else {
                             params.append(key, value.toString());
                         }
@@ -271,8 +260,12 @@ export const propertyApi = createApi({
                 });
 
 
-                console.log('Final API URL:', `/public/search?${params.toString()}`);
-                return `/public/search?${params.toString()}`;
+                const finalURL = `/public/search?${params.toString()}`;
+                console.log('=== DEBUG: Frontend API Call ===');
+                console.log('Filters Object:', filters);
+                console.log('Final API URL:', finalURL);
+                console.log('URL Params:', Object.fromEntries(params));
+                return finalURL;
             },
             providesTags: ['Property'],
         }),

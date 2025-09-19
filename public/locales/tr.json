@@ -49,7 +49,8 @@
     "residential": "Konut",
     "commercial": "İş Yeri",
     "land": "Arsa",
-    "phone": "Telefon"
+    "phone": "Telefon",
+    "all": "Tümü"
 
   },
 
@@ -364,7 +365,8 @@
     },
     "listing-types": {
       "SALE": "Satılık",
-      "RENT": "Kiralık"
+      "RENT": "Kiralık",
+      "DAILY_RENTAL": "Günlük Kiralık"
     },
     "property-types": {
       "RESIDENTIAL": "Konut",
