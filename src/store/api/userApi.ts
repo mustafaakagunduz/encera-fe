@@ -119,6 +119,12 @@ export const userApi = createApi({
       providesTags: ['User'],
     }),
 
+    // Get user by ID
+    getUserById: builder.query<UserProfile, number>({
+      query: (userId) => `/${userId}`,
+      providesTags: ['User'],
+    }),
+
     // Update profile information
     updateProfile: builder.mutation<UserProfile, ProfileUpdateRequest>({
       query: (profileData) => ({
@@ -222,6 +228,7 @@ export const userApi = createApi({
 
 export const {
   useGetProfileQuery,
+  useGetUserByIdQuery,
   useUpdateProfileMutation,
   useUpdatePreferencesMutation,
   useChangePasswordMutation,

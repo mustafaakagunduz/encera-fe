@@ -4,7 +4,7 @@
 import React from 'react';
 import { useGetPropertyByIdQuery, useDeletePropertyMutation, PropertyResponse, ListingType, PropertyType } from '@/store/api/propertyApi';
 import { useToggleFavoriteMutation, useGetFavoriteStatusQuery } from '@/store/api/favoriteApi';
-import { useAddCommentMutation, useGetCommentsByPropertyQuery, useGetPropertyRatingQuery } from '@/store/api/commentApi';
+import { useAddCommentMutation, useGetCommentsByPropertyQuery, useGetPropertyRatingQuery, useDeleteCommentMutation } from '@/store/api/commentApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -29,7 +29,9 @@ import {
     Heart,
     CheckCircle,
     Star,
-    MessageCircle
+    MessageCircle,
+    MessageSquare,
+    Trash
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -69,6 +71,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     );
     const { data: ratingData } = useGetPropertyRatingQuery(propertyId, { skip: !propertyId });
     const [addComment, { isLoading: isSubmittingComment }] = useAddCommentMutation();
+    const [deleteComment] = useDeleteCommentMutation();
 
     const handleDelete = async () => {
         if (window.confirm(isReady ? t('my-listings.actions.delete-confirm') : 'Bu ilanı silmek istediğinizden emin misiniz?')) {
@@ -117,6 +120,17 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     };
 
     const isEncera = property?.owner?.firstName === 'Encera' || property?.pappSellable;
+
+    const handleCommentDelete = async (commentId: number) => {
+        if (window.confirm(isReady ? t('property-detail.comments.delete-confirm') : 'Bu yorumu silmek istediğinizden emin misiniz?')) {
+            try {
+                await deleteComment(commentId).unwrap();
+                refetchComments();
+            } catch (error) {
+                console.error('Yorum silinirken hata oluştu:', error);
+            }
+        }
+    };
 
     const getStatusText = (property: PropertyResponse) => {
         if (!property.active) {
@@ -211,7 +225,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
-                        {isReady ? t('common.back') : 'Geri'}
+                        {isReady ? t('property-detail.back-to-listings') : 'İlanlara Geri Dön'}
                     </button>
 
                     <div className="flex items-center gap-3">
@@ -228,10 +242,10 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             >
                                 <Heart className={`w-4 h-4 mr-2 ${favoriteStatus?.isFavorited ? 'fill-current' : ''}`} />
                                 {isToggling
-                                    ? 'İşleniyor...'
+                                    ? (isReady ? t('common.submitting') : 'İşleniyor...')
                                     : favoriteStatus?.isFavorited
-                                        ? 'Favorilerden Çıkar'
-                                        : 'Favorilere Ekle'
+                                        ? (isReady ? t('property-detail.remove-from-favorites') : 'Favorilerden Çıkar')
+                                        : (isReady ? t('property-detail.add-to-favorites') : 'Favorilere Ekle')
                                 }
                             </button>
                         )}
@@ -315,7 +329,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             </div>
                             {property.negotiable && (
                                 <div className="text-sm text-orange-600 font-medium mt-1">
-                                    {isReady ? 'Pazarlık yapılabilir' : 'Negotiable'}
+                                    {isReady ? t('property-detail.negotiable') : 'Pazarlık yapılabilir'}
                                 </div>
                             )}
                         </div>
@@ -362,7 +376,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-4">
                             <div className="flex items-center">
                                 <Eye className="w-4 h-4 mr-1" />
-                                <span>{property.viewCount} {isReady ? 'görüntülenme' : 'views'}</span>
+                                <span>{property.viewCount} {isReady ? t('property-detail.view-count') : 'görüntülenme'}</span>
                             </div>
                             <div className="flex items-center">
                                 <Calendar className="w-4 h-4 mr-1" />
@@ -375,7 +389,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                     {!isOwner && (
                         <div className="bg-white rounded-lg shadow-sm border p-6">
                             <h3 className="font-medium text-gray-900 mb-4">
-                                {isReady ? 'İletişim' : 'Contact'}
+                                {isReady ? t('property-detail.contact') : 'İletişim'}
                             </h3>
 
                             <div className="space-y-4">
@@ -409,14 +423,22 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 </div>
                             </div>
 
-                            <div className="mt-6">
+                            <div className="mt-6 space-y-3">
                                 <a
                                     href={`tel:${isEncera ? '5356021168' : property.owner.phoneNumber}`}
                                     className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                                 >
                                     <Phone className="w-4 h-4 mr-2" />
-                                    {isReady ? 'Ara' : 'Call'}
+                                    {isReady ? t('property-detail.call') : 'Ara'}
                                 </a>
+
+                                <Link
+                                    href={`/messages?userId=${property.owner.id}&propertyId=${propertyId}`}
+                                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                >
+                                    <MessageSquare className="w-4 h-4 mr-2" />
+                                    {isReady ? t('property-detail.send-message') : 'Mesaj Gönder'}
+                                </Link>
                             </div>
                         </div>
                     )}
@@ -468,7 +490,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 {/* Features */}
                                 <div className="space-y-3">
                                     <h3 className="font-medium text-gray-900">
-                                        {isReady ? 'Özellikler' : 'Features'}
+                                        {isReady ? t('property-detail.features') : 'Özellikler'}
                                     </h3>
 
                                     <div className="space-y-2">
@@ -510,7 +532,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             {property.description && (
                                 <div className="mt-6 pt-6 border-t border-gray-200 w-full max-w-full overflow-hidden">
                                     <h3 className="font-medium text-gray-900 mb-3">
-                                        {isReady ? 'Açıklama' : 'Description'}
+                                        {isReady ? t('property-detail.description') : 'Açıklama'}
                                     </h3>
                                     <p className="text-gray-600 leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap w-full">
                                         {property.description}
@@ -528,7 +550,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     <MessageCircle className="w-5 h-5 text-white" />
                                 </div>
                                 <h3 className="text-xl font-semibold text-gray-900">
-                                    {isReady ? 'Yorum ve Değerlendirme' : 'Comments & Rating'}
+                                    {isReady ? t('property-detail.comments.title') : 'Yorum ve Değerlendirme'}
                                 </h3>
                             </div>
 
@@ -567,18 +589,18 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 {/* Comment Section */}
                                 <div className="bg-white rounded-lg p-6 border border-slate-200">
                                     <label className="block text-sm font-semibold text-gray-800 mb-4">
-                                        {isReady ? 'Yorumunuz' : 'Your Comment'}
+                                        {isReady ? t('property-detail.comments.your-comment') : 'Yorumunuz'}
                                     </label>
                                     <textarea
                                         value={newComment}
                                         onChange={(e) => setNewComment(e.target.value)}
                                         rows={4}
                                         className="w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
-                                        placeholder={isReady ? 'İlan hakkındaki düşüncelerinizi detaylıca paylaşın...' : 'Share your detailed thoughts about this property...'}
+                                        placeholder={isReady ? t('property-detail.comments.comment-placeholder') : 'İlan hakkındaki düşüncelerinizi detaylıca paylaşın...'}
                                         required
                                     />
                                     <div className="text-sm text-slate-500 mt-1">
-                                        {newComment.length}/1000 karakter {newComment.length < 10 && `(en az 10 karakter gerekli)`}
+                                        {newComment.length}/1000 {isReady ? t('property-detail.comments.char-count') : 'karakter'} {newComment.length < 10 && `(${isReady ? t('property-detail.comments.min-chars') : 'en az 10 karakter gerekli'})`}
                                     </div>
                                 </div>
 
@@ -590,8 +612,8 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 >
                                     <MessageCircle className="w-5 h-5 mr-2" />
                                     {isSubmittingComment
-                                        ? (isReady ? 'Gönderiliyor...' : 'Submitting...')
-                                        : (isReady ? 'Yorum Ekle' : 'Submit Review')
+                                        ? (isReady ? t('property-detail.comments.submitting') : 'Gönderiliyor...')
+                                        : (isReady ? t('property-detail.comments.submit-comment') : 'Yorum Ekle')
                                     }
                                 </button>
                             </form>
@@ -600,10 +622,10 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             <div className="mt-10">
                                 <div className="flex items-center gap-2 mb-6">
                                     <h4 className="text-lg font-semibold text-gray-900">
-                                        {isReady ? 'Diğer Yorumlar' : 'Reviews'}
+                                        {isReady ? t('property-detail.comments.title') : 'Diğer Yorumlar'}
                                     </h4>
                                     <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-                                        {commentsData?.totalElements || 0} {isReady ? 'yorum' : 'review'}
+                                        {commentsData?.totalElements || 0} {isReady ? 'yorum' : 'yorum'}
                                     </span>
                                     {ratingData && ratingData.totalComments > 0 && (
                                         <div className="flex items-center gap-1 ml-2">
@@ -649,9 +671,20 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                                                     <span className="text-xs text-gray-500 ml-1 font-medium">{comment.rating}.0</span>
                                                                 </div>
                                                             </div>
-                                                            <span className="text-xs text-gray-500 font-medium">
-                                                                {new Date(comment.createdAt).toLocaleDateString('tr-TR')}
-                                                            </span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-gray-500 font-medium">
+                                                                    {new Date(comment.createdAt).toLocaleDateString('tr-TR')}
+                                                                </span>
+                                                                {user && user.id === comment.userId && (
+                                                                    <button
+                                                                        onClick={() => handleCommentDelete(comment.id)}
+                                                                        className="text-red-500 hover:text-red-700 transition-colors p-1"
+                                                                        title={isReady ? t('property-detail.comments.delete') : 'Sil'}
+                                                                    >
+                                                                        <Trash className="w-4 h-4" />
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                         <p className="text-sm text-gray-700 leading-relaxed">
                                                             {comment.comment}

@@ -579,5 +579,48 @@
     "apply": "Uygula",
     "apply-filters": "Filtreleri Uygula",
     "clear-all": "Filtreleri Temizle"
+  },
+
+  "property-detail": {
+    "back-to-listings": "İlanlara Geri Dön",
+    "price": "Fiyat",
+    "negotiable": "Pazarlık edilebilir",
+    "non-negotiable": "Pazarlık edilemez",
+    "area": "m² Brüt Alan",
+    "net-area": "m² Net Alan",
+    "features": "Özellikler",
+    "elevator": "Asansör",
+    "parking": "Otopark",
+    "balcony": "Balkon",
+    "security": "Güvenlik",
+    "view-count": "görüntülenme",
+    "description": "Açıklama",
+    "featured": "Öne Çıkan",
+    "furnished": "Eşyalı",
+    "contact": "İletişim",
+    "call": "Ara",
+    "send-message": "Mesaj Gönder",
+    "add-to-favorites": "Favorilere Ekle",
+    "remove-from-favorites": "Favorilerden Çıkar",
+    "edit-listing": "İlanı Düzenle",
+    "delete-listing": "İlanı Sil",
+    "delete-confirm": "Bu ilanı silmek istediğinizden emin misiniz?",
+    "property-not-found": "İlan bulunamadı",
+    "try-again": "Tekrar Dene",
+    "comments": {
+      "title": "Yorumlar",
+      "add-comment": "Yorum Ekle",
+      "your-comment": "Yorumunuz",
+      "your-rating": "Puanınız",
+      "comment-placeholder": "İlan hakkındaki düşüncelerinizi detaylıca paylaşın...",
+      "submit-comment": "Yorumu Gönder",
+      "submitting": "Gönderiliyor...",
+      "no-comments": "Henüz yorum yapılmamış",
+      "be-first": "İlk yorumu siz yapın!",
+      "char-count": "karakter",
+      "min-chars": "en az 10 karakter gerekli",
+      "delete": "Sil",
+      "delete-confirm": "Bu yorumu silmek istediğinizden emin misiniz?"
+    }
   }
 }

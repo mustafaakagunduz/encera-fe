@@ -7,6 +7,7 @@ import { adminApi } from './api/adminApi';
 import { userApi } from './api/userApi';
 import { favoriteApi } from './api/favoriteApi';
 import { commentApi } from './api/commentApi';
+import { messageApi } from './api/messageApi';
 import authReducer from './slices/authSlice';
 import listingPreviewReducer from './slices/listingPreviewSlice'; // Yeni slice import
 
@@ -20,6 +21,7 @@ export const store = configureStore({
         [userApi.reducerPath]: userApi.reducer,
         [favoriteApi.reducerPath]: favoriteApi.reducer,
         [commentApi.reducerPath]: commentApi.reducer,
+        [messageApi.reducerPath]: messageApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
@@ -28,7 +30,8 @@ export const store = configureStore({
             adminApi.middleware,
             userApi.middleware,
             favoriteApi.middleware,
-            commentApi.middleware
+            commentApi.middleware,
+            messageApi.middleware
         ),
 });
 

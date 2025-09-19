@@ -578,5 +578,48 @@
     "apply": "Apply",
     "apply-filters": "Apply Filters",
     "clear-all": "Clear All Filters"
+  },
+
+  "property-detail": {
+    "back-to-listings": "Back to Listings",
+    "price": "Price",
+    "negotiable": "Negotiable",
+    "non-negotiable": "Non-negotiable",
+    "area": "m² Gross Area",
+    "net-area": "m² Net Area",
+    "features": "Features",
+    "elevator": "Elevator",
+    "parking": "Parking",
+    "balcony": "Balcony",
+    "security": "Security",
+    "view-count": "views",
+    "description": "Description",
+    "featured": "Featured",
+    "furnished": "Furnished",
+    "contact": "Contact",
+    "call": "Call",
+    "send-message": "Send Message",
+    "add-to-favorites": "Add to Favorites",
+    "remove-from-favorites": "Remove from Favorites",
+    "edit-listing": "Edit Listing",
+    "delete-listing": "Delete Listing",
+    "delete-confirm": "Are you sure you want to delete this listing?",
+    "property-not-found": "Property not found",
+    "try-again": "Try Again",
+    "comments": {
+      "title": "Comments",
+      "add-comment": "Add Comment",
+      "your-comment": "Your Comment",
+      "your-rating": "Your Rating",
+      "comment-placeholder": "Share your detailed thoughts about this property...",
+      "submit-comment": "Submit Comment",
+      "submitting": "Submitting...",
+      "no-comments": "No comments yet",
+      "be-first": "Be the first to comment!",
+      "char-count": "characters",
+      "min-chars": "minimum 10 characters required",
+      "delete": "Delete",
+      "delete-confirm": "Are you sure you want to delete this comment?"
+    }
   }
 }
