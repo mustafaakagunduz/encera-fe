@@ -3,6 +3,8 @@
 
 import React from 'react';
 import { useGetPropertyByIdQuery, useDeletePropertyMutation, PropertyResponse, ListingType, PropertyType } from '@/store/api/propertyApi';
+import { useToggleFavoriteMutation, useGetFavoriteStatusQuery } from '@/store/api/favoriteApi';
+import { useAddCommentMutation, useGetCommentsByPropertyQuery, useGetPropertyRatingQuery } from '@/store/api/commentApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -23,7 +25,11 @@ import {
     Coffee,
     Image as ImageIcon,
     Phone,
-    User as UserIcon
+    User as UserIcon,
+    Heart,
+    CheckCircle,
+    Star,
+    MessageCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -35,11 +41,34 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     const { t, isReady } = useAppTranslation();
     const { user } = useAuth();
     const router = useRouter();
+
+    // Debug auth state
+    React.useEffect(() => {
+        console.log('Auth state in PropertyDetail:', { user });
+    }, [user]);
     const { data: property, isLoading, error } = useGetPropertyByIdQuery(propertyId);
     const [deleteProperty] = useDeletePropertyMutation();
 
     // Kullanıcının bu ilanın sahibi olup olmadığını kontrol et
     const isOwner = user && property && user.id === property.owner.id;
+
+    // Favorites
+    const { data: favoriteStatus } = useGetFavoriteStatusQuery(propertyId, {
+        skip: !user || isOwner
+    });
+    const [toggleFavorite, { isLoading: isToggling }] = useToggleFavoriteMutation();
+
+    // Comments state
+    const [newComment, setNewComment] = React.useState('');
+    const [newRating, setNewRating] = React.useState(5);
+
+    // Comment API hooks
+    const { data: commentsData, isLoading: commentsLoading, refetch: refetchComments } = useGetCommentsByPropertyQuery(
+        { propertyId, page: 0, size: 10 },
+        { skip: !propertyId }
+    );
+    const { data: ratingData } = useGetPropertyRatingQuery(propertyId, { skip: !propertyId });
+    const [addComment, { isLoading: isSubmittingComment }] = useAddCommentMutation();
 
     const handleDelete = async () => {
         if (window.confirm(isReady ? t('my-listings.actions.delete-confirm') : 'Bu ilanı silmek istediğinizden emin misiniz?')) {
@@ -51,6 +80,43 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
             }
         }
     };
+
+    const handleFavoriteToggle = async () => {
+        if (!user) {
+            console.log('User not logged in');
+            return;
+        }
+
+        console.log('User logged in:', user);
+        console.log('User ID:', user.id);
+
+        try {
+            await toggleFavorite(propertyId).unwrap();
+        } catch (error) {
+            console.error('Favorilere ekleme/çıkarma hatası:', error);
+        }
+    };
+
+    const handleCommentSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user || !newComment.trim() || newComment.trim().length < 10) return;
+
+        try {
+            await addComment({
+                propertyId,
+                rating: newRating,
+                comment: newComment.trim()
+            }).unwrap();
+
+            setNewComment('');
+            setNewRating(5);
+            refetchComments();
+        } catch (error) {
+            console.error('Yorum eklenirken hata oluştu:', error);
+        }
+    };
+
+    const isEncera = property?.owner?.firstName === 'Encera' || property?.pappSellable;
 
     const getStatusText = (property: PropertyResponse) => {
         if (!property.active) {
@@ -148,25 +214,48 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         {isReady ? t('common.back') : 'Geri'}
                     </button>
 
-                    {/* Action Buttons - Sadece ilan sahibi görür */}
-                    {isOwner && (
-                        <div className="flex items-center gap-3">
-                            <Link
-                                href={`/create-listing?edit=${property.id}`}
-                                className="inline-flex items-center px-4 py-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 transition-colors"
-                            >
-                                <Edit className="w-4 h-4 mr-2" />
-                                {isReady ? t('my-listings.actions.edit') : 'Düzenle'}
-                            </Link>
+                    <div className="flex items-center gap-3">
+                        {/* Favorites Button - Tüm kullanıcılar için (ilan sahibi hariç) */}
+                        {!isOwner && user && (
                             <button
-                                onClick={handleDelete}
-                                className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors"
+                                onClick={handleFavoriteToggle}
+                                disabled={isToggling}
+                                className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                                    favoriteStatus?.isFavorited
+                                        ? 'text-red-600 bg-red-50 border border-red-200 hover:bg-red-100'
+                                        : 'text-gray-600 bg-white border border-gray-300 hover:bg-gray-50'
+                                } ${isToggling ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                {isReady ? t('my-listings.actions.delete') : 'Sil'}
+                                <Heart className={`w-4 h-4 mr-2 ${favoriteStatus?.isFavorited ? 'fill-current' : ''}`} />
+                                {isToggling
+                                    ? 'İşleniyor...'
+                                    : favoriteStatus?.isFavorited
+                                        ? 'Favorilerden Çıkar'
+                                        : 'Favorilere Ekle'
+                                }
                             </button>
-                        </div>
-                    )}
+                        )}
+
+                        {/* Action Buttons - Sadece ilan sahibi görür */}
+                        {isOwner && (
+                            <>
+                                <Link
+                                    href={`/create-listing?edit=${property.id}`}
+                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 transition-colors"
+                                >
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    {isReady ? t('my-listings.actions.edit') : 'Düzenle'}
+                                </Link>
+                                <button
+                                    onClick={handleDelete}
+                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors"
+                                >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    {isReady ? t('my-listings.actions.delete') : 'Sil'}
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 {/* Main Content */}
@@ -292,9 +381,14 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             <div className="space-y-4">
                                 <div className="flex items-center">
                                     <UserIcon className="w-5 h-5 mr-3 text-gray-400" />
-                                    <div>
-                                        <div className="text-sm font-medium text-gray-900">
-                                            {property.owner.firstName} {property.owner.lastName}
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-sm font-medium text-gray-900">
+                                                {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
+                                            </div>
+                                            {isEncera && (
+                                                <CheckCircle className="w-4 h-4 text-blue-500" />
+                                            )}
                                         </div>
                                         <div className="text-xs text-gray-500">
                                             {isReady ? 'İlan Sahibi' : 'Property Owner'}
@@ -305,8 +399,8 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 <div className="flex items-center">
                                     <Phone className="w-5 h-5 mr-3 text-gray-400" />
                                     <div>
-                                        <div className="text-sm font-medium text-gray-900">
-                                            {property.owner.phoneNumber}
+                                        <div className="text-lg font-semibold text-gray-900 mb-1">
+                                            {isEncera ? '535 602 1168' : property.owner.phoneNumber || 'Telefon bulunamadı'}
                                         </div>
                                         <div className="text-xs text-gray-500">
                                             {isReady ? 'Telefon' : 'Phone'}
@@ -317,7 +411,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
                             <div className="mt-6">
                                 <a
-                                    href={`tel:${property.owner.phoneNumber}`}
+                                    href={`tel:${isEncera ? '5356021168' : property.owner.phoneNumber}`}
                                     className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                                 >
                                     <Phone className="w-4 h-4 mr-2" />
@@ -425,6 +519,196 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             )}
                         </div>
                     </div>
+
+                    {/* Comments and Rating Section */}
+                    {!isOwner && user && (
+                        <div className="bg-gradient-to-br from-white via-slate-50 to-white rounded-xl shadow-lg border border-slate-200/60 p-8">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+                                    <MessageCircle className="w-5 h-5 text-white" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900">
+                                    {isReady ? 'Yorum ve Değerlendirme' : 'Comments & Rating'}
+                                </h3>
+                            </div>
+
+                            {/* Add Comment Form */}
+                            <form onSubmit={handleCommentSubmit} className="space-y-6">
+                                {/* Rating Section */}
+                                <div className="bg-white rounded-lg p-6 border border-slate-200">
+                                    <label className="block text-sm font-semibold text-gray-800 mb-4">
+                                        {isReady ? 'Değerlendirme' : 'Your Rating'}
+                                    </label>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setNewRating(star)}
+                                                    className={`w-8 h-8 transition-all duration-200 hover:scale-110 ${
+                                                        star <= newRating
+                                                            ? 'text-amber-400 hover:text-amber-500'
+                                                            : 'text-gray-300 hover:text-amber-300'
+                                                    }`}
+                                                >
+                                                    <Star className={`w-8 h-8 ${star <= newRating ? 'fill-current' : ''}`} />
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <div className="ml-4 px-3 py-1 bg-amber-50 rounded-full">
+                                            <span className="text-sm font-medium text-amber-700">
+                                                {newRating}/5 {isReady ? 'Yıldız' : 'Stars'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Comment Section */}
+                                <div className="bg-white rounded-lg p-6 border border-slate-200">
+                                    <label className="block text-sm font-semibold text-gray-800 mb-4">
+                                        {isReady ? 'Yorumunuz' : 'Your Comment'}
+                                    </label>
+                                    <textarea
+                                        value={newComment}
+                                        onChange={(e) => setNewComment(e.target.value)}
+                                        rows={4}
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+                                        placeholder={isReady ? 'İlan hakkındaki düşüncelerinizi detaylıca paylaşın...' : 'Share your detailed thoughts about this property...'}
+                                        required
+                                    />
+                                    <div className="text-sm text-slate-500 mt-1">
+                                        {newComment.length}/1000 karakter {newComment.length < 10 && `(en az 10 karakter gerekli)`}
+                                    </div>
+                                </div>
+
+                                {/* Submit Button */}
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingComment || !newComment.trim() || newComment.trim().length < 10}
+                                    className="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                >
+                                    <MessageCircle className="w-5 h-5 mr-2" />
+                                    {isSubmittingComment
+                                        ? (isReady ? 'Gönderiliyor...' : 'Submitting...')
+                                        : (isReady ? 'Yorum Ekle' : 'Submit Review')
+                                    }
+                                </button>
+                            </form>
+
+                            {/* Comments List */}
+                            <div className="mt-10">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <h4 className="text-lg font-semibold text-gray-900">
+                                        {isReady ? 'Diğer Yorumlar' : 'Reviews'}
+                                    </h4>
+                                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                                        {commentsData?.totalElements || 0} {isReady ? 'yorum' : 'review'}
+                                    </span>
+                                    {ratingData && ratingData.totalComments > 0 && (
+                                        <div className="flex items-center gap-1 ml-2">
+                                            <Star className="w-4 h-4 text-amber-400 fill-current" />
+                                            <span className="text-sm font-medium text-gray-700">
+                                                {ratingData.averageRating.toFixed(1)}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {commentsLoading ? (
+                                    <div className="flex justify-center py-8">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                    </div>
+                                ) : commentsData && commentsData.content.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {commentsData.content.map((comment) => (
+                                            <div key={comment.id} className="bg-white rounded-lg p-6 border border-slate-200 hover:shadow-md transition-shadow duration-200">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                                            <span className="text-white font-semibold text-sm">
+                                                                {comment.userFirstName.charAt(0)}{comment.userLastName.charAt(0)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <div className="flex items-center gap-3">
+                                                                <h5 className="text-sm font-semibold text-gray-900">
+                                                                    {comment.userFirstName} {comment.userLastName}
+                                                                </h5>
+                                                                <div className="flex items-center gap-1">
+                                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                                        <Star
+                                                                            key={star}
+                                                                            className={`w-4 h-4 ${
+                                                                                star <= comment.rating ? 'text-amber-400 fill-current' : 'text-gray-300'
+                                                                            }`}
+                                                                        />
+                                                                    ))}
+                                                                    <span className="text-xs text-gray-500 ml-1 font-medium">{comment.rating}.0</span>
+                                                                </div>
+                                                            </div>
+                                                            <span className="text-xs text-gray-500 font-medium">
+                                                                {new Date(comment.createdAt).toLocaleDateString('tr-TR')}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                                            {comment.comment}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <div className="inline-flex items-center gap-2 text-gray-500">
+                                            <MessageCircle className="w-4 h-4" />
+                                            <span className="text-sm font-medium">
+                                                {isReady ? 'Henüz yorum bulunmuyor.' : 'No reviews yet.'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Property Owner Link */}
+                    {!isOwner && (
+                        <div className="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 className="font-medium text-gray-900 mb-4">
+                                {isReady ? 'İlan Sahibi Hakkında' : 'About Property Owner'}
+                            </h3>
+
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <UserIcon className="w-8 h-8 text-gray-400" />
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="font-medium text-gray-900">
+                                                {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
+                                            </div>
+                                            {isEncera && (
+                                                <CheckCircle className="w-4 h-4 text-blue-500" />
+                                            )}
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                            {isReady ? 'Gayrimenkul Uzmanı' : 'Real Estate Professional'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Link
+                                    href={`/profile/${property.owner.id}`}
+                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+                                >
+                                    {isReady ? 'Profili Görüntüle' : 'View Profile'}
+                                </Link>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
             </div>

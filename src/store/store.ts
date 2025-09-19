@@ -5,6 +5,8 @@ import { authApi } from './api/authApi';
 import { propertyApi } from './api/propertyApi';
 import { adminApi } from './api/adminApi';
 import { userApi } from './api/userApi';
+import { favoriteApi } from './api/favoriteApi';
+import { commentApi } from './api/commentApi';
 import authReducer from './slices/authSlice';
 import listingPreviewReducer from './slices/listingPreviewSlice'; // Yeni slice import
 
@@ -16,13 +18,17 @@ export const store = configureStore({
         [propertyApi.reducerPath]: propertyApi.reducer,
         [adminApi.reducerPath]: adminApi.reducer,
         [userApi.reducerPath]: userApi.reducer,
+        [favoriteApi.reducerPath]: favoriteApi.reducer,
+        [commentApi.reducerPath]: commentApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
             authApi.middleware,
             propertyApi.middleware,
             adminApi.middleware,
-            userApi.middleware
+            userApi.middleware,
+            favoriteApi.middleware,
+            commentApi.middleware
         ),
 });
 
