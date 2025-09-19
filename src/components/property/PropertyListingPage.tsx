@@ -40,6 +40,9 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
         if (searchParams.get('district')) {
             urlFilters.district = searchParams.get('district')!;
         }
+        if (searchParams.get('neighborhood')) {
+            urlFilters.neighborhood = searchParams.get('neighborhood')!;
+        }
         if (searchParams.get('minPrice')) {
             urlFilters.minPrice = parseInt(searchParams.get('minPrice')!);
         }
@@ -179,27 +182,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
         }
     }, [searchParams]);
 
-    // Error state
-    if (error) {
-        return (
-            <div className="min-h-screen bg-gray-50">
-                <PropertyListHeader
-                    title={isReady ? t(pageTitle) : fallbackTitle}
-                    viewType={viewType}
-                    onViewTypeChange={setViewType}
-                    sortBy={sortBy}
-                    onSortChange={handleSortChange}
-                    filters={tempFilters}
-                    onFiltersChange={handleFiltersChange}
-                    onClearFilters={clearFilters}
-                    onApplyFilters={applyFilters}
-                    totalElements={searchResult?.totalElements || 0}
-                    propertyType={propertyType}
-                />
-                <PropertyErrorState />
-            </div>
-        );
-    }
+    // Error state - hata durumunda da layout'u koru
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -228,6 +211,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                 viewType={viewType}
                 properties={searchResult?.content || []}
                 isLoading={isLoading}
+                error={error}
                 totalPages={searchResult?.totalPages || 0}
                 totalElements={searchResult?.totalElements || 0}
                 onPageChange={handlePageChange}

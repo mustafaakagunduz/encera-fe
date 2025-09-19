@@ -7,7 +7,7 @@ import { PropertyType, PropertySearchFilters, useSearchPropertiesWithFiltersQuer
 import { PropertyListRow } from './PropertyListRow';
 import { FilterSidebar } from './FilterSidebar';
 import { EmptyState } from '../ui/EmptyState';
-import { Search } from 'lucide-react';
+import { Search, AlertTriangle } from 'lucide-react';
 
 interface PropertyListContainerProps {
     filters: PropertySearchFilters;
@@ -16,6 +16,7 @@ interface PropertyListContainerProps {
     viewType: 'list';
     properties: any[]; // Property tipini kullanabilirsiniz
     isLoading: boolean;
+    error?: any;
     totalPages: number;
     totalElements: number;
     onPageChange: (page: number) => void;
@@ -34,6 +35,7 @@ interface PropertyListContainerProps {
 export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                                                 properties,
                                                                                 isLoading,
+                                                                                error,
                                                                                 viewType,
                                                                                 totalPages,
                                                                                 currentPage,
@@ -90,6 +92,91 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state - layout'u koru
+    if (error) {
+        return (
+            <div className="flex">
+                <div className="flex w-full">
+                    {/* Filter Sidebar - Desktop */}
+                    <div className="hidden lg:block w-80 flex-shrink-0 bg-white border-r fixed left-0 top-16 bottom-0 z-10">
+                        <div className="h-full overflow-y-auto px-6 py-6">
+                            <FilterSidebar
+                                filters={filters}
+                                onFiltersChange={onFiltersChange}
+                                onClearFilters={onClearFilters}
+                                onApplyFilters={onApplyFilters}
+                                propertyType={propertyType}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Main Content - Error State */}
+                    <div className="flex-1 lg:ml-80">
+                        <div className="w-full bg-white">
+                            <div className="flex items-center justify-center py-12">
+                                <div className="text-center px-4">
+                                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                                        <AlertTriangle className="h-6 w-6 text-red-600" />
+                                    </div>
+
+                                    <h2 className="text-lg font-medium text-gray-900 mb-2">
+                                        {isReady ? 'Bir hata oluştu' : 'An error occurred'}
+                                    </h2>
+
+                                    <p className="text-gray-600 mb-4 max-w-md">
+                                        {isReady
+                                            ? 'İlanları yüklerken bir sorun yaşandı. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.'
+                                            : 'There was a problem loading the listings. Please refresh the page or try again later.'
+                                        }
+                                    </p>
+
+                                    <button
+                                        onClick={() => window.location.reload()}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                                    >
+                                        {isReady ? 'Sayfayı Yenile' : 'Refresh Page'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Filter - Error state */}
+                    {showMobileFilters && (
+                        <div className="lg:hidden fixed inset-0 z-50 overflow-hidden">
+                            <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onCloseMobileFilters}></div>
+                            <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-lg transform transition-transform">
+                                <div className="h-full overflow-y-auto p-6">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-medium text-gray-900">
+                                            {isReady ? 'Filtreler' : 'Filters'}
+                                        </h3>
+                                        <button
+                                            onClick={onCloseMobileFilters}
+                                            className="p-2 hover:bg-gray-100 rounded-lg"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                    <FilterSidebar
+                                        filters={filters}
+                                        onFiltersChange={onFiltersChange}
+                                        onClearFilters={onClearFilters}
+                                        onApplyFilters={(filters) => {
+                                            onApplyFilters(filters);
+                                            onCloseMobileFilters();
+                                        }}
+                                        propertyType={propertyType}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         );
