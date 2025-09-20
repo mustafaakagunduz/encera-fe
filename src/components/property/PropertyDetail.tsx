@@ -34,6 +34,7 @@ import {
     Trash
 } from 'lucide-react';
 import Link from 'next/link';
+import { PropertyImageGallery } from '@/components/ui/property-image-gallery';
 
 interface PropertyDetailProps {
     propertyId: number;
@@ -52,7 +53,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     const [deleteProperty] = useDeletePropertyMutation();
 
     // Kullanıcının bu ilanın sahibi olup olmadığını kontrol et
-    const isOwner = user && property && user.id === property.owner.id;
+    const isOwner = Boolean(user && property && user.id === property.owner.id);
 
     // Favorites
     const { data: favoriteStatus } = useGetFavoriteStatusQuery(propertyId, {
@@ -216,8 +217,8 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="min-h-screen bg-white">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header with back button and actions */}
                 <div className="flex items-center justify-between mb-6">
                     <button
@@ -273,477 +274,475 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                 </div>
 
                 {/* Main Content */}
-                <div className={`grid gap-6 mb-6 ${
-                    isOwner 
-                        ? 'grid-cols-1 lg:grid-cols-2' 
-                        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                }`}>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
 
-                    {/* Image Gallery - Left Side */}
-                    <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                        <div className="aspect-video bg-gray-100 flex items-center justify-center relative">
-                            <div className="text-center text-gray-500">
-                                <ImageIcon className="w-16 h-16 mx-auto mb-3 text-gray-300" />
-                                <p className="text-sm">
-                                    {isReady ? 'Görsel yüklenmedi' : 'No image uploaded'}
-                                </p>
-                            </div>
-                        </div>
+                    {/* Left Column - Image Gallery */}
+                    <div className="lg:col-span-2">
+                        <PropertyImageGallery
+                            images={property.imageUrls || []}
+                            primaryImageUrl={property.primaryImageUrl}
+                            title={property.title}
+                        />
                     </div>
 
-                    {/* Property Info - Right Side */}
-                    <div className="bg-white rounded-lg shadow-sm border p-6">
-                        {/* Status Badge - Sadece ilan sahibi görür */}
-                        {isOwner && (
-                            <div className="mb-4">
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(property)}`}>
-                                    {getStatusText(property)}
-                                </span>
-                            </div>
-                        )}
-
-                        {/* Title */}
-                        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                            {property.title}
-                        </h1>
-
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                {getListingTypeText(property.listingType)}
-                            </span>
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                                {getPropertyTypeText(property.propertyType)}
-                            </span>
-                            {property.featured && (
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                                    ⭐ VIP
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Price */}
-                        <div className="mb-6">
-                            <div className="text-3xl font-bold text-gray-900">
-                                {formatPrice(property.price)}
-                            </div>
-                            {property.negotiable && (
-                                <div className="text-sm text-orange-600 font-medium mt-1">
-                                    {isReady ? t('property-detail.negotiable') : 'Pazarlık yapılabilir'}
+                    {/* Right Column - Property Info */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-8">
+                            {/* Status Badge - Sadece ilan sahibi görür */}
+                            {isOwner && (
+                                <div className="mb-6">
+                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(property)}`}>
+                                        {getStatusText(property)}
+                                    </span>
                                 </div>
                             )}
-                        </div>
 
-                        {/* Location */}
-                        <div className="flex items-center text-gray-600 mb-6">
-                            <MapPin className="w-5 h-5 mr-2 text-gray-400" />
-                            <span>
-                                {property.neighborhood}, {property.district}, {property.city}
-                            </span>
-                        </div>
+                            {/* Price Section */}
+                            <div className="mb-8">
+                                <div className="text-4xl font-bold text-gray-900 mb-2">
+                                    {formatPrice(property.price)}
+                                </div>
+                                {property.negotiable && (
+                                    <div className="text-sm text-orange-600 font-medium">
+                                        {isReady ? t('property-detail.negotiable') : 'Pazarlık yapılabilir'}
+                                    </div>
+                                )}
+                            </div>
 
-                        {/* Key Features */}
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                            {property.grossArea && (
-                                <div className="flex items-center">
-                                    <Square className="w-5 h-5 mr-3 text-gray-400" />
+                            {/* Title and Tags */}
+                            <div className="mb-6">
+                                <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                                    {property.title}
+                                </h1>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded">
+                                        {getListingTypeText(property.listingType)}
+                                    </span>
+                                    <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded">
+                                        {getPropertyTypeText(property.propertyType)}
+                                    </span>
+                                    {property.featured && (
+                                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded">
+                                            ⭐ VIP
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Location */}
+                            <div className="mb-6 pb-6 border-b border-gray-100">
+                                <div className="flex items-start">
+                                    <MapPin className="w-5 h-5 mr-3 text-gray-400 mt-0.5" />
                                     <div>
-                                        <div className="text-sm font-semibold text-gray-900">
-                                            {property.grossArea} m²
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            {isReady ? 'Brüt Alan' : 'Gross Area'}
+                                        <div className="font-medium text-gray-900 mb-1">Konum</div>
+                                        <div className="text-gray-600">
+                                            {property.neighborhood}, {property.district}, {property.city}
                                         </div>
                                     </div>
                                 </div>
-                            )}
-                            {property.roomConfiguration && (
-                                <div className="flex items-center">
-                                    <Home className="w-5 h-5 mr-3 text-gray-400" />
-                                    <div>
-                                        <div className="text-sm font-semibold text-gray-900">
-                                            {property.roomConfiguration.roomCount}+{property.roomConfiguration.hallCount}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            {isReady ? 'Oda Sayısı' : 'Room Count'}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* View Count and Date */}
-                        <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-4">
-                            <div className="flex items-center">
-                                <Eye className="w-4 h-4 mr-1" />
-                                <span>{property.viewCount} {isReady ? t('property-detail.view-count') : 'görüntülenme'}</span>
                             </div>
-                            <div className="flex items-center">
-                                <Calendar className="w-4 h-4 mr-1" />
-                                <span>{formatDate(property.createdAt)}</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Contact Info - Ilan sahibi değilse iletişim bilgilerini göster */}
-                    {!isOwner && (
-                        <div className="bg-white rounded-lg shadow-sm border p-6">
-                            <h3 className="font-medium text-gray-900 mb-4">
-                                {isReady ? t('property-detail.contact') : 'İletişim'}
-                            </h3>
-
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <UserIcon className="w-5 h-5 mr-3 text-gray-400" />
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
+                            {/* Key Features */}
+                            <div className="mb-6 pb-6 border-b border-gray-100">
+                                <div className="font-medium text-gray-900 mb-4">Özellikler</div>
+                                <div className="space-y-4">
+                                    {property.grossArea && (
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center">
+                                                <Square className="w-4 h-4 mr-3 text-gray-400" />
+                                                <span className="text-gray-600">Brüt Alan</span>
                                             </div>
-                                            {isEncera && (
-                                                <CheckCircle className="w-4 h-4 text-blue-500" />
-                                            )}
+                                            <span className="font-medium text-gray-900">{property.grossArea} m²</span>
                                         </div>
-                                        <div className="text-xs text-gray-500">
-                                            {isReady ? 'İlan Sahibi' : 'Property Owner'}
+                                    )}
+                                    {property.roomConfiguration && (
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center">
+                                                <Home className="w-4 h-4 mr-3 text-gray-400" />
+                                                <span className="text-gray-600">Oda Sayısı</span>
+                                            </div>
+                                            <span className="font-medium text-gray-900">
+                                                {property.roomConfiguration.roomCount}+{property.roomConfiguration.hallCount}
+                                            </span>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center">
-                                    <Phone className="w-5 h-5 mr-3 text-gray-400" />
-                                    <div>
-                                        <div className="text-lg font-semibold text-gray-900 mb-1">
-                                            {isEncera ? '535 602 1168' : property.owner.phoneNumber || 'Telefon bulunamadı'}
+                                    )}
+                                    {property.netArea && (
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center">
+                                                <Square className="w-4 h-4 mr-3 text-gray-400" />
+                                                <span className="text-gray-600">Net Alan</span>
+                                            </div>
+                                            <span className="font-medium text-gray-900">{property.netArea} m²</span>
                                         </div>
-                                        <div className="text-xs text-gray-500">
-                                            {isReady ? 'Telefon' : 'Phone'}
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
 
-                            <div className="mt-6 space-y-3">
-                                <a
-                                    href={`tel:${isEncera ? '5356021168' : property.owner.phoneNumber}`}
-                                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                                >
-                                    <Phone className="w-4 h-4 mr-2" />
-                                    {isReady ? t('property-detail.call') : 'Ara'}
-                                </a>
-
-                                <Link
-                                    href={`/messages?userId=${property.owner.id}&propertyId=${propertyId}`}
-                                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                                >
-                                    <MessageSquare className="w-4 h-4 mr-2" />
-                                    {isReady ? t('property-detail.send-message') : 'Mesaj Gönder'}
-                                </Link>
+                            {/* Stats */}
+                            <div className="text-sm text-gray-500">
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center">
+                                        <Eye className="w-4 h-4 mr-2" />
+                                        <span>{property.viewCount} görüntülenme</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center">
+                                    <Calendar className="w-4 h-4 mr-2" />
+                                    <span>{formatDate(property.createdAt)}</span>
+                                </div>
                             </div>
                         </div>
-                    )}
+                    </div>
+
                 </div>
 
-                {/* Details Section */}
-                <div className="grid grid-cols-1 gap-6">
+                {/* Contact Info - Full width below */}
+                {!isOwner && (
+                    <div className="mt-8 pt-8 border-t border-gray-100">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Contact Details */}
+                            <div>
+                                <h3 className="font-semibold text-gray-900 mb-6 text-lg">İletişim Bilgileri</h3>
 
-                    {/* Property Details */}
-                    <div>
-                        <div className="bg-white rounded-lg shadow-sm border p-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-                                {/* Basic Info */}
-                                <div className="space-y-3">
-                                    <h3 className="font-medium text-gray-900">
-                                        {isReady ? 'Temel Bilgiler' : 'Basic Information'}
-                                    </h3>
-
-                                    {property.netArea && (
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600 text-sm">{isReady ? 'Net Alan' : 'Net Area'}:</span>
-                                            <span className="font-medium text-sm">{property.netArea} m²</span>
+                                <div className="space-y-4">
+                                    <div className="flex items-center">
+                                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                                            <UserIcon className="w-5 h-5 text-gray-600" />
                                         </div>
-                                    )}
-
-                                    {property.roomConfiguration?.bathroomCount && (
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600 text-sm">{isReady ? 'Banyo Sayısı' : 'Bathroom Count'}:</span>
-                                            <span className="font-medium text-sm">{property.roomConfiguration.bathroomCount}</span>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="font-medium text-gray-900">
+                                                    {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
+                                                </div>
+                                                {isEncera && (
+                                                    <CheckCircle className="w-4 h-4 text-blue-500" />
+                                                )}
+                                            </div>
+                                            <div className="text-sm text-gray-500">İlan Sahibi</div>
                                         </div>
-                                    )}
+                                    </div>
 
-                                    {property.monthlyFee && (
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600 text-sm">{isReady ? 'Aidat' : 'Monthly Fee'}:</span>
-                                            <span className="font-medium text-sm">{formatPrice(property.monthlyFee)}</span>
+                                    <div className="flex items-center">
+                                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                                            <Phone className="w-5 h-5 text-gray-600" />
                                         </div>
-                                    )}
-
-                                    {property.deposit && (
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600 text-sm">{isReady ? 'Depozito' : 'Deposit'}:</span>
-                                            <span className="font-medium text-sm">{formatPrice(property.deposit)}</span>
+                                        <div>
+                                            <div className="font-medium text-gray-900">
+                                                {isEncera ? '535 602 1168' : property.owner.phoneNumber || 'Telefon bulunamadı'}
+                                            </div>
+                                            <div className="text-sm text-gray-500">Telefon Numarası</div>
                                         </div>
-                                    )}
-                                </div>
-
-                                {/* Features */}
-                                <div className="space-y-3">
-                                    <h3 className="font-medium text-gray-900">
-                                        {isReady ? t('property-detail.features') : 'Özellikler'}
-                                    </h3>
-
-                                    <div className="space-y-2">
-                                        {property.elevator && (
-                                            <div className="flex items-center text-green-600">
-                                                <Briefcase className="w-4 h-4 mr-2" />
-                                                <span className="text-sm">{isReady ? 'Asansör' : 'Elevator'}</span>
-                                            </div>
-                                        )}
-                                        {property.parking && (
-                                            <div className="flex items-center text-green-600">
-                                                <Car className="w-4 h-4 mr-2" />
-                                                <span className="text-sm">{isReady ? 'Otopark' : 'Parking'}</span>
-                                            </div>
-                                        )}
-                                        {property.balcony && (
-                                            <div className="flex items-center text-green-600">
-                                                <Home className="w-4 h-4 mr-2" />
-                                                <span className="text-sm">{isReady ? 'Balkon' : 'Balcony'}</span>
-                                            </div>
-                                        )}
-                                        {property.security && (
-                                            <div className="flex items-center text-green-600">
-                                                <Shield className="w-4 h-4 mr-2" />
-                                                <span className="text-sm">{isReady ? 'Güvenlik' : 'Security'}</span>
-                                            </div>
-                                        )}
-                                        {property.furnished && (
-                                            <div className="flex items-center text-green-600">
-                                                <Coffee className="w-4 h-4 mr-2" />
-                                                <span className="text-sm">{isReady ? 'Eşyalı' : 'Furnished'}</span>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Description */}
-                            {property.description && (
-                                <div className="mt-6 pt-6 border-t border-gray-200 w-full max-w-full overflow-hidden">
-                                    <h3 className="font-medium text-gray-900 mb-3">
-                                        {isReady ? t('property-detail.description') : 'Açıklama'}
-                                    </h3>
-                                    <p className="text-gray-600 leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap w-full">
-                                        {property.description}
-                                    </p>
+                            {/* Action Buttons */}
+                            <div>
+                                <h3 className="font-semibold text-gray-900 mb-6 text-lg">İletişime Geç</h3>
+
+                                <div className="space-y-4">
+                                    <a
+                                        href={`tel:${isEncera ? '5356021168' : property.owner.phoneNumber}`}
+                                        className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
+                                    >
+                                        <Phone className="w-4 h-4 mr-2" />
+                                        Hemen Ara
+                                    </a>
+
+                                    <Link
+                                        href={`/messages?userId=${property.owner.id}&propertyId=${propertyId}`}
+                                        className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg"
+                                    >
+                                        <MessageSquare className="w-4 h-4 mr-2" />
+                                        Mesaj Gönder
+                                    </Link>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
+                )}
 
-                    {/* Comments and Rating Section */}
-                    {!isOwner && user && (
-                        <div className="bg-gradient-to-br from-white via-slate-50 to-white rounded-xl shadow-lg border border-slate-200/60 p-8">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
-                                    <MessageCircle className="w-5 h-5 text-white" />
-                                </div>
-                                <h3 className="text-xl font-semibold text-gray-900">
-                                    {isReady ? t('property-detail.comments.title') : 'Yorum ve Değerlendirme'}
-                                </h3>
-                            </div>
+                {/* Property Details Section */}
+                <div className="mt-12 pt-8 border-t border-gray-100">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-8">İlan Detayları</h2>
 
-                            {/* Add Comment Form */}
-                            <form onSubmit={handleCommentSubmit} className="space-y-6">
-                                {/* Rating Section */}
-                                <div className="bg-white rounded-lg p-6 border border-slate-200">
-                                    <label className="block text-sm font-semibold text-gray-800 mb-4">
-                                        {isReady ? 'Değerlendirme' : 'Your Rating'}
-                                    </label>
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex items-center gap-1">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <button
-                                                    key={star}
-                                                    type="button"
-                                                    onClick={() => setNewRating(star)}
-                                                    className={`w-8 h-8 transition-all duration-200 hover:scale-110 ${
-                                                        star <= newRating
-                                                            ? 'text-amber-400 hover:text-amber-500'
-                                                            : 'text-gray-300 hover:text-amber-300'
-                                                    }`}
-                                                >
-                                                    <Star className={`w-8 h-8 ${star <= newRating ? 'fill-current' : ''}`} />
-                                                </button>
-                                            ))}
-                                        </div>
-                                        <div className="ml-4 px-3 py-1 bg-amber-50 rounded-full">
-                                            <span className="text-sm font-medium text-amber-700">
-                                                {newRating}/5 {isReady ? 'Yıldız' : 'Stars'}
-                                            </span>
-                                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        {/* Left Column - Basic Info */}
+                        <div>
+                            <h3 className="font-semibold text-gray-900 mb-6">Temel Bilgiler</h3>
+                            <div className="space-y-4">
+                                {property.roomConfiguration?.bathroomCount && (
+                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                                        <span className="text-gray-600">Banyo Sayısı</span>
+                                        <span className="font-medium text-gray-900">{property.roomConfiguration.bathroomCount}</span>
                                     </div>
-                                </div>
-
-                                {/* Comment Section */}
-                                <div className="bg-white rounded-lg p-6 border border-slate-200">
-                                    <label className="block text-sm font-semibold text-gray-800 mb-4">
-                                        {isReady ? t('property-detail.comments.your-comment') : 'Yorumunuz'}
-                                    </label>
-                                    <textarea
-                                        value={newComment}
-                                        onChange={(e) => setNewComment(e.target.value)}
-                                        rows={4}
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
-                                        placeholder={isReady ? t('property-detail.comments.comment-placeholder') : 'İlan hakkındaki düşüncelerinizi detaylıca paylaşın...'}
-                                        required
-                                    />
-                                    <div className="text-sm text-slate-500 mt-1">
-                                        {newComment.length}/1000 {isReady ? t('property-detail.comments.char-count') : 'karakter'} {newComment.length < 10 && `(${isReady ? t('property-detail.comments.min-chars') : 'en az 10 karakter gerekli'})`}
+                                )}
+                                {property.monthlyFee && (
+                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                                        <span className="text-gray-600">Aidat</span>
+                                        <span className="font-medium text-gray-900">{formatPrice(property.monthlyFee)}</span>
                                     </div>
-                                </div>
-
-                                {/* Submit Button */}
-                                <button
-                                    type="submit"
-                                    disabled={isSubmittingComment || !newComment.trim() || newComment.trim().length < 10}
-                                    className="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                                >
-                                    <MessageCircle className="w-5 h-5 mr-2" />
-                                    {isSubmittingComment
-                                        ? (isReady ? t('property-detail.comments.submitting') : 'Gönderiliyor...')
-                                        : (isReady ? t('property-detail.comments.submit-comment') : 'Yorum Ekle')
-                                    }
-                                </button>
-                            </form>
-
-                            {/* Comments List */}
-                            <div className="mt-10">
-                                <div className="flex items-center gap-2 mb-6">
-                                    <h4 className="text-lg font-semibold text-gray-900">
-                                        {isReady ? t('property-detail.comments.title') : 'Diğer Yorumlar'}
-                                    </h4>
-                                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-                                        {commentsData?.totalElements || 0} {isReady ? 'yorum' : 'yorum'}
-                                    </span>
-                                    {ratingData && ratingData.totalComments > 0 && (
-                                        <div className="flex items-center gap-1 ml-2">
-                                            <Star className="w-4 h-4 text-amber-400 fill-current" />
-                                            <span className="text-sm font-medium text-gray-700">
-                                                {ratingData.averageRating.toFixed(1)}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {commentsLoading ? (
-                                    <div className="flex justify-center py-8">
-                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                )}
+                                {property.deposit && (
+                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                                        <span className="text-gray-600">Depozito</span>
+                                        <span className="font-medium text-gray-900">{formatPrice(property.deposit)}</span>
                                     </div>
-                                ) : commentsData && commentsData.content.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {commentsData.content.map((comment) => (
-                                            <div key={comment.id} className="bg-white rounded-lg p-6 border border-slate-200 hover:shadow-md transition-shadow duration-200">
-                                                <div className="flex items-start gap-4">
-                                                    <div className="flex-shrink-0">
-                                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                                            <span className="text-white font-semibold text-sm">
-                                                                {comment.userFirstName.charAt(0)}{comment.userLastName.charAt(0)}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <div className="flex items-center gap-3">
-                                                                <h5 className="text-sm font-semibold text-gray-900">
-                                                                    {comment.userFirstName} {comment.userLastName}
-                                                                </h5>
-                                                                <div className="flex items-center gap-1">
-                                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                                        <Star
-                                                                            key={star}
-                                                                            className={`w-4 h-4 ${
-                                                                                star <= comment.rating ? 'text-amber-400 fill-current' : 'text-gray-300'
-                                                                            }`}
-                                                                        />
-                                                                    ))}
-                                                                    <span className="text-xs text-gray-500 ml-1 font-medium">{comment.rating}.0</span>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-xs text-gray-500 font-medium">
-                                                                    {new Date(comment.createdAt).toLocaleDateString('tr-TR')}
-                                                                </span>
-                                                                {user && user.id === comment.userId && (
-                                                                    <button
-                                                                        onClick={() => handleCommentDelete(comment.id)}
-                                                                        className="text-red-500 hover:text-red-700 transition-colors p-1"
-                                                                        title={isReady ? t('property-detail.comments.delete') : 'Sil'}
-                                                                    >
-                                                                        <Trash className="w-4 h-4" />
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <p className="text-sm text-gray-700 leading-relaxed">
-                                                            {comment.comment}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-8">
-                                        <div className="inline-flex items-center gap-2 text-gray-500">
-                                            <MessageCircle className="w-4 h-4" />
-                                            <span className="text-sm font-medium">
-                                                {isReady ? 'Henüz yorum bulunmuyor.' : 'No reviews yet.'}
-                                            </span>
-                                        </div>
+                                )}
+                                {property.buildingAge !== undefined && (
+                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                                        <span className="text-gray-600">Bina Yaşı</span>
+                                        <span className="font-medium text-gray-900">{property.buildingAge} yıl</span>
                                     </div>
                                 )}
                             </div>
                         </div>
-                    )}
 
-                    {/* Property Owner Link */}
-                    {!isOwner && (
-                        <div className="bg-white rounded-lg shadow-sm border p-6">
-                            <h3 className="font-medium text-gray-900 mb-4">
-                                {isReady ? 'İlan Sahibi Hakkında' : 'About Property Owner'}
-                            </h3>
-
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <UserIcon className="w-8 h-8 text-gray-400" />
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="font-medium text-gray-900">
-                                                {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
-                                            </div>
-                                            {isEncera && (
-                                                <CheckCircle className="w-4 h-4 text-blue-500" />
-                                            )}
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                            {isReady ? 'Gayrimenkul Uzmanı' : 'Real Estate Professional'}
-                                        </div>
+                        {/* Right Column - Features */}
+                        <div>
+                            <h3 className="font-semibold text-gray-900 mb-6">Özellikler</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                {property.elevator && (
+                                    <div className="flex items-center p-3 bg-green-50 rounded-lg">
+                                        <Briefcase className="w-4 h-4 mr-2 text-green-600" />
+                                        <span className="text-sm text-green-800 font-medium">Asansör</span>
                                     </div>
-                                </div>
+                                )}
+                                {property.parking && (
+                                    <div className="flex items-center p-3 bg-green-50 rounded-lg">
+                                        <Car className="w-4 h-4 mr-2 text-green-600" />
+                                        <span className="text-sm text-green-800 font-medium">Otopark</span>
+                                    </div>
+                                )}
+                                {property.balcony && (
+                                    <div className="flex items-center p-3 bg-green-50 rounded-lg">
+                                        <Home className="w-4 h-4 mr-2 text-green-600" />
+                                        <span className="text-sm text-green-800 font-medium">Balkon</span>
+                                    </div>
+                                )}
+                                {property.security && (
+                                    <div className="flex items-center p-3 bg-green-50 rounded-lg">
+                                        <Shield className="w-4 h-4 mr-2 text-green-600" />
+                                        <span className="text-sm text-green-800 font-medium">Güvenlik</span>
+                                    </div>
+                                )}
+                                {property.furnished && (
+                                    <div className="flex items-center p-3 bg-green-50 rounded-lg">
+                                        <Coffee className="w-4 h-4 mr-2 text-green-600" />
+                                        <span className="text-sm text-green-800 font-medium">Eşyalı</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
 
-                                <Link
-                                    href={`/profile/${property.owner.id}`}
-                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
-                                >
-                                    {isReady ? 'Profili Görüntüle' : 'View Profile'}
-                                </Link>
+                    {/* Description */}
+                    {property.description && (
+                        <div>
+                            <h3 className="font-semibold text-gray-900 mb-4">Açıklama</h3>
+                            <div className="bg-gray-50 rounded-lg p-6">
+                                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                    {property.description}
+                                </p>
                             </div>
                         </div>
                     )}
 
                 </div>
+
+                {/* Comments and Rating Section */}
+                {!isOwner && user && (
+                    <div className="mt-12 pt-8 border-t border-gray-100">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg">
+                                <MessageCircle className="w-5 h-5 text-white" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                Yorum ve Değerlendirme
+                            </h2>
+                        </div>
+
+                        {/* Add Comment Form */}
+                        <form onSubmit={handleCommentSubmit} className="space-y-8">
+                            {/* Rating Section */}
+                            <div>
+                                <label className="block text-lg font-semibold text-gray-900 mb-4">
+                                    Değerlendirme
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                onClick={() => setNewRating(star)}
+                                                className={`w-8 h-8 transition-all duration-200 hover:scale-110 ${
+                                                    star <= newRating
+                                                        ? 'text-amber-400 hover:text-amber-500'
+                                                        : 'text-gray-300 hover:text-amber-300'
+                                                }`}
+                                            >
+                                                <Star className={`w-8 h-8 ${star <= newRating ? 'fill-current' : ''}`} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="ml-4 px-3 py-1 bg-amber-50 rounded-full">
+                                        <span className="text-sm font-medium text-amber-700">
+                                            {newRating}/5 Yıldız
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Comment Section */}
+                            <div>
+                                <label className="block text-lg font-semibold text-gray-900 mb-4">
+                                    Yorumunuz
+                                </label>
+                                <textarea
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    rows={4}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+                                    placeholder="İlan hakkındaki düşüncelerinizi detaylıca paylaşın..."
+                                    required
+                                />
+                                <div className="text-sm text-gray-500 mt-2">
+                                    {newComment.length}/1000 karakter {newComment.length < 10 && '(en az 10 karakter gerekli)'}
+                                </div>
+                            </div>
+
+                            {/* Submit Button */}
+                            <button
+                                type="submit"
+                                disabled={isSubmittingComment || !newComment.trim() || newComment.trim().length < 10}
+                                className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <MessageCircle className="w-5 h-5 mr-2 inline" />
+                                {isSubmittingComment ? 'Gönderiliyor...' : 'Yorum Ekle'}
+                            </button>
+                        </form>
+
+                        {/* Comments List */}
+                        <div className="mt-12">
+                            <div className="flex items-center gap-2 mb-6">
+                                <h3 className="text-xl font-semibold text-gray-900">
+                                    Diğer Yorumlar
+                                </h3>
+                                <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-medium rounded-full">
+                                    {commentsData?.totalElements || 0} yorum
+                                </span>
+                                {ratingData && ratingData.totalComments > 0 && (
+                                    <div className="flex items-center gap-1 ml-2">
+                                        <Star className="w-4 h-4 text-amber-400 fill-current" />
+                                        <span className="text-sm font-medium text-gray-700">
+                                            {ratingData.averageRating.toFixed(1)}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {commentsLoading ? (
+                                <div className="flex justify-center py-8">
+                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                </div>
+                            ) : commentsData && commentsData.content.length > 0 ? (
+                                <div className="space-y-6">
+                                    {commentsData.content.map((comment) => (
+                                        <div key={comment.id} className="pb-6 border-b border-gray-100 last:border-b-0">
+                                            <div className="flex items-start gap-4">
+                                                <div className="flex-shrink-0">
+                                                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                                        <span className="text-white font-semibold text-sm">
+                                                            {comment.userFirstName.charAt(0)}{comment.userLastName.charAt(0)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <h5 className="font-semibold text-gray-900">
+                                                                {comment.userFirstName} {comment.userLastName}
+                                                            </h5>
+                                                            <div className="flex items-center gap-1">
+                                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                                    <Star
+                                                                        key={star}
+                                                                        className={`w-4 h-4 ${
+                                                                            star <= comment.rating ? 'text-amber-400 fill-current' : 'text-gray-300'
+                                                                        }`}
+                                                                    />
+                                                                ))}
+                                                                <span className="text-sm text-gray-500 ml-1">{comment.rating}.0</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm text-gray-500">
+                                                                {new Date(comment.createdAt).toLocaleDateString('tr-TR')}
+                                                            </span>
+                                                            {user && user.id === comment.userId && (
+                                                                <button
+                                                                    onClick={() => handleCommentDelete(comment.id)}
+                                                                    className="text-red-500 hover:text-red-700 transition-colors p-1"
+                                                                    title="Sil"
+                                                                >
+                                                                    <Trash className="w-4 h-4" />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-gray-700 leading-relaxed">
+                                                        {comment.comment}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8">
+                                    <div className="inline-flex items-center gap-2 text-gray-500">
+                                        <MessageCircle className="w-4 h-4" />
+                                        <span className="text-sm font-medium">
+                                            Henüz yorum bulunmuyor.
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Property Owner Link */}
+                {!isOwner && (
+                    <div className="mt-8 pt-6 border-t border-gray-100">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <UserIcon className="w-6 h-6 text-gray-600" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="font-medium text-gray-900">
+                                            {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
+                                        </div>
+                                        {isEncera && (
+                                            <CheckCircle className="w-4 h-4 text-blue-500" />
+                                        )}
+                                    </div>
+                                    <div className="text-sm text-gray-500">Gayrimenkul Uzmanı</div>
+                                </div>
+                            </div>
+
+                            <Link
+                                href={`/profile/${property.owner.id}`}
+                                className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                            >
+                                Profili Görüntüle →
+                            </Link>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

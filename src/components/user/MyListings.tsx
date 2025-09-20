@@ -2,9 +2,12 @@
 // src/components/user/MyListings.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGetUserPropertiesQuery } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
+import { useAuth } from '@/hooks/useAuth';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 import { MyListingsTable } from './MyListingsTable';
 import { MyListingsStats } from './MyListingsStats';
 import { MyListingsEmpty } from './MyListingsEmpty';
@@ -12,7 +15,10 @@ import { Search, Plus, Filter } from 'lucide-react';
 import Link from 'next/link';
 
 export const MyListings: React.FC = () => {
+    // TÜM HOOK'LARI EN BAŞTA ÇAĞIR
     const { t, isReady } = useAppTranslation();
+    const { isAuthenticated } = useAuth();
+    const { isHydrated } = useSelector((state: RootState) => state.auth);
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,27 +27,34 @@ export const MyListings: React.FC = () => {
     const { data, isLoading, error } = useGetUserPropertiesQuery({
         page: currentPage,
         size: pageSize
+    }, {
+        // Authentication ve hydration durumu hazır olmadan query çalıştırma
+        skip: !isAuthenticated || !isHydrated
     });
 
+    // DATA PROCESSING - Hook'lardan sonra
     const properties = data?.content || [];
     const totalElements = data?.totalElements || 0;
     const totalPages = data?.totalPages || 0;
 
-    // Filtreleme
-    const filteredProperties = properties.filter(property => {
-        const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            property.district.toLowerCase().includes(searchTerm.toLowerCase());
+    // Filtreleme - useMemo ile optimize et
+    const filteredProperties = useMemo(() => {
+        return properties.filter(property => {
+            const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                property.district.toLowerCase().includes(searchTerm.toLowerCase());
 
-        const matchesStatus = statusFilter === 'all' ||
-            (statusFilter === 'approved' && property.approved) ||
-            (statusFilter === 'pending' && !property.approved) ||
-            (statusFilter === 'inactive' && !property.active);
+            const matchesStatus = statusFilter === 'all' ||
+                (statusFilter === 'approved' && property.approved) ||
+                (statusFilter === 'pending' && !property.approved) ||
+                (statusFilter === 'inactive' && !property.active);
 
-        return matchesSearch && matchesStatus;
-    });
+            return matchesSearch && matchesStatus;
+        });
+    }, [properties, searchTerm, statusFilter]);
 
-    if (isLoading) {
+    // Loading state - authentication hazır olmadan veya data yüklenirken
+    if (!isHydrated || !isAuthenticated || isLoading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
                 <div className="container mx-auto px-4 py-8">

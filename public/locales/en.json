@@ -176,6 +176,7 @@
       "pricing": "Pricing Information",
       "submit": "Publish Listing",
       "submitting": "Publishing listing...",
+      "please-wait": "Please wait, your listing is being prepared...",
       "listing-title": "Listing Title",
       "listing-title-placeholder": "E.g.: 3+1 apartment for sale in central location",
       "listing-type": "Listing Type",
@@ -211,6 +212,7 @@
       "encera-sellable": "Sellable via Ençera",
       "encera-sellable-description": "Get professional support for your listing through Ençera's sales process.",
       "deposit-sale-note": "Deposit is not required for sale listings.",
+      "photos": "Photos",
       "success": "Listing created successfully!",
       "error": "An error occurred while creating the listing. Please try again.",
       "validation-error": "Please fill in all required fields."
@@ -620,6 +622,46 @@
       "min-chars": "minimum 10 characters required",
       "delete": "Delete",
       "delete-confirm": "Are you sure you want to delete this comment?"
+    }
+  },
+
+  "upload": {
+    "info": {
+      "max-files": "You can upload up to 15 photos"
+    },
+    "drop-zone": {
+      "title": "Drag and drop photos here",
+      "subtitle": "or click to select files"
+    },
+    "primary-image": "Primary Photo",
+    "uploading": "Uploading photos...",
+    "error": {
+      "invalid-type": "Invalid file type. Only JPG, PNG and WebP are supported.",
+      "file-too-large": "File size cannot exceed 5MB.",
+      "too-many-files": "You can upload up to 15 images.",
+      "upload-failed": "Upload failed"
+    }
+  },
+
+  "heating": {
+    "options": {
+      "none": "None",
+      "stove": "Stove",
+      "natural-gas-stove": "Natural Gas Stove",
+      "floor-heating": "Floor Heating",
+      "central": "Central",
+      "central-share": "Central (Shared)",
+      "combi-natural-gas": "Combi (Natural Gas)",
+      "combi-electric": "Combi (Electric)",
+      "underfloor-heating": "Underfloor Heating",
+      "air-conditioning": "Air Conditioning",
+      "fancoil": "Fan Coil",
+      "solar-energy": "Solar Energy",
+      "electric-radiator": "Electric Radiator",
+      "geothermal": "Geothermal",
+      "fireplace": "Fireplace",
+      "vrv": "VRV System",
+      "heat-pump": "Heat Pump"
     }
   }
 }

@@ -178,6 +178,7 @@
       "pricing": "Fiyat Bilgileri",
       "submit": "İlanı Yayınla",
       "submitting": "İlan yayınlanıyor...",
+      "please-wait": "Lütfen bekleyin, ilanınız hazırlanıyor...",
       "listing-title": "İlan Başlığı",
       "listing-title-placeholder": "Örn: Merkezi konumda satılık 3+1 daire",
       "listing-type": "İlan Tipi",
@@ -213,6 +214,7 @@
       "encera-sellable": "Ençera ile satılsın",
       "encera-sellable-description": "İlanınızı Ençera üzerinden satış sürecinde profesyonel destek alabilirsiniz.",
       "deposit-sale-note": "Satılık ilanlar için depozito gerekli değildir.",
+      "photos": "Fotoğraflar",
       "success": "İlan başarıyla oluşturuldu!",
       "error": "İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.",
       "validation-error": "Lütfen tüm zorunlu alanları doldurun."
@@ -623,6 +625,46 @@
       "min-chars": "en az 10 karakter gerekli",
       "delete": "Sil",
       "delete-confirm": "Bu yorumu silmek istediğinizden emin misiniz?"
+    }
+  },
+
+  "upload": {
+    "info": {
+      "max-files": "Maksimum 15 fotoğraf yükleyebilirsiniz"
+    },
+    "drop-zone": {
+      "title": "Fotoğrafları sürükleyip bırakın",
+      "subtitle": "veya tıklayarak dosya seçin"
+    },
+    "primary-image": "Birincil Fotoğraf",
+    "uploading": "Fotoğraflar yükleniyor...",
+    "error": {
+      "invalid-type": "Geçersiz dosya türü. Sadece JPG, PNG ve WebP desteklenir.",
+      "file-too-large": "Dosya boyutu 5MB'dan büyük olamaz.",
+      "too-many-files": "Maksimum 15 resim yükleyebilirsiniz.",
+      "upload-failed": "Yükleme başarısız"
+    }
+  },
+
+  "heating": {
+    "options": {
+      "none": "Yok",
+      "stove": "Soba",
+      "natural-gas-stove": "Doğalgaz Sobası",
+      "floor-heating": "Yerden Isıtma",
+      "central": "Merkezi",
+      "central-share": "Merkezi (Pay Ölçer)",
+      "combi-natural-gas": "Kombi (Doğalgaz)",
+      "combi-electric": "Kombi (Elektrikli)",
+      "underfloor-heating": "Yerden Isıtma",
+      "air-conditioning": "Klima",
+      "fancoil": "Fancoil",
+      "solar-energy": "Güneş Enerjisi",
+      "electric-radiator": "Elektrikli Radyatör",
+      "geothermal": "Jeotermal",
+      "fireplace": "Şömine",
+      "vrv": "VRV Sistem",
+      "heat-pump": "Isı Pompası"
     }
   }
 }

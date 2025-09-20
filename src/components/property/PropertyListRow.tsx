@@ -1,7 +1,7 @@
 // src/components/property/PropertyListRow.tsx
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { PropertySummaryResponse, ListingType, PropertyType } from '@/store/api/propertyApi';
@@ -25,6 +25,14 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
                                                                     linkHref
                                                                 }) => {
     const { t, isReady } = useAppTranslation();
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageError, setImageError] = useState(false);
+
+    // Property değiştiğinde state'i sıfırla
+    React.useEffect(() => {
+        setImageLoaded(false);
+        setImageError(false);
+    }, [property.primaryImageUrl]);
 
     const getListingTypeText = (type: ListingType) => {
         switch (type) {
@@ -81,14 +89,28 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
             <div className="bg-white hover:bg-gray-50 transition-colors cursor-pointer w-full">
                 <div className="flex flex-row w-full border-b border-gray-200 min-h-[100px] items-center">
                     {/* Property Image */}
-                    <div className="flex-shrink-0 w-32 sm:w-48 self-stretch">
+                    <div className="flex-shrink-0 w-32 sm:w-48 h-24 sm:h-32">
                         <div className="w-full h-full bg-gray-300 border-r border-gray-200 flex items-center justify-center relative overflow-hidden">
-                            {property.coverImageUrl ? (
-                                <img
-                                    src={property.coverImageUrl}
-                                    alt={property.title}
-                                    className="w-full h-full object-cover"
-                                />
+                            {property.primaryImageUrl && !imageError ? (
+                                <>
+                                    {!imageLoaded && (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse">
+                                            <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                                        </div>
+                                    )}
+                                    <img
+                                        src={property.primaryImageUrl}
+                                        alt={property.title}
+                                        className={`w-full h-full object-cover transition-opacity duration-300 ${
+                                            imageLoaded ? 'opacity-100' : 'opacity-0'
+                                        }`}
+                                        onLoad={() => setImageLoaded(true)}
+                                        onError={() => {
+                                            setImageError(true);
+                                            setImageLoaded(false);
+                                        }}
+                                    />
+                                </>
                             ) : (
                                 <div className="flex flex-col items-center justify-center text-gray-400">
                                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-2">

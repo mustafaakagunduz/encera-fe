@@ -6,9 +6,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LocationSelector } from '@/components/ui/location-selector';
 import { Toast } from '@/components/ui/toast';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {selectListingPreviewData, setListingPreviewData} from '@/store/slices/listingPreviewSlice';
+import { previewStorage } from '@/utils/previewStorage';
 import { useCreatePropertyMutation, useUpdatePropertyMutation, useGetPropertyByIdQuery, PropertyCreateRequest, ListingType, PropertyType, RoomConfiguration, propertyApi } from '@/store/api/propertyApi';
 import {
     Home,
@@ -22,12 +24,20 @@ import {
     Loader2,
     Crown,
     ChevronDown,
-    X
+    X,
+    Camera
 } from 'lucide-react';
 
 interface FormData extends Omit<PropertyCreateRequest, 'roomConfiguration'> {
     roomCount: string;
     hallCount: string;
+}
+
+interface ImageData {
+    file?: File;
+    url?: string;
+    isPrimary: boolean;
+    preview: string;
 }
 
 interface FormErrors {
@@ -93,6 +103,7 @@ export const CreateListingForm: React.FC = () => {
 
     const [errors, setErrors] = useState<FormErrors>({});
     const [heatingDropdownOpen, setHeatingDropdownOpen] = useState(false);
+    const [images, setImages] = useState<ImageData[]>([]);
 
     // Heating options
     const heatingOptions = [
@@ -133,6 +144,26 @@ export const CreateListingForm: React.FC = () => {
                 currentFloor: previewData.currentFloor,
                 heatingTypes: previewData.heatingTypes || [],
             });
+
+            // Storage'dan image verilerini yükle (File objelerle birlikte)
+            const storageData = previewStorage.load();
+            if (storageData && storageData.images.length > 0) {
+                const imageData: ImageData[] = storageData.images.map(img => ({
+                    file: img.file,
+                    url: img.url,
+                    isPrimary: img.isPrimary,
+                    preview: img.preview
+                }));
+                setImages(imageData);
+            } else if (previewData.imageUrls && previewData.imageUrls.length > 0) {
+                // Fallback - sadece URL'ler varsa
+                const imageData: ImageData[] = previewData.imageUrls.map(url => ({
+                    url,
+                    isPrimary: url === previewData.primaryImageUrl,
+                    preview: url
+                }));
+                setImages(imageData);
+            }
         }
     }, [previewData]);
 
@@ -166,6 +197,16 @@ export const CreateListingForm: React.FC = () => {
                 currentFloor: existingProperty.currentFloor,
                 heatingTypes: existingProperty.heatingTypes || [],
             });
+
+            // Set images from existing property
+            if (existingProperty.imageUrls && existingProperty.imageUrls.length > 0) {
+                const imageData: ImageData[] = existingProperty.imageUrls.map(url => ({
+                    url,
+                    isPrimary: url === existingProperty.primaryImageUrl,
+                    preview: url
+                }));
+                setImages(imageData);
+            }
         }
     }, [existingProperty, isEditMode, previewData]);
 
@@ -289,6 +330,10 @@ export const CreateListingForm: React.FC = () => {
         }));
     };
 
+    const handleImagesChange = React.useCallback((newImages: ImageData[]) => {
+        setImages(newImages);
+    }, []);
+
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};
 
@@ -367,6 +412,8 @@ export const CreateListingForm: React.FC = () => {
             totalFloors: formData.totalFloors,
             currentFloor: formData.currentFloor,
             heatingTypes: formData.heatingTypes,
+            imageUrls: images.filter(img => img.url).map(img => img.url!),
+            primaryImageUrl: images.find(img => img.isPrimary)?.url,
         };
 
         if (isEditMode && editId) {
@@ -412,8 +459,10 @@ export const CreateListingForm: React.FC = () => {
                 );
             }
         } else {
-            // Create mode - existing flow
-            // Form verisini Redux store'a kaydet
+            // Create mode - File objelerini ayrı storage'da tut
+            previewStorage.save(submitData, images);
+
+            // Redux'a sadece serialize edilebilir veriyi kaydet
             dispatch(setListingPreviewData(submitData));
 
             // Preview sayfasına yönlendir
@@ -992,6 +1041,22 @@ export const CreateListingForm: React.FC = () => {
                         </div>
                     </div>
                 
+                </div>
+
+                {/* Fotoğraflar Kartı */}
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
+                        <Camera className="w-5 h-5 mr-2 text-blue-600" />
+                        {isReady ? t('listing.create.photos') : 'Fotoğraflar'}
+                    </h2>
+
+                    <ImageUpload
+                        maxImages={15}
+                        onImagesChange={handleImagesChange}
+                        disabled={isFetchingProperty || isCreating || isUpdating}
+                        initialImages={images.map(img => ({ url: img.preview, isPrimary: img.isPrimary }))}
+                        previewMode={true}
+                    />
                 </div>
 
                 {/* Açıklama Kartı */}

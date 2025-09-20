@@ -41,7 +41,12 @@ export interface PropertyCreateRequest {
     roomConfiguration?: RoomConfiguration;
     monthlyFee?: number;
     deposit?: number;
-
+    buildingAge?: number;
+    totalFloors?: number;
+    currentFloor?: number;
+    heatingTypes?: string[];
+    imageUrls?: string[];
+    primaryImageUrl?: string;
 }
 
 export interface PropertyUpdateRequest {
@@ -65,6 +70,12 @@ export interface PropertyUpdateRequest {
     roomConfiguration?: RoomConfiguration;
     monthlyFee?: number;
     deposit?: number;
+    buildingAge?: number;
+    totalFloors?: number;
+    currentFloor?: number;
+    heatingTypes?: string[];
+    imageUrls?: string[];
+    primaryImageUrl?: string;
     approved?: boolean; // YENİ EKLENEN - İlan editlendiğinde pending durumuna geçmesi için
     active?: boolean; // YENİ EKLENEN - Pasif ilanların editlendiğinde aktif hale gelmesi için
 }
@@ -123,6 +134,12 @@ export interface PropertyResponse {
     viewCount: number;
     reported: boolean;
     reportCount: number;
+    buildingAge?: number;
+    totalFloors?: number;
+    currentFloor?: number;
+    heatingTypes?: string[];
+    imageUrls?: string[];
+    primaryImageUrl?: string;
     owner: {
         id: number;
         firstName: string;
@@ -153,7 +170,7 @@ export interface PropertySummaryResponse {
     pappSellable: boolean;
     viewCount: number;
     createdAt: string;
-    coverImageUrl?: string;
+    primaryImageUrl?: string;
 }
 
 export interface CreatePropertyResponse {
