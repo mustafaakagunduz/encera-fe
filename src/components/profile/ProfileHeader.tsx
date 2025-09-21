@@ -349,8 +349,9 @@ const ProfileHeader: React.FC = () => {
             {/* Cover Image Section */}
             <div className="relative">
                 <div
-                    className="h-56 md:h-72 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden cursor-pointer hover:brightness-105 transition-all duration-300"
+                    className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden cursor-pointer hover:brightness-105 transition-all duration-300"
                     style={{
+                        aspectRatio: '4.167',
                         backgroundImage: userProfile.coverImage ? `url(${userProfile.coverImage})` : 'none',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
@@ -565,7 +566,7 @@ const ProfileHeader: React.FC = () => {
                 currentImageUrl={profile?.originalCoverImageUrl || userProfile.coverImage}
                 title={t('profile.edit-cover-image')}
                 description={t('profile.cover-image-crop-description')}
-                aspectRatio={4.2}
+                aspectRatio={4.167}
                 maxSizeMB={10}
                 isProcessing={isUploadingCover}
             />
