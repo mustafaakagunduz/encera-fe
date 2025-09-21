@@ -287,7 +287,7 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-5xl max-h-[95vh] overflow-hidden">
+      <DialogContent className="sm:max-w-5xl max-h-[95vh] overflow-hidden" onClose={handleClose}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Camera className="w-5 h-5" />

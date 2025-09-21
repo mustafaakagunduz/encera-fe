@@ -11,6 +11,20 @@ interface DialogProps {
 }
 
 const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
+  // ESC key listener
+  React.useEffect(() => {
+    if (!open) return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onOpenChange(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [open, onOpenChange]);
+
   if (!open) return null;
 
   return (
@@ -28,10 +42,11 @@ const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
 
 interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
+  onClose?: () => void;
 }
 
 const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
-  ({ className, children, ...props }, ref) => (
+  ({ className, children, onClose, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
@@ -40,6 +55,15 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
       )}
       {...props}
     >
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:pointer-events-none"
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </button>
+      )}
       {children}
     </div>
   )
