@@ -323,6 +323,16 @@ export const CreateListingForm: React.FC = () => {
         }));
     };
 
+    const handleFeatureToggle = (featureName: string, condition: boolean = true) => {
+        if (!condition) return;
+
+        // Özelliği direkt toggle et
+        setFormData(prev => ({
+            ...prev,
+            [featureName]: !prev[featureName as keyof typeof prev]
+        }));
+    };
+
     const removeHeatingType = (heatingType: string) => {
         setFormData(prev => ({
             ...prev,
@@ -471,30 +481,33 @@ export const CreateListingForm: React.FC = () => {
     };
 
     return (
-        <div className="max-w-none lg:max-w-7xl mx-auto p-4 lg:p-6">
-            {/* Header */}
-            <div className="bg-white rounded-lg shadow-lg mb-6">
-                <div className="p-6 lg:p-8">
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                        <Home className="w-6 h-6 mr-3 text-blue-600" />
-                        {isEditMode 
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-none lg:max-w-7xl mx-auto p-4 lg:p-6">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                        <Home className="w-8 h-8 mr-3 text-blue-600" />
+                        {isEditMode
                             ? (isReady ? t('listing.edit.title') : 'İlan Düzenle')
                             : (isReady ? t('listing.create.title') : 'İlan Ver')
                         }
                     </h1>
+                    <p className="text-gray-600 mt-2 ml-11">
+                        {isEditMode
+                            ? (isReady ? t('listing.edit.loading') : 'İlan bilgilerinizi düzenleyip güncelleyebilirsiniz')
+                            : (isReady ? t('listing.create.create-listing-title') : 'Emlak ilanınızı oluşturun ve yayınlayın')
+                        }
+                    </p>
                 </div>
-            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Main Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
-                    {/* Temel Bilgiler Kartı */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
-                            <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    {/* Temel Bilgiler */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                            <FileText className="w-6 h-6 mr-3 text-blue-600" />
                             {isReady ? t('listing.create.basic-info') : 'Temel Bilgiler'}
                         </h2>
+                        <div className="bg-gray-50 rounded-lg p-6">
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                             {/* İlan Başlığı */}
@@ -508,7 +521,7 @@ export const CreateListingForm: React.FC = () => {
                                     value={formData.title}
                                     onChange={handleInputChange}
                                     placeholder={isReady ? t('listing.create.listing-title-placeholder') : 'Örn: Merkezi konumda satılık 3+1 daire'}
-                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                    className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.title ? 'border-red-500' : 'border-gray-300'
                                     }`}
                                 />
@@ -524,7 +537,7 @@ export const CreateListingForm: React.FC = () => {
                                     name="listingType"
                                     value={formData.listingType}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
                                     <option value={ListingType.SALE}>
                                         {isReady ? t('common.sale') : 'Satılık'}
@@ -544,7 +557,7 @@ export const CreateListingForm: React.FC = () => {
                                     name="propertyType"
                                     value={formData.propertyType}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
                                     <option value={PropertyType.RESIDENTIAL}>
                                         {isReady ? t('common.residential') : 'Konut'}
@@ -558,40 +571,39 @@ export const CreateListingForm: React.FC = () => {
                                 </select>
                             </div>
                         </div>
+                        </div>
                     </div>
 
-                    {/* Konum Kartı */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
-                            <MapPin className="w-5 h-5 mr-2 text-blue-600" />
+                    {/* Konum */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                            <MapPin className="w-6 h-6 mr-3 text-blue-600" />
                             {isReady ? t('listing.location') : 'Konum'}
                         </h2>
+                        <div className="bg-gray-50 rounded-lg p-6">
 
-                        <LocationSelector
-                            selectedCity={formData.city}
-                            selectedDistrict={formData.district}
-                            selectedNeighborhood={formData.neighborhood}
-                            onLocationChange={handleLocationChange}
-                            errors={{
-                                city: errors.city,
-                                district: errors.district,
-                                neighborhood: errors.neighborhood,
-                            }}
-                            disabled={isFetchingProperty || isCreating || isUpdating}
-                        />
+                            <LocationSelector
+                                selectedCity={formData.city}
+                                selectedDistrict={formData.district}
+                                selectedNeighborhood={formData.neighborhood}
+                                onLocationChange={handleLocationChange}
+                                errors={{
+                                    city: errors.city,
+                                    district: errors.district,
+                                    neighborhood: errors.neighborhood,
+                                }}
+                                disabled={isFetchingProperty || isCreating || isUpdating}
+                            />
+                        </div>
                     </div>
-                
-                </div>
 
-                {/* İlan Detayları ve Fiyat Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
-                    {/* Emlak Detayları Kartı */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
-                            <Home className="w-5 h-5 mr-2 text-blue-600" />
+                    {/* İlan Detayları */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                            <Home className="w-6 h-6 mr-3 text-blue-600" />
                             {isReady ? t('listing.create.property-details') : 'İlan Detayları'}
                         </h2>
+                        <div className="bg-gray-50 rounded-lg p-6">
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                             {/* Brüt Alan */}
@@ -604,7 +616,7 @@ export const CreateListingForm: React.FC = () => {
                                     name="grossArea"
                                     value={formData.grossArea || ''}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
 
@@ -618,7 +630,7 @@ export const CreateListingForm: React.FC = () => {
                                     name="netArea"
                                     value={formData.netArea || ''}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
 
@@ -633,12 +645,12 @@ export const CreateListingForm: React.FC = () => {
                                         name="roomCount"
                                         value={formData.propertyType !== PropertyType.RESIDENTIAL ? '' : (formData.roomCount || '')}
                                         onChange={handleInputChange}
-                                        placeholder="Oda"
+                                        placeholder={isReady ? t('listing.create.room-placeholder') : 'Oda'}
                                         disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
                                         className={`w-1/2 px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                             formData.propertyType !== PropertyType.RESIDENTIAL
                                                 ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                                                : 'border-gray-300'
+                                                : 'border-gray-300 bg-white'
                                         }`}
                                     />
                                     <span className={`flex items-center ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-500'}`}>+</span>
@@ -647,12 +659,12 @@ export const CreateListingForm: React.FC = () => {
                                         name="hallCount"
                                         value={formData.propertyType !== PropertyType.RESIDENTIAL ? '' : (formData.hallCount || '')}
                                         onChange={handleInputChange}
-                                        placeholder="Salon"
+                                        placeholder={isReady ? t('listing.create.living-room-placeholder') : 'Salon'}
                                         disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
                                         className={`w-1/2 px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                             formData.propertyType !== PropertyType.RESIDENTIAL
                                                 ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                                                : 'border-gray-300'
+                                                : 'border-gray-300 bg-white'
                                         }`}
                                     />
                                 </div>
@@ -679,7 +691,7 @@ export const CreateListingForm: React.FC = () => {
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         formData.propertyType === PropertyType.LAND
                                             ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                                            : 'border-gray-300'
+                                            : 'border-gray-300 bg-white'
                                     }`}
                                 />
                                 {formData.propertyType === PropertyType.LAND && (
@@ -703,7 +715,7 @@ export const CreateListingForm: React.FC = () => {
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         formData.propertyType === PropertyType.LAND
                                             ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                                            : 'border-gray-300'
+                                            : 'border-gray-300 bg-white'
                                     }`}
                                 />
                                 {formData.propertyType === PropertyType.LAND && (
@@ -727,7 +739,7 @@ export const CreateListingForm: React.FC = () => {
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         formData.propertyType === PropertyType.LAND
                                             ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                                            : 'border-gray-300'
+                                            : 'border-gray-300 bg-white'
                                     }`}
                                 />
                                 {formData.propertyType === PropertyType.LAND && (
@@ -737,14 +749,16 @@ export const CreateListingForm: React.FC = () => {
                                 )}
                             </div>
                         </div>
+                        </div>
                     </div>
 
-                    {/* Fiyat Bilgileri Kartı */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
-                            <DollarSign className="w-5 h-5 mr-2 text-blue-600" />
+                    {/* Fiyat Bilgileri */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                            <DollarSign className="w-6 h-6 mr-3 text-blue-600" />
                             {isReady ? t('listing.create.pricing') : 'Fiyat Bilgileri'}
                         </h2>
+                        <div className="bg-gray-50 rounded-lg p-6">
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                             {/* Fiyat */}
@@ -757,7 +771,7 @@ export const CreateListingForm: React.FC = () => {
                                     name="price"
                                     value={formData.price || ''}
                                     onChange={handleInputChange}
-                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                    className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.price ? 'border-red-500' : 'border-gray-300'
                                     }`}
                                 />
@@ -790,15 +804,15 @@ export const CreateListingForm: React.FC = () => {
                                         formData.propertyType === PropertyType.LAND ||
                                         (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
                                             ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                                            : 'border-gray-300'
+                                            : 'border-gray-300 bg-white'
                                     }`}
                                 />
                                 {(formData.propertyType === PropertyType.LAND ||
                                   (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)) && (
                                     <p className="mt-1 text-xs text-gray-500">
                                         {formData.propertyType === PropertyType.LAND
-                                            ? 'Arsa için uygulanmaz.'
-                                            : 'Satılık konut için uygulanmaz.'}
+                                            ? (isReady ? t('listing.create.monthly-fee-land-note') : 'Arsa için uygulanmaz.')
+                                            : (isReady ? t('listing.create.monthly-fee-sale-note') : 'Satılık konut için uygulanmaz.')}
                                     </p>
                                 )}
                             </div>
@@ -817,7 +831,7 @@ export const CreateListingForm: React.FC = () => {
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         formData.listingType === ListingType.SALE 
                                             ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed' 
-                                            : 'border-gray-300'
+                                            : 'border-gray-300 bg-white'
                                     }`}
                                 />
                                 {formData.listingType === ListingType.SALE && (
@@ -828,113 +842,127 @@ export const CreateListingForm: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Pazarlığa açık */}
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                id="negotiable"
-                                name="negotiable"
-                                checked={formData.negotiable}
-                                onChange={handleInputChange}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <label htmlFor="negotiable" className="ml-3 text-sm text-gray-900">
-                                {isReady ? t('listing.create.negotiable') : 'Pazarlığa açık'}
-                            </label>
+                            {/* Pazarlığa açık */}
+                            <div className="md:col-span-3 mt-4">
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id="negotiable"
+                                        name="negotiable"
+                                        checked={Boolean(formData.negotiable)}
+                                        onChange={handleInputChange}
+                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                                    />
+                                    <label htmlFor="negotiable" className="ml-3 text-sm text-gray-900 cursor-pointer">
+                                        {isReady ? t('listing.create.negotiable') : 'Pazarlığa açık'}
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                
-                </div>
 
-                {/* Özellikler ve Premium Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
-                    {/* Özellikler Kartı */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
-                            <Home className="w-5 h-5 mr-2 text-blue-600" />
+                    {/* Özellikler */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                            <Home className="w-6 h-6 mr-3 text-blue-600" />
                             {isReady ? t('listing.create.amenities') : 'Özellikler'}
                         </h2>
+                        <div className="bg-gray-50 rounded-lg p-6">
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                             {/* Asansör - Arsa için deaktif */}
-                            <div className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType === PropertyType.LAND ? 'bg-gray-50' : 'hover:bg-gray-50'}`}>
+                            <div
+                                className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType === PropertyType.LAND ? 'bg-gray-50 cursor-not-allowed' : 'bg-white hover:bg-gray-50 cursor-pointer'}`}
+                                onClick={() => handleFeatureToggle('elevator', formData.propertyType !== PropertyType.LAND)}
+                            >
                                 <input
                                     type="checkbox"
                                     id="elevator"
                                     name="elevator"
-                                    checked={formData.propertyType === PropertyType.LAND ? false : formData.elevator}
+                                    checked={Boolean(formData.propertyType === PropertyType.LAND ? false : Boolean(formData.elevator))}
                                     onChange={handleInputChange}
                                     disabled={formData.propertyType === PropertyType.LAND}
-                                    className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${formData.propertyType === PropertyType.LAND ? 'cursor-not-allowed opacity-50' : ''}`}
+                                    className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 pointer-events-none ${formData.propertyType === PropertyType.LAND ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label htmlFor="elevator" className={`ml-3 flex items-center text-sm ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <label className="pointer-events-none" htmlFor="elevator" className={`ml-3 flex items-center text-sm pointer-events-none ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     <ArrowUp className={`w-4 h-4 mr-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.elevator') : 'Asansör'}
                                 </label>
                             </div>
 
                             {/* Otopark */}
-                            <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                            <div
+                                className="flex items-center p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 cursor-pointer"
+                                onClick={() => handleFeatureToggle('parking')}
+                            >
                                 <input
                                     type="checkbox"
                                     id="parking"
                                     name="parking"
-                                    checked={formData.parking}
+                                    checked={Boolean(formData.parking)}
                                     onChange={handleInputChange}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 pointer-events-none"
                                 />
-                                <label htmlFor="parking" className="ml-3 flex items-center text-sm text-gray-900">
+                                <label className="pointer-events-none" htmlFor="parking" className="ml-3 flex items-center text-sm text-gray-900 pointer-events-none">
                                     <Car className="w-4 h-4 mr-2 text-gray-600" />
                                     {isReady ? t('listing.create.parking') : 'Otopark'}
                                 </label>
                             </div>
 
                             {/* Balkon - Arsa için deaktif */}
-                            <div className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType === PropertyType.LAND ? 'bg-gray-50' : 'hover:bg-gray-50'}`}>
+                            <div
+                                className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType === PropertyType.LAND ? 'bg-gray-50 cursor-not-allowed' : 'bg-white hover:bg-gray-50 cursor-pointer'}`}
+                                onClick={() => handleFeatureToggle('balcony', formData.propertyType !== PropertyType.LAND)}
+                            >
                                 <input
                                     type="checkbox"
                                     id="balcony"
                                     name="balcony"
-                                    checked={formData.propertyType === PropertyType.LAND ? false : formData.balcony}
+                                    checked={Boolean(formData.propertyType === PropertyType.LAND ? false : formData.balcony)}
                                     onChange={handleInputChange}
                                     disabled={formData.propertyType === PropertyType.LAND}
                                     className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${formData.propertyType === PropertyType.LAND ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label htmlFor="balcony" className={`ml-3 flex items-center text-sm ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <label className="pointer-events-none" htmlFor="balcony" className={`ml-3 flex items-center text-sm ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     <Home className={`w-4 h-4 mr-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.balcony') : 'Balkon'}
                                 </label>
                             </div>
 
                             {/* Güvenlik */}
-                            <div className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                            <div
+                                className="flex items-center p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 cursor-pointer"
+                                onClick={() => handleFeatureToggle('security')}
+                            >
                                 <input
                                     type="checkbox"
                                     id="security"
                                     name="security"
-                                    checked={formData.security}
+                                    checked={Boolean(formData.security)}
                                     onChange={handleInputChange}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 pointer-events-none"
                                 />
-                                <label htmlFor="security" className="ml-3 flex items-center text-sm text-gray-900">
+                                <label className="pointer-events-none" htmlFor="security" className="ml-3 flex items-center text-sm text-gray-900">
                                     <Shield className="w-4 h-4 mr-2 text-gray-600" />
                                     {isReady ? t('listing.create.security') : 'Güvenlik'}
                                 </label>
                             </div>
 
                             {/* Eşyalı - Arsa ve işyeri için deaktif */}
-                            <div className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'bg-gray-50' : 'hover:bg-gray-50'}`}>
+                            <div
+                                className={`flex items-center p-4 border border-gray-200 rounded-lg ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'bg-gray-50 cursor-not-allowed' : 'bg-white hover:bg-gray-50 cursor-pointer'}`}
+                                onClick={() => handleFeatureToggle('furnished', formData.propertyType === PropertyType.RESIDENTIAL)}
+                            >
                                 <input
                                     type="checkbox"
                                     id="furnished"
                                     name="furnished"
-                                    checked={formData.propertyType !== PropertyType.RESIDENTIAL ? false : formData.furnished}
+                                    checked={Boolean(formData.propertyType !== PropertyType.RESIDENTIAL ? false : formData.furnished)}
                                     onChange={handleInputChange}
                                     disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
                                     className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label htmlFor="furnished" className={`ml-3 flex items-center text-sm ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <label className="pointer-events-none" htmlFor="furnished" className={`ml-3 flex items-center text-sm ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-900'}`}>
                                     <Sofa className={`w-4 h-4 mr-2 ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.furnished') : 'Eşyalı'}
                                 </label>
@@ -976,7 +1004,7 @@ export const CreateListingForm: React.FC = () => {
                                                 >
                                                     <input
                                                         type="checkbox"
-                                                        checked={formData.heatingTypes?.includes(option) || false}
+                                                        checked={Boolean(formData.heatingTypes?.includes(option) || false)}
                                                         onChange={() => handleHeatingToggle(option)}
                                                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3"
                                                     />
@@ -1011,12 +1039,13 @@ export const CreateListingForm: React.FC = () => {
                                 )}
                             </div>
                         </div>
+                        </div>
                     </div>
 
-                    {/* Ençera Premium Kartı */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
-                            <Crown className="w-5 h-5 mr-2 text-yellow-600" />
+                    {/* Ençera Premium */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                            <Crown className="w-6 h-6 mr-3 text-yellow-600" />
                             {isReady ? t('listing.create.encera-premium') : 'Ençera Premium'}
                         </h2>
 
@@ -1026,12 +1055,11 @@ export const CreateListingForm: React.FC = () => {
                                     type="checkbox"
                                     id="pappSellable"
                                     name="pappSellable"
-                                    checked={formData.pappSellable}
+                                    checked={Boolean(formData.pappSellable)}
                                     onChange={handleInputChange}
                                     className="w-5 h-5 text-yellow-600 border-yellow-300 rounded focus:ring-yellow-500"
                                 />
-                                <label htmlFor="pappSellable" className="ml-4 flex items-center text-base font-medium text-gray-900">
-                                    <Crown className="w-5 h-5 mr-2 text-yellow-600" />
+                                <label className="pointer-events-none" htmlFor="pappSellable" className="ml-4 flex items-center text-base font-medium text-gray-900">
                                     {isReady ? t('listing.create.encera-sellable') : 'Ençera ile satılsın'}
                                 </label>
                             </div>
@@ -1040,71 +1068,75 @@ export const CreateListingForm: React.FC = () => {
                             </p>
                         </div>
                     </div>
-                
-                </div>
 
-                {/* Fotoğraflar Kartı */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 flex items-center mb-6">
-                        <Camera className="w-5 h-5 mr-2 text-blue-600" />
-                        {isReady ? t('listing.create.photos') : 'Fotoğraflar'}
-                    </h2>
+                    {/* Fotoğraflar */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                            <Camera className="w-6 h-6 mr-3 text-blue-600" />
+                            {isReady ? t('listing.create.photos') : 'Fotoğraflar'}
+                        </h2>
+                        <div className="bg-gray-50 rounded-lg p-6">
 
-                    <ImageUpload
-                        maxImages={15}
-                        onImagesChange={handleImagesChange}
-                        disabled={isFetchingProperty || isCreating || isUpdating}
-                        initialImages={images.map(img => ({ url: img.preview, isPrimary: img.isPrimary }))}
-                        previewMode={true}
-                    />
-                </div>
+                            <ImageUpload
+                                maxImages={15}
+                                onImagesChange={handleImagesChange}
+                                disabled={isFetchingProperty || isCreating || isUpdating}
+                                initialImages={images.map(img => ({ url: img.preview, isPrimary: img.isPrimary }))}
+                                previewMode={true}
+                            />
+                        </div>
+                    </div>
 
-                {/* Açıklama Kartı */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                        {isReady ? t('listing.create.description') : 'Açıklama'}
-                    </h2>
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        rows={6}
-                        placeholder={isReady ? t('listing.create.description-placeholder') : 'İlan açıklamanızı detaylı bir şekilde yazınız...'}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
-                            errors.description ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                    />
-                    {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
-                </div>
+                    {/* Açıklama */}
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                            <FileText className="w-6 h-6 mr-3 text-blue-600" />
+                            {isReady ? t('listing.create.description') : 'Açıklama'}
+                        </h2>
+                        <div className="bg-gray-50 rounded-lg p-6">
+                            <textarea
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                rows={6}
+                                placeholder={isReady ? t('listing.create.description-placeholder') : 'İlan açıklamanızı detaylı bir şekilde yazınız...'}
+                                className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
+                                    errors.description ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                            />
+                            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
+                        </div>
+                    </div>
 
-                {/* Submit Button Kartı */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                    <Button
-                        type="submit"
-                        disabled={isFetchingProperty || isCreating || isUpdating}
-                        className="w-full bg-blue-900 hover:bg-blue-600 text-white py-4 text-lg font-semibold"
-                    >
-                        {(isCreating || isUpdating) ? (
-                            <>
-                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                {isEditMode 
-                                    ? (isReady ? t('listing.update.submitting') : 'İlan güncelleniyor...')
-                                    : (isReady ? t('listing.create.submitting') : 'İlan yayınlanıyor...')
-                                }
-                            </>
-                        ) : isFetchingProperty ? (
-                            <>
-                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                {isReady ? t('listing.edit.loading') : 'İlan yükleniyor...'}
-                            </>
-                        ) : (
-                            isEditMode
-                                ? (isReady ? t('listing.update.submit') : 'İlanı Güncelle')
-                                : (isReady ? t('listing.create.submit') : 'İlanı Yayınla')
-                        )}
-                    </Button>
-                </div>
-            </form>
+                    {/* Submit Button */}
+                    <div className="mt-8">
+                        <Button
+                            type="submit"
+                            disabled={isFetchingProperty || isCreating || isUpdating}
+                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 text-lg font-semibold rounded-xl shadow-lg"
+                        >
+                            {(isCreating || isUpdating) ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                    {isEditMode
+                                        ? (isReady ? t('listing.update.submitting') : 'İlan güncelleniyor...')
+                                        : (isReady ? t('listing.create.submitting') : 'İlan yayınlanıyor...')
+                                    }
+                                </>
+                            ) : isFetchingProperty ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                    {isReady ? t('listing.edit.loading') : 'İlan yükleniyor...'}
+                                </>
+                            ) : (
+                                isEditMode
+                                    ? (isReady ? t('listing.update.submit') : 'İlanı Güncelle')
+                                    : (isReady ? t('listing.create.submit') : 'İlanı Yayınla')
+                            )}
+                        </Button>
+                    </div>
+                </form>
+            </div>
 
             {/* Toast Notification */}
             <Toast

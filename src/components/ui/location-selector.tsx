@@ -241,8 +241,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         <div className="space-y-6">
             {/* İl Seçimi */}
             <div className="relative" ref={cityDropdownRef}>
-                <label className="flex items-center text-sm font-medium text-gray-900 mb-2">
-                    <MapPin className="w-4 h-4 mr-2 text-blue-600" />
+                <label className="block text-sm font-medium text-gray-900 mb-2">
                     {isReady ? t('listing.location-fields.city') : 'İl'}
                 </label>
                 <div className="relative">
