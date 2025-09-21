@@ -15,6 +15,7 @@ import {
     MessageResponse
 } from '@/store/api/messageApi';
 import { useGetUserByIdQuery } from '@/store/api/userApi';
+import { useGetPropertyByIdQuery } from '@/store/api/propertyApi';
 import {
     MessageSquare,
     Send,
@@ -27,6 +28,7 @@ import {
     Search
 } from 'lucide-react';
 import Link from 'next/link';
+import { getMessageUserId, isEnceraUser } from '@/utils/profileHelpers';
 
 export const Messages: React.FC = () => {
     const { user } = useAuth();
@@ -66,6 +68,12 @@ export const Messages: React.FC = () => {
         { skip: !preselectedUserId }
     );
 
+    // Property bilgisini çek (propertyId varsa)
+    const { data: propertyData } = useGetPropertyByIdQuery(
+        parseInt(propertyId!),
+        { skip: !propertyId }
+    );
+
     // Auto-scroll to bottom
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -102,16 +110,25 @@ export const Messages: React.FC = () => {
         e.preventDefault();
         if (!selectedConversation || !newMessage.trim()) return;
 
+        // İlk mesaj olup olmadığını kontrol et
+        const isFirstMessage = messages.length === 0;
+        let messageContent = newMessage.trim();
+
+        // Eğer ilk mesajsa ve propertyData varsa, ilan bilgisini ekle
+        if (isFirstMessage && propertyData) {
+            messageContent = `🏠 ${propertyData.title} hakkında:\n\n${messageContent}`;
+        }
+
         console.log('Sending message:', {
             receiverId: selectedConversation,
-            content: newMessage.trim(),
+            content: messageContent,
             propertyId: propertyId ? parseInt(propertyId) : undefined
         });
 
         try {
             const result = await sendMessage({
                 receiverId: selectedConversation,
-                content: newMessage.trim(),
+                content: messageContent,
                 propertyId: propertyId ? parseInt(propertyId) : undefined
             }).unwrap();
 
@@ -132,11 +149,13 @@ export const Messages: React.FC = () => {
     };
 
     const handleConversationSelect = async (conversationUserId: number) => {
-        setSelectedConversation(conversationUserId);
+        // Encera kullanıcısını kontrol et ve gerekirse ID'yi değiştir
+        const actualUserId = getMessageUserId({ id: conversationUserId });
+        setSelectedConversation(actualUserId);
 
         // Mark conversation as read
         try {
-            await markAsRead(conversationUserId);
+            await markAsRead(actualUserId);
         } catch (error) {
             console.error('Error marking conversation as read:', error);
         }
@@ -264,12 +283,19 @@ export const Messages: React.FC = () => {
                                                     <p className="text-sm text-gray-600 truncate mt-1">
                                                         {isReady ? 'Yeni konuşma başlat' : 'Start new conversation'}
                                                     </p>
-                                                    {propertyId && (
-                                                        <div className="flex items-center mt-2">
-                                                            <Home className="w-3 h-3 text-gray-400 mr-1" />
-                                                            <span className="text-xs text-gray-500 truncate">
-                                                                {isReady ? `İlan #${propertyId}` : `Property #${propertyId}`}
-                                                            </span>
+                                                    {(propertyData || propertyId) && (
+                                                        <div className="mt-2">
+                                                            <div className="flex items-center">
+                                                                <Home className="w-3 h-3 text-gray-400 mr-1" />
+                                                                <span className="text-xs text-gray-500 truncate">
+                                                                    {propertyData?.title || (isReady ? `İlan #${propertyId}` : `Property #${propertyId}`)}
+                                                                </span>
+                                                            </div>
+                                                            {propertyData && (
+                                                                <div className="text-xs text-blue-600 mt-1 truncate">
+                                                                    💰 {propertyData.price?.toLocaleString('tr-TR')} ₺ • 📍 {propertyData.district}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
@@ -358,15 +384,23 @@ export const Messages: React.FC = () => {
                                         </div>
                                         <div>
                                             <h3 className="font-semibold text-gray-900">
-                                                {selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` :
+                                                {selectedUser && isEnceraUser(selectedUser) ? 'Encera' :
+                                                 selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` :
+                                                 preselectedUser && isEnceraUser(preselectedUser) ? 'Encera' :
                                                  preselectedUser ? `${preselectedUser.firstName} ${preselectedUser.lastName}` :
                                                  conversations.find(c => c.otherUserId === selectedConversation)?.otherUserName}
                                             </h3>
-                                            {(conversations.find(c => c.otherUserId === selectedConversation)?.propertyTitle || propertyId) && (
-                                                <p className="text-sm text-gray-500">
+                                            {(conversations.find(c => c.otherUserId === selectedConversation)?.propertyTitle || propertyData?.title || propertyId) && (
+                                                <div className="text-sm text-gray-500">
                                                     {conversations.find(c => c.otherUserId === selectedConversation)?.propertyTitle ||
+                                                     propertyData?.title ||
                                                      (propertyId ? `İlan ID: ${propertyId}` : '')}
-                                                </p>
+                                                    {propertyData && (
+                                                        <div className="text-xs text-blue-600 mt-1">
+                                                            🏠 {propertyData.price?.toLocaleString('tr-TR')} ₺ • {propertyData.district}, {propertyData.city}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                     </div>
