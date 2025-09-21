@@ -5,15 +5,63 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Edit2, Camera, MapPin, Calendar, Award, Star } from 'lucide-react';
-import { useGetProfileQuery } from '@/store/api/userApi';
+import { Edit2, Camera, MapPin, Calendar, Award, Star, Upload } from 'lucide-react';
+import { useGetProfileQuery, useUploadProfilePictureMutation, useUploadCoverImageMutation } from '@/store/api/userApi';
+import { useUploadProfilePictureMutation as useUploadProfilePictureFile, useUploadCoverImageMutation as useUploadCoverImageFile } from '@/store/api/fileUploadApi';
+import ImageUploadModal from '@/components/ui/ImageUploadModal';
 
 const ProfileHeader: React.FC = () => {
     const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
+    const [isUploadingProfile, setIsUploadingProfile] = useState(false);
+    const [isUploadingCover, setIsUploadingCover] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const [showCoverModal, setShowCoverModal] = useState(false);
 
     // Get profile data from API
     const { data: profile, isLoading, error } = useGetProfileQuery();
+
+    // File upload mutations
+    const [uploadProfilePictureFile] = useUploadProfilePictureFile();
+    const [uploadCoverImageFile] = useUploadCoverImageFile();
+    const [updateProfilePicture] = useUploadProfilePictureMutation();
+    const [updateCoverImage] = useUploadCoverImageMutation();
+
+    // Handle profile picture upload
+    const handleProfilePictureUpload = async (file: File) => {
+        try {
+            setIsUploadingProfile(true);
+
+            // Upload file to storage
+            const uploadResult = await uploadProfilePictureFile(file).unwrap();
+
+            // Update user profile with new URL
+            await updateProfilePicture({ profilePictureUrl: uploadResult.fileUrl }).unwrap();
+        } catch (error) {
+            console.error('Profile picture upload failed:', error);
+            throw error;
+        } finally {
+            setIsUploadingProfile(false);
+        }
+    };
+
+    // Handle cover image upload
+    const handleCoverImageUpload = async (file: File) => {
+        try {
+            setIsUploadingCover(true);
+
+            // Upload file to storage
+            const uploadResult = await uploadCoverImageFile(file).unwrap();
+
+            // Update user profile with new URL
+            await updateCoverImage({ coverImageUrl: uploadResult.fileUrl }).unwrap();
+        } catch (error) {
+            console.error('Cover image upload failed:', error);
+            throw error;
+        } finally {
+            setIsUploadingCover(false);
+        }
+    };
 
     // Handle loading state
     if (isLoading) {
@@ -49,7 +97,7 @@ const ProfileHeader: React.FC = () => {
         successRate: 95, // TODO: Calculate from actual data
         rating: 4.8, // TODO: Get from reviews API
         profileImage: profile.profilePictureUrl || '',
-        coverImage: '' // TODO: Add cover image support
+        coverImage: profile.coverImageUrl || ''
     };
 
     return (
@@ -58,6 +106,7 @@ const ProfileHeader: React.FC = () => {
             <div
                 className="h-56 md:h-72 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden"
                 style={{
+                    backgroundImage: userProfile.coverImage ? `url(${userProfile.coverImage})` : 'none',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}
@@ -71,9 +120,15 @@ const ProfileHeader: React.FC = () => {
                     size="sm"
                     variant="secondary"
                     className="absolute top-6 right-6 bg-white/80 backdrop-blur-md border-white/50 text-slate-700 hover:bg-white/90 shadow-lg transition-all duration-300"
+                    onClick={() => setShowCoverModal(true)}
+                    disabled={isUploadingCover}
                 >
-                    <Camera className="w-4 h-4 mr-2" />
-                    {t('profile.cover-photo')}
+                    {isUploadingCover ? (
+                        <Upload className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                        <Camera className="w-4 h-4 mr-2" />
+                    )}
+                    {isUploadingCover ? t('common.uploading') : t('profile.cover-photo')}
                 </Button>
 
                 {/* Subtle gradient overlay */}
@@ -97,8 +152,14 @@ const ProfileHeader: React.FC = () => {
                             <Button
                                 size="sm"
                                 className="absolute -bottom-3 -right-3 rounded-full w-10 h-10 p-0 bg-blue-600 hover:bg-blue-700 shadow-lg border-4 border-white transition-all duration-300"
+                                onClick={() => setShowProfileModal(true)}
+                                disabled={isUploadingProfile}
                             >
-                                <Camera className="w-4 h-4" />
+                                {isUploadingProfile ? (
+                                    <Upload className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Camera className="w-4 h-4" />
+                                )}
                             </Button>
                         </div>
 
@@ -187,6 +248,29 @@ const ProfileHeader: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Upload Modals */}
+            <ImageUploadModal
+                isOpen={showProfileModal}
+                onClose={() => setShowProfileModal(false)}
+                onUpload={handleProfilePictureUpload}
+                title={t('profile.upload-profile-picture')}
+                description={t('profile.profile-picture-description')}
+                aspectRatio="square"
+                maxSizeMB={5}
+                isUploading={isUploadingProfile}
+            />
+
+            <ImageUploadModal
+                isOpen={showCoverModal}
+                onClose={() => setShowCoverModal(false)}
+                onUpload={handleCoverImageUpload}
+                title={t('profile.upload-cover-image')}
+                description={t('profile.cover-image-description')}
+                aspectRatio="wide"
+                maxSizeMB={10}
+                isUploading={isUploadingCover}
+            />
         </div>
     );
 };

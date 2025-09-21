@@ -18,6 +18,7 @@ export interface UserProfile {
   bio?: string;
   location?: string;
   profilePictureUrl?: string;
+  coverImageUrl?: string;
   isVerified: boolean;
   isPhoneVerified: boolean;
   preferredLanguage: string;
@@ -183,6 +184,16 @@ export const userApi = createApi({
       invalidatesTags: ['User'],
     }),
 
+    // Upload cover image
+    uploadCoverImage: builder.mutation<ApiResponse<null>, { coverImageUrl: string }>({
+      query: (data) => ({
+        url: '/upload-cover-image',
+        method: 'POST',
+        params: { coverImageUrl: data.coverImageUrl },
+      }),
+      invalidatesTags: ['User'],
+    }),
+
     // Get reviews for a profile
     getProfileReviews: builder.query<ProfileReview[], string>({
       query: (profileOwnerId) => `/profile/${profileOwnerId}/reviews`,
@@ -235,6 +246,7 @@ export const {
   useSendPhoneVerificationMutation,
   useVerifyPhoneMutation,
   useUploadProfilePictureMutation,
+  useUploadCoverImageMutation,
   useGetProfileReviewsQuery,
   useGetReviewStatsQuery,
   useCreateReviewMutation,

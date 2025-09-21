@@ -2,8 +2,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export interface UploadResponse {
-    url: string;
+    fileUrl: string;
     fileName: string;
+    fileSize: number;
+    contentType: string;
 }
 
 export interface MultipleUploadResponse {
@@ -66,6 +68,34 @@ export const fileUploadApi = createApi({
                 };
             },
         }),
+
+        // Upload profile picture
+        uploadProfilePicture: builder.mutation<UploadResponse, File>({
+            query: (file) => {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                return {
+                    url: '/profile',
+                    method: 'POST',
+                    body: formData,
+                };
+            },
+        }),
+
+        // Upload cover image
+        uploadCoverImage: builder.mutation<UploadResponse, File>({
+            query: (file) => {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                return {
+                    url: '/cover',
+                    method: 'POST',
+                    body: formData,
+                };
+            },
+        }),
     }),
 });
 
@@ -73,4 +103,6 @@ export const fileUploadApi = createApi({
 export const {
     useUploadSingleFileMutation,
     useUploadMultipleFilesMutation,
+    useUploadProfilePictureMutation,
+    useUploadCoverImageMutation,
 } = fileUploadApi;
