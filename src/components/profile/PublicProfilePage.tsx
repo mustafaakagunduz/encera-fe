@@ -18,6 +18,7 @@ import {
     Building,
     Eye
 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import {
     useGetUserByIdQuery,
@@ -172,12 +173,29 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Profile Info */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-lg shadow-sm border p-6">
+                        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                            {/* Cover Image */}
+                            <div
+                                className="h-32 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 relative"
+                                style={{
+                                    backgroundImage: profileUser.coverImageUrl ? `url(${profileUser.coverImageUrl})` : 'none',
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center'
+                                }}
+                            >
+                                {!profileUser.coverImageUrl && (
+                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-indigo-600/20"></div>
+                                )}
+                            </div>
+
                             {/* Profile Header */}
-                            <div className="text-center mb-6">
-                                <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                                    <UserIcon className="w-12 h-12 text-gray-400" />
-                                </div>
+                            <div className="text-center p-6 -mt-12 relative">
+                                <Avatar className="w-24 h-24 mx-auto border-4 border-white shadow-lg">
+                                    <AvatarImage src={profileUser.profilePictureUrl || ''} alt={`${profileUser.firstName} ${profileUser.lastName}`} />
+                                    <AvatarFallback className="bg-blue-600 text-white text-xl font-bold">
+                                        {profileUser.firstName[0]}{profileUser.lastName[0]}
+                                    </AvatarFallback>
+                                </Avatar>
 
                                 <div className="flex items-center justify-center gap-2 mb-2">
                                     <h1 className="text-xl font-bold text-gray-900">
@@ -216,7 +234,7 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                             </div>
 
                             {/* Contact Info */}
-                            <div className="space-y-3 mb-6">
+                            <div className="space-y-3 mb-6 mt-4">
                                 <div className="flex items-center">
                                     <Calendar className="w-4 h-4 mr-3 text-gray-400" />
                                     <span className="text-sm text-gray-600">
@@ -250,13 +268,15 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
 
                             {/* Contact Button */}
                             {profileUser.phoneNumber && (
-                                <a
-                                    href={`tel:${profileUser.phoneNumber.replace(/\s/g, '')}`}
-                                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                                >
-                                    <Phone className="w-4 h-4 mr-2" />
-                                    {isReady ? 'Ara' : 'Call'}
-                                </a>
+                                <div className="mt-6">
+                                    <a
+                                        href={`tel:${profileUser.phoneNumber.replace(/\s/g, '')}`}
+                                        className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                                    >
+                                        <Phone className="w-4 h-4 mr-2" />
+                                        {isReady ? 'Ara' : 'Call'}
+                                    </a>
+                                </div>
                             )}
                         </div>
 
@@ -444,7 +464,12 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                         <div key={review.id} className="border-b border-gray-100 pb-4 last:border-b-0">
                                             <div className="flex items-start justify-between mb-2">
                                                 <div className="flex items-center gap-2">
-                                                    <UserIcon className="w-5 h-5 text-gray-400" />
+                                                    <Avatar className="w-8 h-8">
+                                                        <AvatarImage src={review.authorAvatar || ''} alt={review.authorName} />
+                                                        <AvatarFallback className="bg-gray-600 text-white text-sm">
+                                                            {review.authorName.split(' ').map(n => n[0]).join('')}
+                                                        </AvatarFallback>
+                                                    </Avatar>
                                                     <div>
                                                         <div className="text-sm font-medium text-gray-900">
                                                             {review.authorName}

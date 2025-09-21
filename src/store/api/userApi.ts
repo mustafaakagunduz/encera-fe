@@ -18,7 +18,9 @@ export interface UserProfile {
   bio?: string;
   location?: string;
   profilePictureUrl?: string;
+  originalProfilePictureUrl?: string;
   coverImageUrl?: string;
+  originalCoverImageUrl?: string;
   isVerified: boolean;
   isPhoneVerified: boolean;
   preferredLanguage: string;
@@ -184,12 +186,38 @@ export const userApi = createApi({
       invalidatesTags: ['User'],
     }),
 
+    // Upload profile picture with original
+    uploadProfilePictureWithOriginal: builder.mutation<ApiResponse<null>, { profilePictureUrl: string; originalProfilePictureUrl: string }>({
+      query: (data) => ({
+        url: '/upload-profile-picture-with-original',
+        method: 'POST',
+        params: {
+          profilePictureUrl: data.profilePictureUrl,
+          originalProfilePictureUrl: data.originalProfilePictureUrl
+        },
+      }),
+      invalidatesTags: ['User'],
+    }),
+
     // Upload cover image
     uploadCoverImage: builder.mutation<ApiResponse<null>, { coverImageUrl: string }>({
       query: (data) => ({
         url: '/upload-cover-image',
         method: 'POST',
         params: { coverImageUrl: data.coverImageUrl },
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    // Upload cover image with original
+    uploadCoverImageWithOriginal: builder.mutation<ApiResponse<null>, { coverImageUrl: string; originalCoverImageUrl: string }>({
+      query: (data) => ({
+        url: '/upload-cover-image-with-original',
+        method: 'POST',
+        params: {
+          coverImageUrl: data.coverImageUrl,
+          originalCoverImageUrl: data.originalCoverImageUrl
+        },
       }),
       invalidatesTags: ['User'],
     }),
@@ -246,7 +274,9 @@ export const {
   useSendPhoneVerificationMutation,
   useVerifyPhoneMutation,
   useUploadProfilePictureMutation,
+  useUploadProfilePictureWithOriginalMutation,
   useUploadCoverImageMutation,
+  useUploadCoverImageWithOriginalMutation,
   useGetProfileReviewsQuery,
   useGetReviewStatsQuery,
   useCreateReviewMutation,

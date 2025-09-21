@@ -43,6 +43,9 @@
     "show-more": "Daha Fazla Göster",
     "show-less": "Daha Az Göster",
     "submitting": "Gönderiliyor...",
+    "upload": "Yükle",
+    "uploading": "Yükleniyor...",
+    "change": "Değiştir",
     "sale": "Satılık",
     "rent": "Kiralık",
     "daily-rental": "Günlük Kiralık",
@@ -446,6 +449,7 @@
     "verification-code-sent": "Doğrulama kodu gönderildi",
     "enter-verification-code": "Doğrulama kodunu girin",
     "edit-profile": "Profili Düzenle",
+    "profile-picture": "Profil Fotoğrafı",
     "cover-photo": "Kapak Fotoğrafı",
     "expert": "Uzman",
     "member-since": "den beri üye",
@@ -466,7 +470,24 @@
     "helpful": "Faydalı",
     "no-reviews-yet": "Henüz yorum yok",
     "no-reviews-own": "Profiliniz için henüz yorum yapılmamış.",
-    "no-reviews-other": "Bu kullanıcı için henüz yorum yapılmamış. İlk yorumu siz yapın!"
+    "no-reviews-other": "Bu kullanıcı için henüz yorum yapılmamış. İlk yorumu siz yapın!",
+    "upload-profile-picture": "Profil Fotoğrafı Yükle",
+    "profile-picture-description": "Profil fotoğrafınızı değiştirmek için yeni bir fotoğraf yükleyin",
+    "edit-profile-picture": "Profil Fotoğrafını Düzenle",
+    "profile-picture-crop-description": "Profil fotoğrafınızı kırpın veya yeni bir fotoğraf yükleyin",
+    "upload-cover-image": "Kapak Fotoğrafı Yükle",
+    "cover-image-description": "Profil kapak fotoğrafınızı değiştirmek için yeni bir fotoğraf yükleyin",
+    "edit-cover-image": "Kapak Fotoğrafını Düzenle",
+    "cover-image-crop-description": "Kapak fotoğrafınızı kırpın veya yeni bir fotoğraf yükleyin"
+  },
+
+  "crop": {
+    "instructions": "Fotoğrafta görünmesini istediğiniz alanı seçin ve beyaz çerçeveyi sürükleyerek konumlandırın",
+    "instructions-advanced": "Zoom ile büyütüp küçültün, döndürün ve istediğiniz alanı seçin. Fotoğrafınızın orijinal kalitesi korunacaktır.",
+    "upload-new": "Yeni Fotoğraf Yükle",
+    "crop-and-save": "Kırp ve Kaydet",
+    "zoom": "Zoom",
+    "rotation": "Döndürme"
   },
 
   "admin": {
@@ -638,6 +659,12 @@
     },
     "primary-image": "Birincil Fotoğraf",
     "uploading": "Fotoğraflar yükleniyor...",
+    "click-to-upload": "Yüklemek için tıklayın",
+    "or-drag-and-drop": "veya sürükleyip bırakın",
+    "up-to": "Maksimum",
+    "invalid-file-type": "Geçersiz dosya türü",
+    "file-too-large": "Dosya boyutu {{maxSize}}MB'dan büyük olamaz",
+    "upload-failed": "Yükleme başarısız oldu",
     "error": {
       "invalid-type": "Geçersiz dosya türü. Sadece JPG, PNG ve WebP desteklenir.",
       "file-too-large": "Dosya boyutu 5MB'dan büyük olamaz.",

@@ -96,6 +96,14 @@ export const fileUploadApi = createApi({
                 };
             },
         }),
+
+        // Delete file
+        deleteFile: builder.mutation<{ message: string }, string>({
+            query: (fileUrl) => ({
+                url: `/delete?fileUrl=${encodeURIComponent(fileUrl)}`,
+                method: 'DELETE',
+            }),
+        }),
     }),
 });
 
@@ -105,4 +113,5 @@ export const {
     useUploadMultipleFilesMutation,
     useUploadProfilePictureMutation,
     useUploadCoverImageMutation,
+    useDeleteFileMutation,
 } = fileUploadApi;

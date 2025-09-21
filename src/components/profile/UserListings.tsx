@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Building2,
     Calendar,
@@ -150,25 +149,25 @@ const UserListings: React.FC = () => {
     };
 
     return (
-        <Card className="bg-white rounded-3xl shadow-xl border border-stone-200/50">
-            <CardHeader className="pb-6">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-8 bg-white">
+            <div className="pb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <CardTitle className="text-2xl md:text-3xl font-bold text-stone-800 flex items-center gap-3">
+                        <h2 className="text-2xl md:text-3xl font-bold text-stone-800 flex items-center gap-3">
                             <div className="p-2 rounded-xl bg-gradient-to-br from-amber-100 to-orange-100">
                                 <Building2 className="w-6 h-6 text-amber-700" />
                             </div>
                             İlanlarım
-                        </CardTitle>
-                        <CardDescription className="text-stone-600 mt-1">
+                        </h2>
+                        <p className="text-stone-600 mt-1">
                             Yayınladığınız {listings.length} ilanı yönetin ve takip edin
-                        </CardDescription>
+                        </p>
                     </div>
 
                 </div>
-            </CardHeader>
+            </div>
 
-            <CardContent>
+            <div>
                 {listings.length === 0 ? (
                     <div className="text-center py-16">
                         <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
@@ -346,8 +345,8 @@ const UserListings: React.FC = () => {
                         </div>
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 };
 

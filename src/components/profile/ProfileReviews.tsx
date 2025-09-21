@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Star, ThumbsUp, MessageCircle, Send, Flag, ChevronDown, ChevronUp } from 'lucide-react';
 import {
@@ -96,8 +95,8 @@ const ProfileReviews: React.FC<ProfileReviewsProps> = ({
     };
 
     return (
-        <Card className="shadow-xl rounded-3xl border border-slate-200/30 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50/50 pb-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-8 bg-white overflow-hidden">
+            <div className="bg-gradient-to-r from-slate-50 to-blue-50/50 pb-8 px-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
@@ -124,9 +123,9 @@ const ProfileReviews: React.FC<ProfileReviewsProps> = ({
                         </Button>
                     )}
                 </div>
-            </CardHeader>
+            </div>
 
-            <CardContent className="p-8">
+            <div className="p-8">
                 {/* Add Review Form */}
                 {showAddReview && !isOwnProfile && (
                     <div className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/30">
@@ -300,8 +299,8 @@ const ProfileReviews: React.FC<ProfileReviewsProps> = ({
                         </p>
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 };
 

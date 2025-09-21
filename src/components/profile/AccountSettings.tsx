@@ -16,7 +16,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     User,
@@ -182,42 +181,42 @@ const AccountSettings: React.FC = () => {
 
     if (profileLoading) {
         return (
-            <Card className="bg-white rounded-3xl shadow-xl border border-stone-200/50">
-                <CardContent className="flex items-center justify-center py-8">
+            <div className="w-full px-4 sm:px-6 lg:px-8 py-8 bg-white">
+                <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
                     <span className="ml-2">{t('common.loading')}</span>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         );
     }
 
     if (profileError) {
         return (
-            <Card className="bg-white rounded-3xl shadow-xl border border-stone-200/50">
-                <CardContent className="py-8">
+            <div className="w-full px-4 sm:px-6 lg:px-8 py-8 bg-white">
+                <div className="py-8">
                     <div className="text-center text-red-600">
                         Failed to load profile data. Please refresh the page.
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         );
     }
 
     return (
-        <Card className="bg-white rounded-3xl shadow-xl border border-stone-200/50">
-            <CardHeader className="pb-6">
-                <CardTitle className="text-2xl md:text-3xl font-bold text-stone-800 flex items-center gap-3">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-8 bg-white">
+            <div className="pb-6">
+                <h2 className="text-2xl md:text-3xl font-bold text-stone-800 flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-gradient-to-br from-amber-100 to-orange-100">
                         <Shield className="w-6 h-6 text-amber-700" />
                     </div>
                     {t('profile.account-settings')}
-                </CardTitle>
-                <CardDescription className="text-stone-600">
+                </h2>
+                <p className="text-stone-600 mt-2">
                     {t('profile.account-settings-description')}
-                </CardDescription>
-            </CardHeader>
+                </p>
+            </div>
 
-            <CardContent>
+            <div>
                 <Tabs defaultValue="personal" className="space-y-6">
                     <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto p-1 bg-stone-100 rounded-xl">
                         <TabsTrigger
@@ -606,8 +605,8 @@ const AccountSettings: React.FC = () => {
                         </div>
                     </TabsContent>
                 </Tabs>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 };
 

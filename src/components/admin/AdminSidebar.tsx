@@ -61,7 +61,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
                                 <span className="text-sm font-semibold text-white">P</span>
                             </div>
-                            <span className="text-xl font-bold text-gray-900">PAPP Admin</span>
+                            <span className="text-xl font-bold text-gray-900">Admin Panel</span>
                         </Link>
                     </div>
 
@@ -158,7 +158,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
                                         <span className="text-sm font-semibold text-white">P</span>
                                     </div>
-                                    <span className="text-xl font-bold text-gray-900">PAPP Admin</span>
+                                    <span className="text-xl font-bold text-gray-900">Admin Panel</span>
                                 </Link>
                             </div>
 

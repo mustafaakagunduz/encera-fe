@@ -49,6 +49,10 @@ export interface UserResponse {
     enabled: boolean;
     createdAt: string;
     updatedAt: string;
+    profilePictureUrl?: string;
+    originalProfilePictureUrl?: string;
+    coverImageUrl?: string;
+    originalCoverImageUrl?: string;
 }
 
 export interface VerificationResponse {

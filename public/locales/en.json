@@ -43,6 +43,9 @@
     "show-more": "Show More",
     "show-less": "Show Less",
     "submitting": "Submitting...",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "change": "Change",
     "sale": "For Sale",
     "rent": "For Rent",
     "daily-rental": "Daily Rental",
@@ -443,6 +446,7 @@
     "verification-code-sent": "Verification code sent",
     "enter-verification-code": "Enter verification code",
     "edit-profile": "Edit Profile",
+    "profile-picture": "Profile Picture",
     "cover-photo": "Cover Photo",
     "expert": "Expert",
     "member-since": " member since",
@@ -463,7 +467,24 @@
     "helpful": "Helpful",
     "no-reviews-yet": "No reviews yet",
     "no-reviews-own": "No reviews have been made for your profile yet.",
-    "no-reviews-other": "No reviews have been made for this user yet. Be the first to leave a review!"
+    "no-reviews-other": "No reviews have been made for this user yet. Be the first to leave a review!",
+    "upload-profile-picture": "Upload Profile Picture",
+    "profile-picture-description": "Upload a new photo to change your profile picture",
+    "edit-profile-picture": "Edit Profile Picture",
+    "profile-picture-crop-description": "Crop your profile picture or upload a new one",
+    "upload-cover-image": "Upload Cover Photo",
+    "cover-image-description": "Upload a new photo to change your profile cover image",
+    "edit-cover-image": "Edit Cover Photo",
+    "cover-image-crop-description": "Crop your cover photo or upload a new one"
+  },
+
+  "crop": {
+    "instructions": "Select the area you want to show in the photo and drag the white frame to position it",
+    "instructions-advanced": "Zoom in/out, rotate and select the desired area. Your photo's original quality will be preserved.",
+    "upload-new": "Upload New Photo",
+    "crop-and-save": "Crop and Save",
+    "zoom": "Zoom",
+    "rotation": "Rotation"
   },
 
   "admin": {
@@ -635,6 +656,12 @@
     },
     "primary-image": "Primary Photo",
     "uploading": "Uploading photos...",
+    "click-to-upload": "Click to upload",
+    "or-drag-and-drop": "or drag and drop",
+    "up-to": "up to",
+    "invalid-file-type": "Invalid file type",
+    "file-too-large": "File size cannot exceed {{maxSize}}MB",
+    "upload-failed": "Upload failed",
     "error": {
       "invalid-type": "Invalid file type. Only JPG, PNG and WebP are supported.",
       "file-too-large": "File size cannot exceed 5MB.",

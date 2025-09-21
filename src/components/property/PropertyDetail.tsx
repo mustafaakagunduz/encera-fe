@@ -756,7 +756,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             </div>
 
                             <Link
-                                href={isEncera ? '/encera' : getProfileUrl(property.owner)}
+                                href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
                                 className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
                             >
                                 Profili Görüntüle →

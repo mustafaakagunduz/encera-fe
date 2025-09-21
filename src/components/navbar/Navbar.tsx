@@ -8,6 +8,7 @@ import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { ChevronDown, User, Globe } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
@@ -149,9 +150,12 @@ const Navbar: React.FC = () => {
                                                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                                 className="navbar-user-button"
                                             >
-                                                <div className="navbar-user-avatar">
-                                                    <User className="w-4 h-4" />
-                                                </div>
+                                                <Avatar className="w-8 h-8">
+                                                    <AvatarImage src={user.profilePictureUrl || ''} alt={`${user.firstName} ${user.lastName}`} />
+                                                    <AvatarFallback className="bg-blue-600 text-white text-sm">
+                                                        {user.firstName[0]}{user.lastName[0]}
+                                                    </AvatarFallback>
+                                                </Avatar>
                                                 <span className="text-sm font-medium">
                                                     {user.firstName} {user.lastName}
                                                 </span>

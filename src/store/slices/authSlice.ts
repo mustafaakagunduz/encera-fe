@@ -92,6 +92,16 @@ const authSlice = createSlice({
             // Mark as hydrated
             state.isHydrated = true;
         },
+        updateUser: (state, action: PayloadAction<Partial<UserResponse>>) => {
+            if (state.user) {
+                state.user = { ...state.user, ...action.payload };
+
+                // Update localStorage
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('user', JSON.stringify(state.user));
+                }
+            }
+        },
     },
 });
 
@@ -103,6 +113,7 @@ export const {
     setLoading,
     setPendingVerificationEmail,
     initializeAuth,
+    updateUser,
 } = authSlice.actions;
 
 export default authSlice.reducer;

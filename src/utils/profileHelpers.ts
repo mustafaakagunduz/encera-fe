@@ -9,8 +9,16 @@ export const ENCERA_CONFIG = {
     PHONE: '5356021168'
 };
 
+// User tipi tanımı
+interface UserBasic {
+    id?: number;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+}
+
 // Bir kullanıcının Encera olup olmadığını kontrol eder
-export const isEnceraUser = (user: { id?: number; firstName?: string; email?: string }): boolean => {
+export const isEnceraUser = (user: UserBasic): boolean => {
     if (!user) return false;
 
     // ID ile kontrol
@@ -26,7 +34,7 @@ export const isEnceraUser = (user: { id?: number; firstName?: string; email?: st
 };
 
 // Profil linkini oluşturur - Encera ise özel route'a yönlendirir
-export const getProfileUrl = (user: { id?: number; firstName?: string; email?: string }): string => {
+export const getProfileUrl = (user: UserBasic): string => {
     if (isEnceraUser(user)) {
         return '/encera';
     }
@@ -34,7 +42,7 @@ export const getProfileUrl = (user: { id?: number; firstName?: string; email?: s
 };
 
 // Mesajlaşma için doğru kullanıcı ID'sini döner
-export const getMessageUserId = (user: { id?: number; firstName?: string; email?: string }): number => {
+export const getMessageUserId = (user: UserBasic): number => {
     if (isEnceraUser(user)) {
         return ENCERA_CONFIG.USER_ID;
     }
@@ -42,7 +50,7 @@ export const getMessageUserId = (user: { id?: number; firstName?: string; email?
 };
 
 // İlan sahibi Encera ise özel işlem yapar
-export const handlePropertyOwnerRedirect = (owner: { id?: number; firstName?: string; email?: string }) => {
+export const handlePropertyOwnerRedirect = (owner: UserBasic) => {
     if (isEnceraUser(owner)) {
         return {
             isEncera: true,

@@ -6,17 +6,24 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Edit2, Camera, MapPin, Calendar, Award, Star, Upload } from 'lucide-react';
-import { useGetProfileQuery, useUploadProfilePictureMutation, useUploadCoverImageMutation } from '@/store/api/userApi';
-import { useUploadProfilePictureMutation as useUploadProfilePictureFile, useUploadCoverImageMutation as useUploadCoverImageFile } from '@/store/api/fileUploadApi';
+import { useGetProfileQuery, useUploadProfilePictureMutation, useUploadProfilePictureWithOriginalMutation, useUploadCoverImageMutation, useUploadCoverImageWithOriginalMutation } from '@/store/api/userApi';
+import { useUploadProfilePictureMutation as useUploadProfilePictureFile, useUploadCoverImageMutation as useUploadCoverImageFile, useDeleteFileMutation } from '@/store/api/fileUploadApi';
+import { useAppDispatch } from '@/store/hooks';
+import { updateUser } from '@/store/slices/authSlice';
 import ImageUploadModal from '@/components/ui/ImageUploadModal';
+import ImageCropModal from '@/components/ui/ImageCropModal';
 
 const ProfileHeader: React.FC = () => {
     const { t } = useTranslation();
+    const dispatch = useAppDispatch();
     const [isEditing, setIsEditing] = useState(false);
     const [isUploadingProfile, setIsUploadingProfile] = useState(false);
     const [isUploadingCover, setIsUploadingCover] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
     const [showCoverModal, setShowCoverModal] = useState(false);
+    const [showProfileCropModal, setShowProfileCropModal] = useState(false);
+    const [showCoverCropModal, setShowCoverCropModal] = useState(false);
+
 
     // Get profile data from API
     const { data: profile, isLoading, error } = useGetProfileQuery();
@@ -25,18 +32,53 @@ const ProfileHeader: React.FC = () => {
     const [uploadProfilePictureFile] = useUploadProfilePictureFile();
     const [uploadCoverImageFile] = useUploadCoverImageFile();
     const [updateProfilePicture] = useUploadProfilePictureMutation();
+    const [updateProfilePictureWithOriginal] = useUploadProfilePictureWithOriginalMutation();
     const [updateCoverImage] = useUploadCoverImageMutation();
+    const [updateCoverImageWithOriginal] = useUploadCoverImageWithOriginalMutation();
+    const [deleteFile] = useDeleteFileMutation();
 
-    // Handle profile picture upload
+    // Handle profile picture upload (for new files)
     const handleProfilePictureUpload = async (file: File) => {
         try {
             setIsUploadingProfile(true);
 
-            // Upload file to storage
-            const uploadResult = await uploadProfilePictureFile(file).unwrap();
+            // Store old profile picture URLs for deletion
+            const oldProfilePictureUrl = profile?.profilePictureUrl;
+            const oldOriginalProfilePictureUrl = profile?.originalProfilePictureUrl;
 
-            // Update user profile with new URL
-            await updateProfilePicture({ profilePictureUrl: uploadResult.fileUrl }).unwrap();
+            // Upload file to storage (this will be the original)
+            const uploadResult = await uploadProfilePictureFile(file).unwrap();
+            const originalUrl = uploadResult.fileUrl;
+
+            // For new uploads, use the same URL for both original and display
+            await updateProfilePictureWithOriginal({
+                profilePictureUrl: originalUrl,
+                originalProfilePictureUrl: originalUrl
+            }).unwrap();
+
+            // Update auth state for navbar
+            dispatch(updateUser({
+                profilePictureUrl: originalUrl,
+                originalProfilePictureUrl: originalUrl
+            }));
+
+            // Delete old profile pictures if they exist
+            if (oldProfilePictureUrl) {
+                try {
+                    await deleteFile(oldProfilePictureUrl).unwrap();
+                    console.log('Old profile picture deleted successfully');
+                } catch (deleteError) {
+                    console.warn('Failed to delete old profile picture:', deleteError);
+                }
+            }
+            if (oldOriginalProfilePictureUrl && oldOriginalProfilePictureUrl !== oldProfilePictureUrl) {
+                try {
+                    await deleteFile(oldOriginalProfilePictureUrl).unwrap();
+                    console.log('Old original profile picture deleted successfully');
+                } catch (deleteError) {
+                    console.warn('Failed to delete old original profile picture:', deleteError);
+                }
+            }
         } catch (error) {
             console.error('Profile picture upload failed:', error);
             throw error;
@@ -45,18 +87,220 @@ const ProfileHeader: React.FC = () => {
         }
     };
 
-    // Handle cover image upload
+    // Handle profile picture crop (for existing photos)
+    const handleProfilePictureCrop = async (croppedFile: File, originalFile?: File) => {
+        try {
+            setIsUploadingProfile(true);
+
+            // Keep the original URL, only update the display URL
+            const originalUrl = profile?.originalProfilePictureUrl;
+            const oldDisplayUrl = profile?.profilePictureUrl;
+
+            // If originalFile is provided, this is first upload with cropping
+            if (originalFile) {
+                // First upload - save original file to storage first
+                const originalUploadResult = await uploadProfilePictureFile(originalFile).unwrap();
+                const originalUrl = originalUploadResult.fileUrl;
+
+                // Then save cropped version
+                const croppedUploadResult = await uploadProfilePictureFile(croppedFile).unwrap();
+                const croppedUrl = croppedUploadResult.fileUrl;
+
+                await updateProfilePictureWithOriginal({
+                    profilePictureUrl: croppedUrl,
+                    originalProfilePictureUrl: originalUrl
+                }).unwrap();
+
+                dispatch(updateUser({
+                    profilePictureUrl: croppedUrl,
+                    originalProfilePictureUrl: originalUrl
+                }));
+
+                // Delete old photos if they exist
+                if (oldDisplayUrl) {
+                    try {
+                        await deleteFile(oldDisplayUrl).unwrap();
+                    } catch (deleteError) {
+                        console.warn('Failed to delete old display photo:', deleteError);
+                    }
+                }
+            } else if (!originalUrl) {
+                // Fallback: If there's no original URL and no originalFile
+                const croppedUploadResult = await uploadProfilePictureFile(croppedFile).unwrap();
+                const croppedUrl = croppedUploadResult.fileUrl;
+                const originalToKeep = oldDisplayUrl || croppedUrl;
+
+                await updateProfilePictureWithOriginal({
+                    profilePictureUrl: croppedUrl,
+                    originalProfilePictureUrl: originalToKeep
+                }).unwrap();
+
+                dispatch(updateUser({
+                    profilePictureUrl: croppedUrl,
+                    originalProfilePictureUrl: originalToKeep
+                }));
+            } else {
+                // Normal crop operation - keep existing original
+                const croppedUploadResult = await uploadProfilePictureFile(croppedFile).unwrap();
+                const croppedUrl = croppedUploadResult.fileUrl;
+
+                await updateProfilePictureWithOriginal({
+                    profilePictureUrl: croppedUrl,
+                    originalProfilePictureUrl: originalUrl
+                }).unwrap();
+
+                dispatch(updateUser({
+                    profilePictureUrl: croppedUrl,
+                    originalProfilePictureUrl: originalUrl
+                }));
+
+                // Delete old display version if it exists and is different from original
+                if (oldDisplayUrl && oldDisplayUrl !== originalUrl) {
+                    try {
+                        await deleteFile(oldDisplayUrl).unwrap();
+                        console.log('Old cropped profile picture deleted successfully');
+                    } catch (deleteError) {
+                        console.warn('Failed to delete old cropped profile picture:', deleteError);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Profile picture crop failed:', error);
+            throw error;
+        } finally {
+            setIsUploadingProfile(false);
+        }
+    };
+
+    // Handle cover image upload (for new files)
     const handleCoverImageUpload = async (file: File) => {
         try {
             setIsUploadingCover(true);
 
-            // Upload file to storage
-            const uploadResult = await uploadCoverImageFile(file).unwrap();
+            // Store old cover image URLs for deletion
+            const oldCoverImageUrl = profile?.coverImageUrl;
+            const oldOriginalCoverImageUrl = profile?.originalCoverImageUrl;
 
-            // Update user profile with new URL
-            await updateCoverImage({ coverImageUrl: uploadResult.fileUrl }).unwrap();
+            // Upload file to storage (this will be the original)
+            const uploadResult = await uploadCoverImageFile(file).unwrap();
+            const originalUrl = uploadResult.fileUrl;
+
+            // For new uploads, use the same URL for both original and display
+            await updateCoverImageWithOriginal({
+                coverImageUrl: originalUrl,
+                originalCoverImageUrl: originalUrl
+            }).unwrap();
+
+            // Update auth state
+            dispatch(updateUser({
+                coverImageUrl: originalUrl,
+                originalCoverImageUrl: originalUrl
+            }));
+
+            // Delete old cover images if they exist
+            if (oldCoverImageUrl) {
+                try {
+                    await deleteFile(oldCoverImageUrl).unwrap();
+                    console.log('Old cover image deleted successfully');
+                } catch (deleteError) {
+                    console.warn('Failed to delete old cover image:', deleteError);
+                }
+            }
+            if (oldOriginalCoverImageUrl && oldOriginalCoverImageUrl !== oldCoverImageUrl) {
+                try {
+                    await deleteFile(oldOriginalCoverImageUrl).unwrap();
+                    console.log('Old original cover image deleted successfully');
+                } catch (deleteError) {
+                    console.warn('Failed to delete old original cover image:', deleteError);
+                }
+            }
         } catch (error) {
             console.error('Cover image upload failed:', error);
+            throw error;
+        } finally {
+            setIsUploadingCover(false);
+        }
+    };
+
+    // Handle cover image crop (for existing photos)
+    const handleCoverImageCrop = async (croppedFile: File, originalFile?: File) => {
+        try {
+            setIsUploadingCover(true);
+
+            // Keep the original URL, only update the display URL
+            const originalUrl = profile?.originalCoverImageUrl;
+            const oldDisplayUrl = profile?.coverImageUrl;
+
+            // If originalFile is provided, this is first upload with cropping
+            if (originalFile) {
+                // First upload - save original file to storage first
+                const originalUploadResult = await uploadCoverImageFile(originalFile).unwrap();
+                const originalUrl = originalUploadResult.fileUrl;
+
+                // Then save cropped version
+                const croppedUploadResult = await uploadCoverImageFile(croppedFile).unwrap();
+                const croppedUrl = croppedUploadResult.fileUrl;
+
+                await updateCoverImageWithOriginal({
+                    coverImageUrl: croppedUrl,
+                    originalCoverImageUrl: originalUrl
+                }).unwrap();
+
+                dispatch(updateUser({
+                    coverImageUrl: croppedUrl,
+                    originalCoverImageUrl: originalUrl
+                }));
+
+                // Delete old photos if they exist
+                if (oldDisplayUrl) {
+                    try {
+                        await deleteFile(oldDisplayUrl).unwrap();
+                    } catch (deleteError) {
+                        console.warn('Failed to delete old display photo:', deleteError);
+                    }
+                }
+            } else if (!originalUrl) {
+                // Fallback: If there's no original URL and no originalFile
+                const croppedUploadResult = await uploadCoverImageFile(croppedFile).unwrap();
+                const croppedUrl = croppedUploadResult.fileUrl;
+                const originalToKeep = oldDisplayUrl || croppedUrl;
+
+                await updateCoverImageWithOriginal({
+                    coverImageUrl: croppedUrl,
+                    originalCoverImageUrl: originalToKeep
+                }).unwrap();
+
+                dispatch(updateUser({
+                    coverImageUrl: croppedUrl,
+                    originalCoverImageUrl: originalToKeep
+                }));
+            } else {
+                // Normal crop operation - keep existing original
+                const croppedUploadResult = await uploadCoverImageFile(croppedFile).unwrap();
+                const croppedUrl = croppedUploadResult.fileUrl;
+
+                await updateCoverImageWithOriginal({
+                    coverImageUrl: croppedUrl,
+                    originalCoverImageUrl: originalUrl
+                }).unwrap();
+
+                dispatch(updateUser({
+                    coverImageUrl: croppedUrl,
+                    originalCoverImageUrl: originalUrl
+                }));
+
+                // Delete old display version if it exists and is different from original
+                if (oldDisplayUrl && oldDisplayUrl !== originalUrl) {
+                    try {
+                        await deleteFile(oldDisplayUrl).unwrap();
+                        console.log('Old cropped cover image deleted successfully');
+                    } catch (deleteError) {
+                        console.warn('Failed to delete old cropped cover image:', deleteError);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Cover image crop failed:', error);
             throw error;
         } finally {
             setIsUploadingCover(false);
@@ -101,38 +345,48 @@ const ProfileHeader: React.FC = () => {
     };
 
     return (
-        <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200/30 backdrop-blur-sm">
+        <div className="relative bg-white overflow-hidden w-full px-4 sm:px-6 lg:px-8 py-8">
             {/* Cover Image Section */}
-            <div
-                className="h-56 md:h-72 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden"
-                style={{
-                    backgroundImage: userProfile.coverImage ? `url(${userProfile.coverImage})` : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                }}
-            >
-                {/* Modern pattern overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-indigo-500/10"></div>
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%236366f1%22%20fill-opacity%3D%220.03%22%3E%3Ccircle%20cx%3D%227%22%20cy%3D%227%22%20r%3D%227%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
-
-                {/* Cover Edit Button */}
-                <Button
-                    size="sm"
-                    variant="secondary"
-                    className="absolute top-6 right-6 bg-white/80 backdrop-blur-md border-white/50 text-slate-700 hover:bg-white/90 shadow-lg transition-all duration-300"
-                    onClick={() => setShowCoverModal(true)}
-                    disabled={isUploadingCover}
+            <div className="relative">
+                <div
+                    className="h-56 md:h-72 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden cursor-pointer hover:brightness-105 transition-all duration-300"
+                    style={{
+                        backgroundImage: userProfile.coverImage ? `url(${userProfile.coverImage})` : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        // Always show crop modal (it handles both upload and crop)
+                        setShowCoverCropModal(true);
+                    }}
                 >
-                    {isUploadingCover ? (
-                        <Upload className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                        <Camera className="w-4 h-4 mr-2" />
-                    )}
-                    {isUploadingCover ? t('common.uploading') : t('profile.cover-photo')}
-                </Button>
+                    {/* Modern pattern overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-indigo-500/10"></div>
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%236366f1%22%20fill-opacity%3D%220.03%22%3E%3Ccircle%20cx%3D%227%22%20cy%3D%227%22%20r%3D%227%22%20/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
 
-                {/* Subtle gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-transparent"></div>
+                    {/* Subtle gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-transparent"></div>
+
+                    {/* Loading overlay for cover image */}
+                    {isUploadingCover && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                            <div className="text-center text-white">
+                                <Upload className="w-12 h-12 mx-auto mb-3 animate-spin" />
+                                <p className="text-lg font-medium">{t('common.uploading')}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Hover effect overlay */}
+                    <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
+                        <div className="opacity-0 hover:opacity-100 transition-opacity duration-300 text-white text-center">
+                            <Camera className="w-16 h-16 mx-auto mb-3" />
+                            <p className="text-lg font-medium">{t('profile.cover-photo')}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Profile Content */}
@@ -141,26 +395,43 @@ const ProfileHeader: React.FC = () => {
                     {/* Left Side - Profile Image & Basic Info */}
                     <div className="flex flex-col md:flex-row md:items-end gap-8">
                         {/* Profile Image */}
-                        <div className="relative">
-                            <Avatar className="w-40 h-40 border-6 border-white shadow-2xl ring-4 ring-blue-500/10">
+                        <div className="relative group">
+                            <Avatar
+                                className="w-40 h-40 border-6 border-white shadow-2xl ring-4 ring-blue-500/10 cursor-pointer hover:ring-blue-500/20 transition-all duration-300"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    // Always show crop modal (it handles both upload and crop)
+                                    setShowProfileCropModal(true);
+                                }}
+                            >
                                 <AvatarImage src={userProfile.profileImage} alt={userProfile.name} />
                                 <AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-blue-600 to-indigo-600 text-white">
                                     {userProfile.name.split(' ').map(n => n[0]).join('')}
                                 </AvatarFallback>
                             </Avatar>
 
-                            <Button
-                                size="sm"
-                                className="absolute -bottom-3 -right-3 rounded-full w-10 h-10 p-0 bg-blue-600 hover:bg-blue-700 shadow-lg border-4 border-white transition-all duration-300"
-                                onClick={() => setShowProfileModal(true)}
-                                disabled={isUploadingProfile}
+                            {/* Hover effect overlay for profile image */}
+                            <div
+                                className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all duration-300 flex items-center justify-center rounded-full cursor-pointer"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    setShowProfileCropModal(true);
+                                }}
                             >
-                                {isUploadingProfile ? (
-                                    <Upload className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <Camera className="w-4 h-4" />
-                                )}
-                            </Button>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center">
+                                    <Camera className="w-8 h-8 mx-auto mb-1" />
+                                    <p className="text-sm font-medium">{t('profile.profile-picture')}</p>
+                                </div>
+                            </div>
+
+                            {/* Loading overlay for profile image */}
+                            {isUploadingProfile && (
+                                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center z-10">
+                                    <Upload className="w-8 h-8 text-white animate-spin" />
+                                </div>
+                            )}
                         </div>
 
                         {/* Basic Info */}
@@ -270,6 +541,33 @@ const ProfileHeader: React.FC = () => {
                 aspectRatio="wide"
                 maxSizeMB={10}
                 isUploading={isUploadingCover}
+            />
+
+            {/* Crop Modals */}
+            <ImageCropModal
+                isOpen={showProfileCropModal}
+                onClose={() => setShowProfileCropModal(false)}
+                onCrop={handleProfilePictureCrop}
+                onUploadNew={handleProfilePictureUpload}
+                currentImageUrl={profile?.originalProfilePictureUrl || userProfile.profileImage}
+                title={t('profile.edit-profile-picture')}
+                description={t('profile.profile-picture-crop-description')}
+                aspectRatio={1}
+                maxSizeMB={5}
+                isProcessing={isUploadingProfile}
+            />
+
+            <ImageCropModal
+                isOpen={showCoverCropModal}
+                onClose={() => setShowCoverCropModal(false)}
+                onCrop={handleCoverImageCrop}
+                onUploadNew={handleCoverImageUpload}
+                currentImageUrl={profile?.originalCoverImageUrl || userProfile.coverImage}
+                title={t('profile.edit-cover-image')}
+                description={t('profile.cover-image-crop-description')}
+                aspectRatio={4.2}
+                maxSizeMB={10}
+                isProcessing={isUploadingCover}
             />
         </div>
     );
