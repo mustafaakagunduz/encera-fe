@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { PropertyImageGallery } from '@/components/ui/property-image-gallery';
+import { getProfileUrl, isEnceraUser, ENCERA_CONFIG } from '@/utils/profileHelpers';
 
 interface PropertyDetailProps {
     propertyId: number;
@@ -120,7 +121,13 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
         }
     };
 
-    const isEncera = property?.owner?.firstName === 'Encera' || property?.pappSellable;
+    const isEncera = property?.owner ? isEnceraUser(property.owner) || property?.pappSellable : false;
+
+    // Kullanıcının daha önce bu ilana yorum yapıp yapmadığını kontrol et
+    const userHasCommented = React.useMemo(() => {
+        if (!user || !commentsData?.content) return false;
+        return commentsData.content.some(comment => comment.userId === user.id);
+    }, [user, commentsData]);
 
     const handleCommentDelete = async (commentId: number) => {
         if (window.confirm(isReady ? t('property-detail.comments.delete-confirm') : 'Bu yorumu silmek istediğinizden emin misiniz?')) {
@@ -428,7 +435,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         </div>
                                         <div>
                                             <div className="font-medium text-gray-900">
-                                                {isEncera ? '535 602 1168' : property.owner.phoneNumber || 'Telefon bulunamadı'}
+                                                {isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber || 'Telefon bulunamadı'}
                                             </div>
                                             <div className="text-sm text-gray-500">Telefon Numarası</div>
                                         </div>
@@ -442,7 +449,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
                                 <div className="space-y-4">
                                     <a
-                                        href={`tel:${isEncera ? '5356021168' : property.owner.phoneNumber}`}
+                                        href={`tel:${isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber}`}
                                         className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
                                     >
                                         <Phone className="w-4 h-4 mr-2" />
@@ -450,7 +457,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     </a>
 
                                     <Link
-                                        href={`/messages?userId=${property.owner.id}&propertyId=${propertyId}`}
+                                        href={`/messages?userId=${isEncera ? ENCERA_CONFIG.USER_ID : property.owner.id}&propertyId=${propertyId}`}
                                         className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg"
                                     >
                                         <MessageSquare className="w-4 h-4 mr-2" />
@@ -562,8 +569,21 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             </h2>
                         </div>
 
-                        {/* Add Comment Form */}
-                        <form onSubmit={handleCommentSubmit} className="space-y-8">
+                        {/* Add Comment Form or Already Commented Message */}
+                        {userHasCommented ? (
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                                <div className="text-green-600 mb-2 text-lg font-medium">
+                                    ✓ Değerlendirme Tamamlandı
+                                </div>
+                                <p className="text-green-700 text-sm">
+                                    Bu ilan hakkında daha önce değerlendirme yapmışsınız.
+                                </p>
+                                <p className="text-green-600 text-xs mt-1">
+                                    Her ilan için sadece bir değerlendirme yapabilirsiniz.
+                                </p>
+                            </div>
+                        ) : (
+                            <form onSubmit={handleCommentSubmit} className="space-y-8">
                             {/* Rating Section */}
                             <div>
                                 <label className="block text-lg font-semibold text-gray-900 mb-4">
@@ -622,6 +642,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 {isSubmittingComment ? 'Gönderiliyor...' : 'Yorum Ekle'}
                             </button>
                         </form>
+                        )}
 
                         {/* Comments List */}
                         <div className="mt-12">
@@ -735,7 +756,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             </div>
 
                             <Link
-                                href={`/profile/${property.owner.id}`}
+                                href={isEncera ? '/encera' : getProfileUrl(property.owner)}
                                 className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
                             >
                                 Profili Görüntüle →

@@ -83,7 +83,7 @@ export interface ProfileReview {
 }
 
 export interface CreateReviewRequest {
-  profileOwnerId: string;
+  profileOwnerId: number;
   rating: number;
   comment: string;
 }
@@ -195,13 +195,13 @@ export const userApi = createApi({
     }),
 
     // Get reviews for a profile
-    getProfileReviews: builder.query<ProfileReview[], string>({
+    getProfileReviews: builder.query<ProfileReview[], number>({
       query: (profileOwnerId) => `/profile/${profileOwnerId}/reviews`,
       providesTags: ['Review'],
     }),
 
     // Get review statistics for a profile
-    getReviewStats: builder.query<ReviewStatsResponse, string>({
+    getReviewStats: builder.query<ReviewStatsResponse, number>({
       query: (profileOwnerId) => `/profile/${profileOwnerId}/review-stats`,
       providesTags: ['Review'],
     }),

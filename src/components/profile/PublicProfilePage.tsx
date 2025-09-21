@@ -19,6 +19,13 @@ import {
     Eye
 } from 'lucide-react';
 import Link from 'next/link';
+import {
+    useGetUserByIdQuery,
+    useGetProfileReviewsQuery,
+    useGetReviewStatsQuery,
+    useCreateReviewMutation
+} from '@/store/api/userApi';
+import { useGetAllPropertiesQuery } from '@/store/api/propertyApi';
 
 interface PublicProfilePageProps {
     userId: number;
@@ -29,64 +36,108 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
     const { user } = useAuth();
     const router = useRouter();
 
-    // Mock data - Bu gerçek API'den gelecek
-    const profileUser = {
-        id: userId,
-        firstName: userId === 1 ? 'Encera' : 'Ahmet',
-        lastName: userId === 1 ? '' : 'Yılmaz',
-        email: userId === 1 ? 'info@encera.com' : 'ahmet@example.com',
-        phoneNumber: userId === 1 ? '535 602 1168' : '532 123 4567',
-        verified: userId === 1,
-        joinDate: '2023-01-15',
-        totalListings: 15,
-        activeListings: 12,
-        averageRating: 4.6,
-        totalReviews: 23
-    };
+    // Backend API calls
+    const { data: profileUser, isLoading: profileLoading } = useGetUserByIdQuery(userId);
+    const { data: reviews, isLoading: reviewsLoading } = useGetProfileReviewsQuery(userId);
+    const { data: reviewStats, isLoading: statsLoading } = useGetReviewStatsQuery(userId);
+    const { data: propertiesData, isLoading: propertiesLoading } = useGetAllPropertiesQuery({ page: 0, size: 50 });
 
-    const isEncera = userId === 1 || profileUser.firstName === 'Encera';
-
-    // Mock listings data
-    const userListings = [
-        {
-            id: 1,
-            title: 'Şaşırtıcı Manzaralı 3+1 Daire',
-            price: 2500000,
-            city: 'İstanbul',
-            district: 'Beşiktaş',
-            neighborhood: 'Ortaköy',
-            listingType: 'SALE',
-            propertyType: 'RESIDENTIAL',
-            viewCount: 245,
-            createdAt: '2024-01-15T10:30:00Z',
-            featured: true
-        },
-        {
-            id: 2,
-            title: 'Modern Ofis Alanı',
-            price: 25000,
-            city: 'İstanbul',
-            district: 'Şişli',
-            neighborhood: 'Mecidiyeköy',
-            listingType: 'RENT',
-            propertyType: 'COMMERCIAL',
-            viewCount: 156,
-            createdAt: '2024-01-10T14:20:00Z',
-            featured: false
-        }
-    ];
+    const [createReview] = useCreateReviewMutation();
 
     // Comments state
     const [newComment, setNewComment] = React.useState('');
     const [newRating, setNewRating] = React.useState(5);
+    const [reviewError, setReviewError] = React.useState('');
 
-    const handleCommentSubmit = (e: React.FormEvent) => {
+    const isEncera = profileUser?.firstName === 'Encera';
+
+    // Kullanıcının daha önce bu profile yorum yapıp yapmadığını kontrol et
+    const userHasReviewed = React.useMemo(() => {
+        if (!user || !reviews) return false;
+        return reviews.some(review => review.authorId === user.id.toString());
+    }, [user, reviews]);
+
+    // Filter properties by owner - Encera için özel koşul
+    const userListings = React.useMemo(() => {
+        if (!propertiesData?.content || !profileUser) return [];
+
+        // Eğer Encera profili ise, hem kendi ilanlarını hem de pappSellable ilanlarını göster
+        if (isEncera) {
+            return propertiesData.content.filter(property =>
+                property.owner?.id === profileUser.id || property.pappSellable === true
+            );
+        }
+
+        // Normal kullanıcılar için sadece kendi ilanları
+        return propertiesData.content.filter(property =>
+            property.owner?.id === profileUser.id
+        );
+    }, [propertiesData, profileUser, isEncera]);
+
+    const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Implement comment API call
-        console.log('Comment for user:', userId, 'Comment:', newComment, 'Rating:', newRating);
-        setNewComment('');
-        setNewRating(5);
+        setReviewError('');
+
+        // Frontend validation
+        if (!newComment.trim()) {
+            setReviewError('Yorum boş olamaz');
+            return;
+        }
+
+        if (newComment.trim().length < 10) {
+            setReviewError('Yorum en az 10 karakter olmalıdır');
+            return;
+        }
+
+        try {
+            await createReview({
+                profileOwnerId: userId,
+                rating: newRating,
+                comment: newComment.trim()
+            }).unwrap();
+
+            setNewComment('');
+            setNewRating(5);
+            setReviewError('');
+            alert('Değerlendirmeniz başarıyla kaydedildi!');
+        } catch (error: any) {
+            console.error('Error creating review:', error);
+
+            // Backend hata mesajlarını kullanıcı dostu hale getir
+            let errorMessage = 'Bir hata oluştu';
+
+            if (error?.data?.error) {
+                const backendError = error.data.error;
+                if (backendError.includes('already reviewed')) {
+                    errorMessage = 'Bu profile daha önce değerlendirme yapmışsınız';
+                } else if (backendError.includes('your own profile')) {
+                    errorMessage = 'Kendi profilinize değerlendirme yapamazsınız';
+                } else if (backendError.includes('10 and 1000 characters')) {
+                    errorMessage = 'Yorum 10-1000 karakter arasında olmalıdır';
+                } else {
+                    errorMessage = backendError;
+                }
+            }
+
+            setReviewError(errorMessage);
+        }
     };
+
+    if (profileLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-gray-600">Profil yükleniyor...</div>
+            </div>
+        );
+    }
+
+    if (!profileUser) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-gray-600">Kullanıcı bulunamadı</div>
+            </div>
+        );
+    }
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('tr-TR', {
@@ -132,7 +183,7 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                     <h1 className="text-xl font-bold text-gray-900">
                                         {isEncera ? 'Encera' : `${profileUser.firstName} ${profileUser.lastName}`}
                                     </h1>
-                                    {isEncera && (
+                                    {(isEncera || profileUser.isVerified) && (
                                         <CheckCircle className="w-5 h-5 text-blue-500" />
                                     )}
                                 </div>
@@ -148,7 +199,7 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                             <Star
                                                 key={star}
                                                 className={`w-4 h-4 ${
-                                                    star <= Math.floor(profileUser.averageRating)
+                                                    star <= Math.floor(reviewStats?.averageRating || 0)
                                                         ? 'text-yellow-400 fill-current'
                                                         : 'text-gray-300'
                                                 }`}
@@ -156,10 +207,10 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                         ))}
                                     </div>
                                     <span className="text-sm font-medium text-gray-700 ml-1">
-                                        {profileUser.averageRating}
+                                        {reviewStats?.averageRating?.toFixed(1) || '0.0'}
                                     </span>
                                     <span className="text-sm text-gray-500">
-                                        ({profileUser.totalReviews} değerlendirme)
+                                        ({reviewStats?.totalReviews || 0} değerlendirme)
                                     </span>
                                 </div>
                             </div>
@@ -169,23 +220,25 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                 <div className="flex items-center">
                                     <Calendar className="w-4 h-4 mr-3 text-gray-400" />
                                     <span className="text-sm text-gray-600">
-                                        {formatDate(profileUser.joinDate)} tarihinde katıldı
+                                        {formatDate(profileUser.createdAt)} tarihinde katıldı
                                     </span>
                                 </div>
 
                                 <div className="flex items-center">
                                     <Building className="w-4 h-4 mr-3 text-gray-400" />
                                     <span className="text-sm text-gray-600">
-                                        {profileUser.totalListings} ilan • {profileUser.activeListings} aktif
+                                        {userListings.length} ilan • {userListings.filter(p => p.active).length} aktif
                                     </span>
                                 </div>
 
-                                <div className="flex items-center">
-                                    <Phone className="w-4 h-4 mr-3 text-gray-400" />
-                                    <span className="text-sm text-gray-600">
-                                        {profileUser.phoneNumber}
-                                    </span>
-                                </div>
+                                {profileUser.phoneNumber && (
+                                    <div className="flex items-center">
+                                        <Phone className="w-4 h-4 mr-3 text-gray-400" />
+                                        <span className="text-sm text-gray-600">
+                                            {profileUser.phoneNumber}
+                                        </span>
+                                    </div>
+                                )}
 
                                 <div className="flex items-center">
                                     <Mail className="w-4 h-4 mr-3 text-gray-400" />
@@ -196,21 +249,37 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                             </div>
 
                             {/* Contact Button */}
-                            <a
-                                href={`tel:${profileUser.phoneNumber.replace(/\s/g, '')}`}
-                                className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                            >
-                                <Phone className="w-4 h-4 mr-2" />
-                                {isReady ? 'Ara' : 'Call'}
-                            </a>
+                            {profileUser.phoneNumber && (
+                                <a
+                                    href={`tel:${profileUser.phoneNumber.replace(/\s/g, '')}`}
+                                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                                >
+                                    <Phone className="w-4 h-4 mr-2" />
+                                    {isReady ? 'Ara' : 'Call'}
+                                </a>
+                            )}
                         </div>
 
-                        {/* Reviews Form - Only for logged in users */}
+                        {/* Reviews Form - Only for logged in users who haven't reviewed yet */}
                         {user && user.id !== userId && (
                             <div className="bg-white rounded-lg shadow-sm border p-6 mt-6">
-                                <h3 className="font-medium text-gray-900 mb-4">
-                                    {isReady ? 'Değerlendirme Yap' : 'Leave a Review'}
-                                </h3>
+                                {userHasReviewed ? (
+                                    <div className="text-center py-6">
+                                        <div className="text-green-600 mb-2">
+                                            ✓ Değerlendirme Tamamlandı
+                                        </div>
+                                        <p className="text-gray-600 text-sm">
+                                            Bu kullanıcı hakkında daha önce değerlendirme yapmışsınız.
+                                        </p>
+                                        <p className="text-gray-500 text-xs mt-1">
+                                            Her kullanıcı için sadece bir değerlendirme yapabilirsiniz.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <h3 className="font-medium text-gray-900 mb-4">
+                                            {isReady ? 'Değerlendirme Yap' : 'Leave a Review'}
+                                        </h3>
 
                                 <form onSubmit={handleCommentSubmit} className="space-y-4">
                                     {/* Rating */}
@@ -246,20 +315,41 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                             value={newComment}
                                             onChange={(e) => setNewComment(e.target.value)}
                                             rows={3}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                                                reviewError ? 'border-red-300' : 'border-gray-300'
+                                            }`}
                                             placeholder={isReady ? 'Deneyiminizi paylaşın...' : 'Share your experience...'}
                                             required
                                         />
+                                        <div className="flex justify-between items-center mt-1">
+                                            <div className={`text-xs ${
+                                                newComment.length < 10 ? 'text-red-500' : 'text-gray-500'
+                                            }`}>
+                                                {newComment.length}/1000 karakter {newComment.length < 10 && '(en az 10 karakter gerekli)'}
+                                            </div>
+                                        </div>
+                                        {reviewError && (
+                                            <div className="text-red-500 text-sm mt-1">
+                                                {reviewError}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <button
                                         type="submit"
-                                        className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors"
+                                        disabled={newComment.trim().length < 10}
+                                        className={`w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors ${
+                                            newComment.trim().length < 10
+                                                ? 'text-gray-500 bg-gray-300 cursor-not-allowed'
+                                                : 'text-white bg-green-600 hover:bg-green-700'
+                                        }`}
                                     >
                                         <MessageCircle className="w-4 h-4 mr-2" />
                                         {isReady ? 'Değerlendirme Gönder' : 'Submit Review'}
                                     </button>
                                 </form>
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>
@@ -273,57 +363,69 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                             </h2>
 
                             <div className="grid gap-4">
-                                {userListings.map((listing) => (
-                                    <Link
-                                        key={listing.id}
-                                        href={`/house/${listing.id}`}
-                                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all"
-                                    >
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="font-medium text-gray-900 hover:text-blue-600 transition-colors">
-                                                {listing.title}
-                                            </h3>
-                                            {listing.featured && (
-                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                    ⭐ VIP
+                                {propertiesLoading ? (
+                                    <div className="text-center py-8 text-gray-500">
+                                        İlanlar yükleniyor...
+                                    </div>
+                                ) : userListings.length > 0 ? (
+                                    userListings.map((listing) => (
+                                        <Link
+                                            key={listing.id}
+                                            href={`/house/${listing.id}`}
+                                            className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all"
+                                        >
+                                            <div className="flex justify-between items-start mb-2">
+                                                <h3 className="font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                                                    {listing.title}
+                                                </h3>
+                                                <div className="flex gap-2">
+                                                    {listing.pappSellable && (
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                            ENCERA
+                                                        </span>
+                                                    )}
+                                                    {listing.featured && (
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                            ⭐ VIP
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center text-gray-600 text-sm mb-2">
+                                                <MapPin className="w-4 h-4 mr-1" />
+                                                <span>
+                                                    {listing.neighborhood}, {listing.district}, {listing.city}
                                                 </span>
-                                            )}
-                                        </div>
-
-                                        <div className="flex items-center text-gray-600 text-sm mb-2">
-                                            <MapPin className="w-4 h-4 mr-1" />
-                                            <span>
-                                                {listing.neighborhood}, {listing.district}, {listing.city}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-lg font-semibold text-gray-900">
-                                                {formatPrice(listing.price)}
                                             </div>
-                                            <div className="flex items-center text-gray-500 text-sm">
-                                                <Eye className="w-4 h-4 mr-1" />
-                                                <span>{listing.viewCount}</span>
-                                            </div>
-                                        </div>
 
-                                        <div className="flex gap-2 mt-2">
-                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                {listing.listingType === 'SALE' ? 'Satılık' : 'Kiralık'}
-                                            </span>
-                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                {listing.propertyType === 'RESIDENTIAL' ? 'Konut' : 'İş Yeri'}
-                                            </span>
-                                        </div>
-                                    </Link>
-                                ))}
+                                            <div className="flex items-center justify-between">
+                                                <div className="text-lg font-semibold text-gray-900">
+                                                    {formatPrice(listing.price)}
+                                                </div>
+                                                <div className="flex items-center text-gray-500 text-sm">
+                                                    <Eye className="w-4 h-4 mr-1" />
+                                                    <span>{listing.viewCount}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-2 mt-2">
+                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {listing.listingType === 'SALE' ? 'Satılık' : 'Kiralık'}
+                                                </span>
+                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                    {listing.propertyType === 'RESIDENTIAL' ? 'Konut' : 'İş Yeri'}
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <div className="text-center text-gray-500 py-8">
+                                        {isReady ? 'Henüz aktif ilan bulunmuyor.' : 'No active listings yet.'}
+                                    </div>
+                                )}
                             </div>
 
-                            {userListings.length === 0 && (
-                                <div className="text-center text-gray-500 py-8">
-                                    {isReady ? 'Henüz aktif ilan bulunmuyor.' : 'No active listings yet.'}
-                                </div>
-                            )}
                         </div>
 
                         {/* Reviews */}
@@ -333,64 +435,61 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                             </h2>
 
                             <div className="space-y-4">
-                                {/* Sample Review */}
-                                <div className="border-b border-gray-100 pb-4">
-                                    <div className="flex items-start justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <UserIcon className="w-5 h-5 text-gray-400" />
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-900">Mehmet Öz</div>
-                                                <div className="flex items-center gap-1">
-                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                        <Star
-                                                            key={star}
-                                                            className={`w-3 h-3 ${
-                                                                star <= 5 ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                                            }`}
-                                                        />
-                                                    ))}
-                                                    <span className="text-xs text-gray-500 ml-1">5/5</span>
+                                {reviewsLoading ? (
+                                    <div className="text-center py-8 text-gray-500">
+                                        Değerlendirmeler yükleniyor...
+                                    </div>
+                                ) : reviews && reviews.length > 0 ? (
+                                    reviews.slice(0, 5).map((review) => (
+                                        <div key={review.id} className="border-b border-gray-100 pb-4 last:border-b-0">
+                                            <div className="flex items-start justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <UserIcon className="w-5 h-5 text-gray-400" />
+                                                    <div>
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            {review.authorName}
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <Star
+                                                                    key={star}
+                                                                    className={`w-3 h-3 ${
+                                                                        star <= review.rating
+                                                                            ? 'text-yellow-400 fill-current'
+                                                                            : 'text-gray-300'
+                                                                    }`}
+                                                                />
+                                                            ))}
+                                                            <span className="text-xs text-gray-500 ml-1">
+                                                                {review.rating}/5
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {new Date(review.createdAt).toLocaleDateString('tr-TR', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric'
+                                                    })}
                                                 </div>
                                             </div>
+                                            <p className="text-sm text-gray-600">
+                                                {review.comment}
+                                            </p>
                                         </div>
-                                        <div className="text-xs text-gray-500">1 hafta önce</div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                        Henüz değerlendirme bulunmuyor.
                                     </div>
-                                    <p className="text-sm text-gray-600">
-                                        Çok profesyonel ve güvenilir. İlan süreci boyunca çok yardımcı oldu.
-                                    </p>
-                                </div>
-
-                                <div className="border-b border-gray-100 pb-4">
-                                    <div className="flex items-start justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <UserIcon className="w-5 h-5 text-gray-400" />
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-900">Ayşe Kara</div>
-                                                <div className="flex items-center gap-1">
-                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                        <Star
-                                                            key={star}
-                                                            className={`w-3 h-3 ${
-                                                                star <= 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                                            }`}
-                                                        />
-                                                    ))}
-                                                    <span className="text-xs text-gray-500 ml-1">4/5</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="text-xs text-gray-500">2 hafta önce</div>
-                                    </div>
-                                    <p className="text-sm text-gray-600">
-                                        İlanları çok detaylı ve doğru bilgilerle hazırlanmış. Tavsiye ederim.
-                                    </p>
-                                </div>
+                                )}
                             </div>
 
-                            {profileUser.totalReviews > 2 && (
+                            {reviews && reviews.length > 5 && (
                                 <div className="text-center mt-4">
                                     <button className="text-blue-600 text-sm hover:text-blue-700 transition-colors">
-                                        Tüm değerlendirmeleri görüntüle ({profileUser.totalReviews})
+                                        Tüm değerlendirmeleri görüntüle ({reviewStats?.totalReviews || reviews.length})
                                     </button>
                                 </div>
                             )}
