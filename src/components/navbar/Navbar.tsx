@@ -9,6 +9,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { ChevronDown, User, Globe } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { NotificationBell } from '@/components/ui/notification-bell';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
@@ -122,6 +123,9 @@ const Navbar: React.FC = () => {
                                 </div>
                             )}
                         </div>
+
+                        {/* Bildirim Bell'i - Sadece giriş yapmış kullanıcılar için */}
+                        {isHydrated && isAuthenticated && <NotificationBell />}
 
                         {!isHydrated ? (
                             // Redux store henüz hydrate olmadı - static rendering

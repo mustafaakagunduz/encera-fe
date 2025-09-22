@@ -312,10 +312,10 @@ export const Messages: React.FC = () => {
                                         </div>
                                     ) : (
                                         filteredConversations.map((conversation) => (
-                                        <button
+                                        <div
                                             key={conversation.otherUserId}
                                             onClick={() => handleConversationSelect(conversation.otherUserId)}
-                                            className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
+                                            className={`w-full p-4 text-left hover:bg-gray-50 transition-colors cursor-pointer ${
                                                 selectedConversation === conversation.otherUserId
                                                     ? 'bg-blue-50 border-r-2 border-blue-600'
                                                     : ''
@@ -364,7 +364,7 @@ export const Messages: React.FC = () => {
                                                     )}
                                                 </div>
                                             </div>
-                                        </button>
+                                        </div>
                                     ))
                                     )}
                                 </div>

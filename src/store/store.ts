@@ -10,6 +10,7 @@ import { commentApi } from './api/commentApi';
 import { messageApi } from './api/messageApi';
 import { fileUploadApi } from './api/fileUploadApi';
 import { complaintApi } from './api/complaintApi';
+import { notificationApi } from './api/notificationApi';
 import authReducer from './slices/authSlice';
 import listingPreviewReducer from './slices/listingPreviewSlice'; // Yeni slice import
 
@@ -26,6 +27,7 @@ export const store = configureStore({
         [messageApi.reducerPath]: messageApi.reducer,
         [fileUploadApi.reducerPath]: fileUploadApi.reducer,
         [complaintApi.reducerPath]: complaintApi.reducer,
+        [notificationApi.reducerPath]: notificationApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
@@ -37,7 +39,8 @@ export const store = configureStore({
             commentApi.middleware,
             messageApi.middleware,
             fileUploadApi.middleware,
-            complaintApi.middleware
+            complaintApi.middleware,
+            notificationApi.middleware
         ),
 });
 
