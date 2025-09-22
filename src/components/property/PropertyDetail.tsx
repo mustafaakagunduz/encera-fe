@@ -31,10 +31,12 @@ import {
     Star,
     MessageCircle,
     MessageSquare,
-    Trash
+    Trash,
+    Flag
 } from 'lucide-react';
 import Link from 'next/link';
 import { PropertyImageGallery } from '@/components/ui/property-image-gallery';
+import { ComplaintButton } from '@/components/ui/complaint-button';
 import { getProfileUrl, isEnceraUser, ENCERA_CONFIG } from '@/utils/profileHelpers';
 
 interface PropertyDetailProps {
@@ -257,6 +259,16 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         : (isReady ? t('property-detail.add-to-favorites') : 'Favorilere Ekle')
                                 }
                             </button>
+                        )}
+
+                        {/* Complaint Button - Tüm kullanıcılar için (ilan sahibi hariç) */}
+                        {!isOwner && user && (
+                            <ComplaintButton
+                                type="PROPERTY"
+                                targetId={propertyId}
+                                targetTitle={property.title}
+                                buttonText="Şikayet Et"
+                            />
                         )}
 
                         {/* Action Buttons - Sadece ilan sahibi görür */}

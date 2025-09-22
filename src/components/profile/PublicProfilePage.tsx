@@ -16,9 +16,11 @@ import {
     Mail,
     Calendar,
     Building,
-    Eye
+    Eye,
+    Flag
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ComplaintButton } from '@/components/ui/complaint-button';
 import Link from 'next/link';
 import {
     useGetUserByIdQuery,
@@ -258,9 +260,9 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                 </div>
                             </div>
 
-                            {/* Contact Button */}
-                            {profileUser.phoneNumber && (
-                                <div className="mt-6">
+                            {/* Contact and Report Buttons */}
+                            <div className="mt-6 space-y-3">
+                                {profileUser.phoneNumber && (
                                     <a
                                         href={`tel:${profileUser.phoneNumber.replace(/\s/g, '')}`}
                                         className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
@@ -268,8 +270,19 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                         <Phone className="w-4 h-4 mr-2" />
                                         {isReady ? 'Ara' : 'Call'}
                                     </a>
-                                </div>
-                            )}
+                                )}
+
+                                {/* Complaint Button - Only for logged in users viewing other profiles */}
+                                {user && user.id !== userId && (
+                                    <ComplaintButton
+                                        type="PROFILE"
+                                        targetId={userId}
+                                        targetTitle={`${profileUser.firstName} ${profileUser.lastName}`}
+                                        buttonText="Profili Şikayet Et"
+                                        className="w-full justify-center"
+                                    />
+                                )}
+                            </div>
                         </div>
 
                         {/* Reviews Form - Only for logged in users who haven't reviewed yet */}

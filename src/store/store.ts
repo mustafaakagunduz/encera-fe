@@ -9,6 +9,7 @@ import { favoriteApi } from './api/favoriteApi';
 import { commentApi } from './api/commentApi';
 import { messageApi } from './api/messageApi';
 import { fileUploadApi } from './api/fileUploadApi';
+import { complaintApi } from './api/complaintApi';
 import authReducer from './slices/authSlice';
 import listingPreviewReducer from './slices/listingPreviewSlice'; // Yeni slice import
 
@@ -24,6 +25,7 @@ export const store = configureStore({
         [commentApi.reducerPath]: commentApi.reducer,
         [messageApi.reducerPath]: messageApi.reducer,
         [fileUploadApi.reducerPath]: fileUploadApi.reducer,
+        [complaintApi.reducerPath]: complaintApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
@@ -34,7 +36,8 @@ export const store = configureStore({
             favoriteApi.middleware,
             commentApi.middleware,
             messageApi.middleware,
-            fileUploadApi.middleware
+            fileUploadApi.middleware,
+            complaintApi.middleware
         ),
 });
 
