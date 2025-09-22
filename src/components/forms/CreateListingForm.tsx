@@ -248,7 +248,7 @@ export const CreateListingForm: React.FC = () => {
         // Property type değiştiğinde ilgili alanları temizle
         if (name === 'propertyType') {
             setFormData(prev => {
-                const newData = { ...prev, [name]: value };
+                const newData = { ...prev, [name]: value as PropertyType };
 
                 // Arsa seçildiğinde bu alanları temizle
                 if (value === PropertyType.LAND) {
@@ -277,7 +277,7 @@ export const CreateListingForm: React.FC = () => {
         // Listing type değiştiğinde ilgili alanları temizle
         if (name === 'listingType') {
             setFormData(prev => {
-                const newData = { ...prev, [name]: value };
+                const newData = { ...prev, [name]: value as ListingType };
 
                 // Satılık seçildiğinde aidat ve depozito temizle
                 if (value === ListingType.SALE) {
@@ -884,7 +884,7 @@ export const CreateListingForm: React.FC = () => {
                                     disabled={formData.propertyType === PropertyType.LAND}
                                     className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 pointer-events-none ${formData.propertyType === PropertyType.LAND ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label className="pointer-events-none" htmlFor="elevator" className={`ml-3 flex items-center text-sm pointer-events-none ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <label htmlFor="elevator" className={`ml-3 flex items-center text-sm pointer-events-none ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     <ArrowUp className={`w-4 h-4 mr-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.elevator') : 'Asansör'}
                                 </label>
@@ -903,7 +903,7 @@ export const CreateListingForm: React.FC = () => {
                                     onChange={handleInputChange}
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 pointer-events-none"
                                 />
-                                <label className="pointer-events-none" htmlFor="parking" className="ml-3 flex items-center text-sm text-gray-900 pointer-events-none">
+                                <label htmlFor="parking" className="ml-3 flex items-center text-sm text-gray-900 pointer-events-none">
                                     <Car className="w-4 h-4 mr-2 text-gray-600" />
                                     {isReady ? t('listing.create.parking') : 'Otopark'}
                                 </label>
@@ -923,7 +923,7 @@ export const CreateListingForm: React.FC = () => {
                                     disabled={formData.propertyType === PropertyType.LAND}
                                     className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${formData.propertyType === PropertyType.LAND ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label className="pointer-events-none" htmlFor="balcony" className={`ml-3 flex items-center text-sm ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <label htmlFor="balcony" className={`ml-3 flex items-center text-sm pointer-events-none ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
                                     <Home className={`w-4 h-4 mr-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.balcony') : 'Balkon'}
                                 </label>
@@ -942,7 +942,7 @@ export const CreateListingForm: React.FC = () => {
                                     onChange={handleInputChange}
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 pointer-events-none"
                                 />
-                                <label className="pointer-events-none" htmlFor="security" className="ml-3 flex items-center text-sm text-gray-900">
+                                <label htmlFor="security" className="ml-3 flex items-center text-sm text-gray-900 pointer-events-none">
                                     <Shield className="w-4 h-4 mr-2 text-gray-600" />
                                     {isReady ? t('listing.create.security') : 'Güvenlik'}
                                 </label>
@@ -962,7 +962,7 @@ export const CreateListingForm: React.FC = () => {
                                     disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
                                     className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'cursor-not-allowed opacity-50' : ''}`}
                                 />
-                                <label className="pointer-events-none" htmlFor="furnished" className={`ml-3 flex items-center text-sm ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <label htmlFor="furnished" className={`ml-3 flex items-center text-sm pointer-events-none ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-900'}`}>
                                     <Sofa className={`w-4 h-4 mr-2 ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-600'}`} />
                                     {isReady ? t('listing.create.furnished') : 'Eşyalı'}
                                 </label>
@@ -1059,7 +1059,7 @@ export const CreateListingForm: React.FC = () => {
                                     onChange={handleInputChange}
                                     className="w-5 h-5 text-yellow-600 border-yellow-300 rounded focus:ring-yellow-500"
                                 />
-                                <label className="pointer-events-none" htmlFor="pappSellable" className="ml-4 flex items-center text-base font-medium text-gray-900">
+                                <label htmlFor="pappSellable" className="ml-4 flex items-center text-base font-medium text-gray-900 pointer-events-none">
                                     {isReady ? t('listing.create.encera-sellable') : 'Ençera ile satılsın'}
                                 </label>
                             </div>
@@ -1149,5 +1149,4 @@ export const CreateListingForm: React.FC = () => {
     );
 };
 
-export { CreateListingForm };
 export default CreateListingForm;

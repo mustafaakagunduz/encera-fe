@@ -17,7 +17,7 @@ const ProfilePage: React.FC = () => {
 
                 {/* Reviews & Comments Section */}
                 {profile?.id && (
-                    <ProfileReviews isOwnProfile={true} profileOwnerId={profile.id} />
+                    <ProfileReviews isOwnProfile={true} profileOwnerId={profile.id.toString()} />
                 )}
 
                 {/* User Listings Flow Section */}

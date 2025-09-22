@@ -31,8 +31,8 @@ const ProfileReviews: React.FC<ProfileReviewsProps> = ({
     const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
 
     // API queries
-    const { data: reviews = [], isLoading: reviewsLoading, error: reviewsError } = useGetProfileReviewsQuery(profileOwnerId);
-    const { data: reviewStats, isLoading: statsLoading } = useGetReviewStatsQuery(profileOwnerId);
+    const { data: reviews = [], isLoading: reviewsLoading, error: reviewsError } = useGetProfileReviewsQuery(parseInt(profileOwnerId));
+    const { data: reviewStats, isLoading: statsLoading } = useGetReviewStatsQuery(parseInt(profileOwnerId));
 
     // API mutations
     const [createReview, { isLoading: isCreating }] = useCreateReviewMutation();
@@ -47,7 +47,7 @@ const ProfileReviews: React.FC<ProfileReviewsProps> = ({
 
         try {
             await createReview({
-                profileOwnerId,
+                profileOwnerId: parseInt(profileOwnerId),
                 rating: newReview.rating,
                 comment: newReview.comment.trim()
             }).unwrap();

@@ -146,7 +146,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                     if (imageIndex !== -1) {
                         updated[imageIndex] = {
                             ...updated[imageIndex],
-                            url: uploadResult.url || uploadResult, // Backend response'a göre ayarla
+                            url: ('fileUrl' in uploadResult) ? uploadResult.fileUrl : (uploadResult as unknown as string), // Backend response'a göre ayarla
                             isUploading: false
                         };
                     }
@@ -257,7 +257,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 const uploadResult = response.uploadedFiles ? response.uploadedFiles[0] : response;
                 updated[index] = {
                     ...updated[index],
-                    url: uploadResult.url || uploadResult,
+                    url: ('fileUrl' in uploadResult) ? uploadResult.fileUrl : (uploadResult as unknown as string),
                     isUploading: false,
                     error: undefined
                 };

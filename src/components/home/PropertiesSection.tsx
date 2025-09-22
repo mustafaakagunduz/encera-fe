@@ -191,13 +191,13 @@ const PropertiesSection: React.FC = () => {
             filtered = filtered.filter(p => p.price <= parseInt(newFilters.maxPrice));
         }
         if (newFilters.roomCount) {
-            filtered = filtered.filter(p => p.roomConfiguration === newFilters.roomCount);
+            filtered = filtered.filter(p => p.roomConfiguration?.roomCount === parseInt(newFilters.roomCount));
         }
         if (newFilters.minArea) {
-            filtered = filtered.filter(p => p.area >= parseInt(newFilters.minArea));
+            filtered = filtered.filter(p => p.grossArea && p.grossArea >= parseInt(newFilters.minArea));
         }
         if (newFilters.maxArea) {
-            filtered = filtered.filter(p => p.area <= parseInt(newFilters.maxArea));
+            filtered = filtered.filter(p => p.grossArea && p.grossArea <= parseInt(newFilters.maxArea));
         }
 
         // Apply search
@@ -205,8 +205,7 @@ const PropertiesSection: React.FC = () => {
             filtered = filtered.filter(p =>
                 p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 p.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.district.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.neighborhood.toLowerCase().includes(searchQuery.toLowerCase())
+                p.district.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
 
@@ -225,10 +224,10 @@ const PropertiesSection: React.FC = () => {
                 filtered.sort((a, b) => b.price - a.price);
                 break;
             case 'area-large':
-                filtered.sort((a, b) => b.area - a.area);
+                filtered.sort((a, b) => (b.grossArea || 0) - (a.grossArea || 0));
                 break;
             case 'area-small':
-                filtered.sort((a, b) => a.area - b.area);
+                filtered.sort((a, b) => (a.grossArea || 0) - (b.grossArea || 0));
                 break;
         }
 

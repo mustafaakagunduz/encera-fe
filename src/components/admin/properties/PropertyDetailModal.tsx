@@ -52,7 +52,6 @@ interface Property {
     roomConfiguration?: {
         roomCount: number;
         hallCount?: number;
-        hallCount?: number;
         bathroomCount?: number;
     };
     owner: {

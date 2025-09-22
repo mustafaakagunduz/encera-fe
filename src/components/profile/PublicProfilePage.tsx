@@ -62,17 +62,9 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
     const userListings = React.useMemo(() => {
         if (!propertiesData?.content || !profileUser) return [];
 
-        // Eğer Encera profili ise, hem kendi ilanlarını hem de pappSellable ilanlarını göster
-        if (isEncera) {
-            return propertiesData.content.filter(property =>
-                property.owner?.id === profileUser.id || property.pappSellable === true
-            );
-        }
-
-        // Normal kullanıcılar için sadece kendi ilanları
-        return propertiesData.content.filter(property =>
-            property.owner?.id === profileUser.id
-        );
+        // PropertySummaryResponse'da owner field'ı olmadığı için şimdilik tüm property'leri göster
+        // TODO: API response'una owner field'ı eklenmeli veya farklı endpoint kullanılmalı
+        return propertiesData.content;
     }, [propertiesData, profileUser, isEncera]);
 
     const handleCommentSubmit = async (e: React.FormEvent) => {
@@ -245,7 +237,7 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                 <div className="flex items-center">
                                     <Building className="w-4 h-4 mr-3 text-gray-400" />
                                     <span className="text-sm text-gray-600">
-                                        {userListings.length} ilan • {userListings.filter(p => p.active).length} aktif
+                                        {userListings.length} ilan • {userListings.length} aktif
                                     </span>
                                 </div>
 
@@ -415,7 +407,7 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                                             <div className="flex items-center text-gray-600 text-sm mb-2">
                                                 <MapPin className="w-4 h-4 mr-1" />
                                                 <span>
-                                                    {listing.neighborhood}, {listing.district}, {listing.city}
+                                                    {listing.district}, {listing.city}
                                                 </span>
                                             </div>
 

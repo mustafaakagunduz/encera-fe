@@ -6,18 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Edit2, Camera, MapPin, Calendar, Award, Star, Upload } from 'lucide-react';
-<<<<<<< Updated upstream
-import { useGetProfileQuery, useUploadProfilePictureMutation, useUploadProfilePictureWithOriginalMutation, useUploadCoverImageMutation, useUploadCoverImageWithOriginalMutation } from '@/store/api/userApi';
+import { useGetProfileQuery, useUploadProfilePictureMutation, useUploadProfilePictureWithOriginalMutation , useGetReviewStatsQuery, useUploadCoverImageMutation, useUploadCoverImageWithOriginalMutation } from '@/store/api/userApi';
 import { useUploadProfilePictureMutation as useUploadProfilePictureFile, useUploadCoverImageMutation as useUploadCoverImageFile, useDeleteFileMutation } from '@/store/api/fileUploadApi';
 import { useAppDispatch } from '@/store/hooks';
 import { updateUser } from '@/store/slices/authSlice';
-=======
-import { useGetProfileQuery, useUploadProfilePictureMutation, useUploadCoverImageMutation, useGetReviewStatsQuery } from '@/store/api/userApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useGetAllPropertiesQuery } from '@/store/api/propertyApi';
-import { useUploadProfilePictureMutation as useUploadProfilePictureFile, useUploadCoverImageMutation as useUploadCoverImageFile } from '@/store/api/fileUploadApi';
->>>>>>> Stashed changes
 import ImageUploadModal from '@/components/ui/ImageUploadModal';
 import ImageCropModal from '@/components/ui/ImageCropModal';
 
@@ -59,11 +54,9 @@ const ProfileHeader: React.FC = () => {
 
     // Count user's properties
     const userPropertiesCount = React.useMemo(() => {
-        if (!propertiesData?.content || !profile?.id) return 0;
-        return propertiesData.content.filter(property =>
-            property.owner?.id === profile.id
-        ).length;
-    }, [propertiesData, profile?.id]);
+        if (!propertiesData?.content) return 0;
+        return propertiesData.content.length;
+    }, [propertiesData]);
 
     // File upload mutations
     const [uploadProfilePictureFile] = useUploadProfilePictureFile();

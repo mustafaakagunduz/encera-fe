@@ -17,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     User,
     Mail,
@@ -239,7 +240,8 @@ const AccountSettings: React.FC = () => {
                 </p>
             </div>
 
-            <div>
+            <Card className="bg-white shadow-lg border-stone-200">
+                <CardContent className="p-6">
                 <Tabs defaultValue="personal" className="space-y-6">
                     <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto p-1 bg-stone-100 rounded-xl">
                         <TabsTrigger
@@ -628,10 +630,8 @@ const AccountSettings: React.FC = () => {
                         </div>
                     </TabsContent>
                 </Tabs>
-<<<<<<< Updated upstream
-            </div>
-        </div>
-=======
+                </CardContent>
+            </Card>
 
                 {/* Phone Verification Modal */}
                 {showPhoneVerificationModal && (
@@ -702,9 +702,7 @@ const AccountSettings: React.FC = () => {
                         </div>
                     </div>
                 )}
-            </CardContent>
-        </Card>
->>>>>>> Stashed changes
+        </div>
     );
 };
 
