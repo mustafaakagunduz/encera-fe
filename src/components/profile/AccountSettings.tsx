@@ -39,6 +39,8 @@ const AccountSettings: React.FC = () => {
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showPhoneVerificationModal, setShowPhoneVerificationModal] = useState(false);
+    const [verificationCode, setVerificationCode] = useState('');
 
     // API hooks
     const { data: profile, isLoading: profileLoading, error: profileError } = useGetProfileQuery();
@@ -172,10 +174,31 @@ const AccountSettings: React.FC = () => {
             await sendPhoneVerification({
                 phoneNumber: userSettings.phoneNumber
             }).unwrap();
+            setShowPhoneVerificationModal(true);
             alert('Verification code sent to your phone');
         } catch (error) {
             console.error('Phone verification failed:', error);
             alert('Failed to send verification code');
+        }
+    };
+
+    const handleVerifyPhoneCode = async () => {
+        if (!verificationCode) {
+            alert('Please enter the verification code');
+            return;
+        }
+
+        try {
+            await verifyPhone({
+                phoneNumber: userSettings.phoneNumber,
+                verificationCode: verificationCode
+            }).unwrap();
+            setShowPhoneVerificationModal(false);
+            setVerificationCode('');
+            alert('Phone number verified successfully!');
+        } catch (error) {
+            console.error('Phone verification failed:', error);
+            alert('Verification failed. Please check your code.');
         }
     };
 
@@ -605,8 +628,83 @@ const AccountSettings: React.FC = () => {
                         </div>
                     </TabsContent>
                 </Tabs>
+<<<<<<< Updated upstream
             </div>
         </div>
+=======
+
+                {/* Phone Verification Modal */}
+                {showPhoneVerificationModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+                            <div className="text-center mb-6">
+                                <Phone className="w-12 h-12 text-amber-600 mx-auto mb-4" />
+                                <h3 className="text-xl font-bold text-stone-800 mb-2">
+                                    Telefon Doğrulama
+                                </h3>
+                                <p className="text-stone-600">
+                                    {userSettings.phoneNumber} numarasına gönderilen doğrulama kodunu girin
+                                </p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="verificationCode" className="text-stone-700">
+                                        Doğrulama Kodu
+                                    </Label>
+                                    <Input
+                                        id="verificationCode"
+                                        value={verificationCode}
+                                        onChange={(e) => setVerificationCode(e.target.value)}
+                                        placeholder="6 haneli kodu girin"
+                                        className="rounded-lg border-stone-200 focus:border-amber-400 text-center text-lg tracking-widest"
+                                        maxLength={6}
+                                    />
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setShowPhoneVerificationModal(false);
+                                            setVerificationCode('');
+                                        }}
+                                        className="flex-1"
+                                    >
+                                        İptal
+                                    </Button>
+                                    <Button
+                                        onClick={handleVerifyPhoneCode}
+                                        disabled={verifyPhoneLoading || verificationCode.length !== 6}
+                                        className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white"
+                                    >
+                                        {verifyPhoneLoading ? (
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                                        ) : (
+                                            'Doğrula'
+                                        )}
+                                    </Button>
+                                </div>
+
+                                <Button
+                                    variant="ghost"
+                                    onClick={handlePhoneVerification}
+                                    disabled={phoneVerificationLoading}
+                                    className="w-full text-amber-600 hover:text-amber-700"
+                                >
+                                    {phoneVerificationLoading ? (
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-600 mr-2" />
+                                    ) : (
+                                        'Kodu Tekrar Gönder'
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+>>>>>>> Stashed changes
     );
 };
 

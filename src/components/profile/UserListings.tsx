@@ -3,6 +3,12 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+<<<<<<< Updated upstream
+=======
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useGetProfileQuery } from '@/store/api/userApi';
+import { useGetAllPropertiesQuery } from '@/store/api/propertyApi';
+>>>>>>> Stashed changes
 import {
     Building2,
     Calendar,
@@ -36,69 +42,40 @@ interface Listing {
 const UserListings: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // Mock listings data - replace with actual data from your store/API
-    const listings: Listing[] = [
-        {
-            id: '1',
-            title: 'Merkezi Konumda Lüks 3+1 Daire',
-            location: 'Beşiktaş, İstanbul',
-            price: '2.850.000 ₺',
-            image: '/api/placeholder/300/200',
-            status: 'active',
-            createdDate: '2024-01-15',
-            views: 1250,
-            type: 'sale',
-            propertyType: 'Daire'
-        },
-        {
-            id: '2',
-            title: 'Deniz Manzaralı Modern Villa',
-            location: 'Bodrum, Muğla',
-            price: '25.000 ₺/ay',
-            image: '/api/placeholder/300/200',
-            status: 'pending',
-            createdDate: '2024-01-10',
-            views: 890,
-            type: 'rent',
-            propertyType: 'Villa'
-        },
-        {
-            id: '3',
-            title: 'Şehir Merkezinde Ofis Katı',
-            location: 'Şişli, İstanbul',
-            price: '1.950.000 ₺',
-            image: '/api/placeholder/300/200',
-            status: 'inactive',
-            createdDate: '2023-12-28',
-            views: 567,
-            type: 'sale',
-            propertyType: 'Ofis'
-        },
-        {
-            id: '4',
-            title: 'Bahçeli Müstakil Ev',
-            location: 'Ankara',
-            price: '1.750.000 ₺',
-            image: '/api/placeholder/300/200',
-            status: 'active',
-            createdDate: '2024-01-05',
-            views: 345,
-            type: 'sale',
-            propertyType: 'Müstakil Ev'
-        },
-        {
-            id: '5',
-            title: 'Yeni Yapı 2+1 Kiralık',
-            location: 'Kadıköy, İstanbul',
-            price: '18.000 ₺/ay',
-            image: '/api/placeholder/300/200',
-            status: 'active',
-            createdDate: '2024-01-08',
-            views: 923,
-            type: 'rent',
-            propertyType: 'Daire'
-        }
-    ];
+    // Get current user profile
+    const { data: profile } = useGetProfileQuery();
+
+    // Get all properties
+    const { data: propertiesData, isLoading } = useGetAllPropertiesQuery({
+        page: 0,
+        size: 1000
+    });
+
+    // Filter current user's properties
+    const userProperties = React.useMemo(() => {
+        if (!propertiesData?.content || !profile?.id) return [];
+        return propertiesData.content.filter(property =>
+            property.owner?.id === profile.id
+        );
+    }, [propertiesData, profile?.id]);
+
+    // Convert backend properties to frontend listing format
+    const listings: Listing[] = userProperties.map(property => ({
+        id: property.id.toString(),
+        title: property.title,
+        location: `${property.district}, ${property.city}`,
+        price: property.listingType === 'RENT'
+            ? `${property.price.toLocaleString('tr-TR')} ₺/ay`
+            : `${property.price.toLocaleString('tr-TR')} ₺`,
+        image: property.images?.[0] || '/api/placeholder/300/200',
+        status: property.active ? 'active' : 'inactive',
+        createdDate: property.createdAt,
+        views: property.viewCount || 0,
+        type: property.listingType === 'SALE' ? 'sale' : 'rent',
+        propertyType: property.propertyType === 'RESIDENTIAL' ? 'Konut' :
+                     property.propertyType === 'COMMERCIAL' ? 'Ticari' : 'Arsa'
+    }));
+
 
     const itemsPerPage = 3;
     const maxIndex = Math.max(0, listings.length - itemsPerPage);
@@ -167,8 +144,18 @@ const UserListings: React.FC = () => {
                 </div>
             </div>
 
+<<<<<<< Updated upstream
             <div>
                 {listings.length === 0 ? (
+=======
+            <CardContent>
+                {isLoading ? (
+                    <div className="text-center py-16">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-4"></div>
+                        <p className="text-stone-600">İlanlarınız yükleniyor...</p>
+                    </div>
+                ) : listings.length === 0 ? (
+>>>>>>> Stashed changes
                     <div className="text-center py-16">
                         <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
                             <Building2 className="w-12 h-12 text-amber-600" />

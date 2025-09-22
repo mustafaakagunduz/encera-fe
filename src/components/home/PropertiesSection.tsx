@@ -6,6 +6,7 @@ import { SlidersHorizontal, Map, Grid3X3, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PropertyGrid from './PropertyGrid';
 import PropertyFilterModal from './PropertyFilterModal';
+import { useGetAllPropertiesQuery } from '@/store/api/propertyApi';
 
 // Mock data - replace with actual API call
 const mockProperties = [
@@ -144,9 +145,19 @@ const PropertiesSection: React.FC = () => {
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
     const [searchQuery, setSearchQuery] = useState('');
-    const [properties, setProperties] = useState(mockProperties);
-    const [filteredProperties, setFilteredProperties] = useState(mockProperties);
-    const [loading, setLoading] = useState(false);
+    const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
+
+    // Backend'den ilanları çek - sadece ilk 50'sini al
+    const { data: propertiesData, isLoading: loading, error } = useGetAllPropertiesQuery({
+        page: 0,
+        size: 50
+    });
+
+    // Sadece Encera ilanlarını filtrele
+    const enceraProperties = React.useMemo(() => {
+        if (!propertiesData?.content) return [];
+        return propertiesData.content.filter(property => property.pappSellable === true);
+    }, [propertiesData]);
     const [filters, setFilters] = useState<FilterState>({
         propertyType: '',
         listingType: '',
@@ -164,7 +175,7 @@ const PropertiesSection: React.FC = () => {
     const applyFilters = (newFilters: FilterState) => {
         setFilters(newFilters);
 
-        let filtered = [...properties];
+        let filtered = [...enceraProperties];
 
         // Apply filters
         if (newFilters.propertyType) {
@@ -180,7 +191,7 @@ const PropertiesSection: React.FC = () => {
             filtered = filtered.filter(p => p.price <= parseInt(newFilters.maxPrice));
         }
         if (newFilters.roomCount) {
-            filtered = filtered.filter(p => p.roomCount === newFilters.roomCount);
+            filtered = filtered.filter(p => p.roomConfiguration === newFilters.roomCount);
         }
         if (newFilters.minArea) {
             filtered = filtered.filter(p => p.area >= parseInt(newFilters.minArea));
@@ -193,8 +204,9 @@ const PropertiesSection: React.FC = () => {
         if (searchQuery) {
             filtered = filtered.filter(p =>
                 p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.location.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.location.district.toLowerCase().includes(searchQuery.toLowerCase())
+                p.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.district.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.neighborhood.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
 
@@ -229,12 +241,16 @@ const PropertiesSection: React.FC = () => {
     };
 
     useEffect(() => {
-        // Simulate API call
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-    }, []);
+        // Encera ilanları yüklendiğinde filtrelenmiş listeyi güncelle
+        if (enceraProperties.length > 0) {
+            applyFilters(filters);
+        }
+    }, [enceraProperties]);
+
+    useEffect(() => {
+        // Arama sorgusu değiştiğinde filtreyi yeniden uygula
+        applyFilters(filters);
+    }, [searchQuery]);
 
     // i18n yüklenene kadar loading göster
     if (!isReady) {
@@ -243,6 +259,19 @@ const PropertiesSection: React.FC = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-center min-h-[400px]">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    // Error durumu
+    if (error) {
+        return (
+            <section className="py-16 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <p className="text-red-600">İlanlar yüklenirken bir hata oluştu.</p>
                     </div>
                 </div>
             </section>
@@ -324,7 +353,7 @@ const PropertiesSection: React.FC = () => {
                     {/* Results Count */}
                     <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
                         <span>
-                            {filteredProperties.length} ilan bulundu
+                            {loading ? 'Yükleniyor...' : `${filteredProperties.length} Encera ilanı bulundu`}
                         </span>
                         {searchQuery && (
                             <span>

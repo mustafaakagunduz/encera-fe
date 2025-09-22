@@ -9,20 +9,21 @@ interface Property {
     id: number;
     title: string;
     price: number;
-    currency: string;
-    location: {
-        city: string;
-        district: string;
-        neighborhood: string;
-    };
+    city: string;
+    district: string;
+    neighborhood: string;
     propertyType: string;
     listingType: string;
-    roomCount: string;
+    roomConfiguration: {
+        roomCount: number;
+        hallCount: number;
+        displayFormat: string;
+    };
     area: number;
     images?: string[];
     viewCount: number;
     createdAt: string;
-    isFeatured: boolean;
+    featured: boolean;
 }
 
 interface PropertyGridProps {
@@ -60,7 +61,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                     )}
 
                     {/* Featured Badge */}
-                    {property.isFeatured && (
+                    {property.featured && (
                         <div className="absolute top-3 left-3 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
                             ⭐ Premium
                         </div>
@@ -83,7 +84,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                 {/* Price */}
                 <div className="mb-3">
                     <span className="text-2xl font-bold text-gray-900">
-                        {formatPrice(property.price)} {property.currency}
+                        {formatPrice(property.price)} ₺
                     </span>
                 </div>
 
@@ -96,7 +97,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                 <div className="flex items-center gap-1 text-gray-600 mb-3">
                     <MapPin className="w-4 h-4" />
                     <span className="text-sm">
-                        {property.location.district}, {property.location.city}
+                        {property.district}, {property.city}
                     </span>
                 </div>
 
@@ -104,7 +105,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                     <div className="flex items-center gap-1">
                         <Bed className="w-4 h-4" />
-                        <span>{property.roomCount}</span>
+                        <span>{property.roomConfiguration?.displayFormat || `${property.roomConfiguration?.roomCount}+${property.roomConfiguration?.hallCount}`}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Square className="w-4 h-4" />
@@ -124,9 +125,9 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                 {/* Action Button */}
                 <Button
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => window.location.href = `/property/${property.id}`}
+                    onClick={() => window.location.href = `/house/${property.id}`}
                 >
-                    {t('common.view')} Detayları
+                    Detayları Görüntüle
                 </Button>
             </div>
         </div>

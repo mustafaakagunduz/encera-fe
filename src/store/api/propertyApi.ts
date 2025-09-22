@@ -39,6 +39,7 @@ export interface PropertyCreateRequest {
     furnished?: boolean;
     pappSellable?: boolean;
     roomConfiguration?: RoomConfiguration;
+    bathroomCount?: number;
     monthlyFee?: number;
     deposit?: number;
     buildingAge?: number;
@@ -68,6 +69,7 @@ export interface PropertyUpdateRequest {
     furnished?: boolean;
     pappSellable?: boolean;
     roomConfiguration?: RoomConfiguration;
+    bathroomCount?: number;
     monthlyFee?: number;
     deposit?: number;
     buildingAge?: number;
@@ -126,6 +128,7 @@ export interface PropertyResponse {
     pappSellable: boolean;
     furnished: boolean;
     roomConfiguration?: RoomConfiguration;
+    bathroomCount?: number;
     monthlyFee?: number;
     deposit?: number;
     active: boolean;

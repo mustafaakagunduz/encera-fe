@@ -6,10 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Edit2, Camera, MapPin, Calendar, Award, Star, Upload } from 'lucide-react';
+<<<<<<< Updated upstream
 import { useGetProfileQuery, useUploadProfilePictureMutation, useUploadProfilePictureWithOriginalMutation, useUploadCoverImageMutation, useUploadCoverImageWithOriginalMutation } from '@/store/api/userApi';
 import { useUploadProfilePictureMutation as useUploadProfilePictureFile, useUploadCoverImageMutation as useUploadCoverImageFile, useDeleteFileMutation } from '@/store/api/fileUploadApi';
 import { useAppDispatch } from '@/store/hooks';
 import { updateUser } from '@/store/slices/authSlice';
+=======
+import { useGetProfileQuery, useUploadProfilePictureMutation, useUploadCoverImageMutation, useGetReviewStatsQuery } from '@/store/api/userApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { useGetAllPropertiesQuery } from '@/store/api/propertyApi';
+import { useUploadProfilePictureMutation as useUploadProfilePictureFile, useUploadCoverImageMutation as useUploadCoverImageFile } from '@/store/api/fileUploadApi';
+>>>>>>> Stashed changes
 import ImageUploadModal from '@/components/ui/ImageUploadModal';
 import ImageCropModal from '@/components/ui/ImageCropModal';
 
@@ -25,8 +33,37 @@ const ProfileHeader: React.FC = () => {
     const [showCoverCropModal, setShowCoverCropModal] = useState(false);
 
 
+    // Get auth state for debugging
+    const { token, user: authUser } = useSelector((state: RootState) => state.auth);
+
     // Get profile data from API
     const { data: profile, isLoading, error } = useGetProfileQuery();
+
+    // Debug: console.log to see what profile data we get
+    console.log('ProfileHeader - Auth token:', token ? 'Present' : 'Missing');
+    console.log('ProfileHeader - Auth user from store:', authUser);
+    console.log('ProfileHeader - Profile API response:', profile);
+    console.log('ProfileHeader - Profile API error:', error);
+    console.log('ProfileHeader - Profile API loading:', isLoading);
+
+    // Get review stats for current user
+    const { data: reviewStats } = useGetReviewStatsQuery(profile?.id || 0, {
+        skip: !profile?.id
+    });
+
+    // Get properties to count user's listings
+    const { data: propertiesData } = useGetAllPropertiesQuery({
+        page: 0,
+        size: 1000 // Hepsini al sayım için
+    });
+
+    // Count user's properties
+    const userPropertiesCount = React.useMemo(() => {
+        if (!propertiesData?.content || !profile?.id) return 0;
+        return propertiesData.content.filter(property =>
+            property.owner?.id === profile.id
+        ).length;
+    }, [propertiesData, profile?.id]);
 
     // File upload mutations
     const [uploadProfilePictureFile] = useUploadProfilePictureFile();
@@ -332,17 +369,21 @@ const ProfileHeader: React.FC = () => {
 
     // Create user profile object from API data
     const userProfile = {
-        name: `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || t('profile.unknown-user'),
-        email: profile.email || '',
-        bio: profile.bio || t('profile.no-bio'),
-        location: profile.location || t('profile.location-not-specified'),
-        joinDate: profile.createdAt ? new Date(profile.createdAt).getFullYear().toString() : '2024',
-        totalListings: 0, // TODO: Get from properties API
-        successRate: 95, // TODO: Calculate from actual data
-        rating: 4.8, // TODO: Get from reviews API
-        profileImage: profile.profilePictureUrl || '',
-        coverImage: profile.coverImageUrl || ''
+        name: profile?.firstName && profile?.lastName
+            ? `${profile.firstName} ${profile.lastName}`
+            : profile?.firstName || profile?.lastName || t('profile.unknown-user'),
+        email: profile?.email || '',
+        bio: profile?.bio || t('profile.no-bio'),
+        location: profile?.location || t('profile.location-not-specified'),
+        joinDate: profile?.createdAt ? new Date(profile.createdAt).getFullYear().toString() : '2024',
+        totalListings: userPropertiesCount,
+        rating: reviewStats?.averageRating || 0,
+        profileImage: profile?.profilePictureUrl || '',
+        coverImage: profile?.coverImageUrl || ''
     };
+
+    // Debug: log the profile object
+    console.log('ProfileHeader - userProfile object:', userProfile);
 
     return (
         <div className="relative bg-white overflow-hidden w-full px-4 sm:px-6 lg:px-8 py-8">
@@ -468,21 +509,10 @@ const ProfileHeader: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Right Side - Edit Button */}
-                    <div className="md:mb-6">
-                        <Button
-                            onClick={() => setIsEditing(!isEditing)}
-                            size="lg"
-                            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 text-lg font-semibold"
-                        >
-                            <Edit2 className="w-5 h-5 mr-3" />
-                            {t('profile.edit-profile')}
-                        </Button>
-                    </div>
                 </div>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-12">
                     <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-8 rounded-3xl border border-blue-200/30 shadow-lg hover:shadow-xl transition-all duration-300">
                         <div className="text-center">
                             <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
@@ -490,17 +520,6 @@ const ProfileHeader: React.FC = () => {
                             </div>
                             <div className="text-slate-600 font-semibold text-lg">
                                 {t('profile.total-listings')}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-8 rounded-3xl border border-emerald-200/30 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="text-center">
-                            <div className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent mb-2">
-                                %{userProfile.successRate}
-                            </div>
-                            <div className="text-slate-600 font-semibold text-lg">
-                                {t('profile.success-rate')}
                             </div>
                         </div>
                     </div>

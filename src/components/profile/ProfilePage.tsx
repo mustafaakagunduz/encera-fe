@@ -2,11 +2,13 @@
 
 import React from 'react';
 import ProfileHeader from './ProfileHeader';
-import AccountSettings from './AccountSettings';
 import UserListings from './UserListings';
 import ProfileReviews from './ProfileReviews';
+import { useGetProfileQuery } from '@/store/api/userApi';
 
 const ProfilePage: React.FC = () => {
+    const { data: profile } = useGetProfileQuery();
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/10">
             <div className="w-full">
@@ -14,10 +16,9 @@ const ProfilePage: React.FC = () => {
                 <ProfileHeader />
 
                 {/* Reviews & Comments Section */}
-                <ProfileReviews isOwnProfile={true} profileOwnerId="1" />
-
-                {/* Settings & Account Management Section */}
-                <AccountSettings />
+                {profile?.id && (
+                    <ProfileReviews isOwnProfile={true} profileOwnerId={profile.id} />
+                )}
 
                 {/* User Listings Flow Section */}
                 <UserListings />
