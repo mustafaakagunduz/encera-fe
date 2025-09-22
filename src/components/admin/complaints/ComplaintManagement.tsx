@@ -20,36 +20,9 @@ import {
     Calendar,
     MessageSquare
 } from 'lucide-react';
-import { useGetAllComplaintsQuery, useHandleComplaintMutation } from '@/store/api/complaintApi';
+import { useGetAllComplaintsQuery, useHandleComplaintMutation, ComplaintResponse } from '@/store/api/complaintApi';
 
-interface Complaint {
-    id: number;
-    type: 'PROPERTY' | 'PROFILE';
-    reason: string;
-    description: string;
-    status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'IN_REVIEW';
-    adminNotes?: string;
-    handledAt?: string;
-    createdAt: string;
-    updatedAt: string;
-    reporter: {
-        id: number;
-        firstName: string;
-        lastName: string;
-        email: string;
-    };
-    target: {
-        id: number;
-        type: 'property' | 'user';
-        title: string;
-        url: string;
-    };
-    handledByAdmin?: {
-        id: number;
-        firstName: string;
-        lastName: string;
-    };
-}
+// Use the ComplaintResponse type from the API instead of defining a separate interface
 
 interface ComplaintStats {
     pending: number;
@@ -86,7 +59,7 @@ const reasonLabels = {
 };
 
 export function ComplaintManagement() {
-    const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
+    const [selectedComplaint, setSelectedComplaint] = useState<ComplaintResponse | null>(null);
     const [handleDialogOpen, setHandleDialogOpen] = useState(false);
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -159,7 +132,7 @@ export function ComplaintManagement() {
         }
     };
 
-    const openHandleDialog = (complaint: Complaint) => {
+    const openHandleDialog = (complaint: ComplaintResponse) => {
         setSelectedComplaint(complaint);
         setSelectedStatus('');
         setAdminNotes('');
