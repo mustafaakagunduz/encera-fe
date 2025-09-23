@@ -1,5 +1,6 @@
 // src/store/api/fileUploadApi.ts
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createBaseQueryWithAuth } from './baseQuery';
+import { createApi } from '@reduxjs/toolkit/query/react';
 
 export interface UploadResponse {
     fileUrl: string;
@@ -23,18 +24,7 @@ export interface UploadError {
 
 export const fileUploadApi = createApi({
     reducerPath: 'fileUploadApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8081/api/upload',
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as any).auth.token;
-            if (token) {
-                headers.set('authorization', `Bearer ${token}`);
-            }
-            // FormData için content-type header'ını set etmiyoruz
-            // Browser otomatik olarak multipart/form-data; boundary=... ekleyecek
-            return headers;
-        },
-    }),
+    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/upload', true),
     tagTypes: ['Upload'],
     endpoints: (builder) => ({
         // Single file upload

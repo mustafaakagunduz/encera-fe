@@ -1,5 +1,6 @@
 // src/store/api/complaintApi.ts
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createBaseQueryWithAuth } from './baseQuery';
+import { createApi } from '@reduxjs/toolkit/query/react';
 
 // Types
 export interface ComplaintCreateRequest {
@@ -57,17 +58,7 @@ export interface ComplaintHandleRequest {
 
 export const complaintApi = createApi({
     reducerPath: 'complaintApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8081/api/complaints',
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as any).auth.token;
-            if (token) {
-                headers.set('authorization', `Bearer ${token}`);
-            }
-            headers.set('content-type', 'application/json');
-            return headers;
-        },
-    }),
+    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/complaints'),
     tagTypes: ['Complaint'],
     endpoints: (builder) => ({
         createComplaint: builder.mutation<ComplaintResponse, ComplaintCreateRequest>({

@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from '@/store/store';
 import { initializeAuth } from '@/store/slices/authSlice';
 import { I18nProvider } from './I18nProvider';
+import { TokenRefreshProvider } from './TokenRefreshProvider';
 
 interface ProvidersProps {
     children: React.ReactNode;
@@ -31,7 +32,9 @@ export function Providers({ children }: ProvidersProps) {
     return (
         <Provider store={store}>
             <I18nProvider>
-                {children}
+                <TokenRefreshProvider>
+                    {children}
+                </TokenRefreshProvider>
             </I18nProvider>
         </Provider>
     );

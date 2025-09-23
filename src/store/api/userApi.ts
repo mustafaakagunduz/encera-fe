@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { createBaseQueryWithAuth } from './baseQuery';
 import { RootState } from '../store';
 
 const baseUrl = process.env.NODE_ENV === 'production'
@@ -104,16 +105,7 @@ export interface ReviewStatsResponse {
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${baseUrl}/user`,
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.token;
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: createBaseQueryWithAuth(`${baseUrl}/user`),
   tagTypes: ['User', 'Review'],
   endpoints: (builder) => ({
     // Get current user profile

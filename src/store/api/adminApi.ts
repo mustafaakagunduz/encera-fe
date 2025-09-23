@@ -1,5 +1,6 @@
 // src/store/api/adminApi.ts
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { createBaseQueryWithAuth } from './baseQuery';
 
 // Types for Admin API
 export interface UserResponse {
@@ -99,17 +100,7 @@ export interface PaginatedResponse<T> {
 
 export const adminApi = createApi({
     reducerPath: 'adminApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8081/api',
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as any).auth.token;
-            if (token) {
-                headers.set('authorization', `Bearer ${token}`);
-            }
-            headers.set('content-type', 'application/json');
-            return headers;
-        },
-    }),
+    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api'),
     tagTypes: ['AdminUsers', 'AdminProperties', 'AdminStats'],
     endpoints: (builder) => ({
         // ========== USER MANAGEMENT ==========

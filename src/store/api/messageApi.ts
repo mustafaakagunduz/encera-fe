@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { createBaseQueryWithAuth } from './baseQuery';
 
 export interface MessageRequest {
   receiverId: number;
@@ -37,16 +38,7 @@ export interface ConversationResponse {
 
 export const messageApi = createApi({
   reducerPath: 'messageApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:8081/api/messages',
-    prepareHeaders: (headers, { getState }) => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/messages'),
   tagTypes: ['Message', 'Conversation'],
   endpoints: (builder) => ({
     sendMessage: builder.mutation<MessageResponse, MessageRequest>({

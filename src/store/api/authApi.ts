@@ -1,5 +1,6 @@
 // src/store/api/authApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithRetry } from './baseQuery';
 
 // Types
 export interface RegisterRequest {
@@ -72,19 +73,22 @@ export interface ErrorResponse {
     message: string;
 }
 
+// Auth-specific base query (auth endpoints don't need token refresh)
+const authBaseQuery = fetchBaseQuery({
+    baseUrl: 'http://localhost:8081/api/auth',
+    prepareHeaders: (headers, { getState }) => {
+        const token = (getState() as any).auth.token;
+        if (token) {
+            headers.set('authorization', `Bearer ${token}`);
+        }
+        headers.set('content-type', 'application/json');
+        return headers;
+    },
+});
+
 export const authApi = createApi({
     reducerPath: 'authApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8081/api/auth',
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as any).auth.token;
-            if (token) {
-                headers.set('authorization', `Bearer ${token}`);
-            }
-            headers.set('content-type', 'application/json');
-            return headers;
-        },
-    }),
+    baseQuery: authBaseQuery,
     tagTypes: ['Auth'],
     endpoints: (builder) => ({
         register: builder.mutation<AuthResponse, RegisterRequest>({
@@ -135,19 +139,18 @@ export const authApi = createApi({
                 method: 'GET',
             }),
         }),
-        refreshToken: builder.mutation<AuthResponse, string>({
-            query: (refreshToken) => ({
+        refreshToken: builder.mutation<AuthResponse, { refreshToken: string }>({
+            query: (data) => ({
                 url: '/refresh',
                 method: 'POST',
-                headers: {
-                    'authorization': `Bearer ${refreshToken}`,
-                },
+                body: data,
             }),
         }),
-        logout: builder.mutation<{ message: string }, void>({
-            query: () => ({
+        logout: builder.mutation<{ message: string }, { refreshToken?: string }>({
+            query: (data) => ({
                 url: '/logout',
                 method: 'POST',
+                body: data,
             }),
         }),
     }),

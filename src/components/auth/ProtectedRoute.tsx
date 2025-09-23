@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { useAuth } from '@/hooks/useAuth';
+import { useTokenRefresh } from '@/hooks/useTokenRefresh';
 import { Role, roleUtils } from '@/utils/roleUtils';
 import { RootState } from '@/store/store';
 
@@ -34,6 +35,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
                                                               }) => {
     const { user, isAuthenticated } = useAuth();
     const { isHydrated } = useSelector((state: RootState) => state.auth);
+    const { tokenStatus } = useTokenRefresh();
     const router = useRouter();
 
     useEffect(() => {
@@ -44,6 +46,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
         // Authentication check
         if (requireAuth && !isAuthenticated) {
+            router.push(fallbackPath);
+            return;
+        }
+
+        // Token validity check - if authenticated but token is invalid, logout
+        if (isAuthenticated && !tokenStatus.isValid) {
+            console.log('Token is invalid, redirecting to authentication');
             router.push(fallbackPath);
             return;
         }
@@ -68,7 +77,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             router.push('/account-disabled');
             return;
         }
-    }, [isHydrated, isAuthenticated, user, requireAuth, requiredRoles, router, fallbackPath]);
+    }, [isHydrated, isAuthenticated, user, requireAuth, requiredRoles, router, fallbackPath, tokenStatus.isValid]);
 
     // Show loading while hydrating or checking authentication
     if (!isHydrated || (requireAuth && !isAuthenticated)) {
