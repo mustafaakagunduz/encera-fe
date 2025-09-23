@@ -79,6 +79,11 @@ export const ListingPreview: React.FC = () => {
 
     // Storage'dan File objelerini yükle
     React.useEffect(() => {
+        // Modal açıkken yönlendirme yapma
+        if (showPublishingModal) {
+            return;
+        }
+
         if (!previewData) {
             router.push('/create-listing');
             return;
@@ -88,7 +93,30 @@ export const ListingPreview: React.FC = () => {
         if (storageData) {
             setLocalImages(storageData.images);
         }
-    }, [previewData, router]);
+    }, [previewData, router, showPublishingModal]);
+
+    // Keyboard navigation - Hook sırasını korumak için erken return'den önce
+    React.useEffect(() => {
+        // PreviewData yoksa keyboard navigation'ı aktif etme
+        if (!previewData) {
+            return;
+        }
+
+        const handleKeyPress = (e: KeyboardEvent) => {
+            if (modalImage) {
+                if (e.key === 'Escape') {
+                    closeImageModal();
+                } else if (e.key === 'ArrowRight') {
+                    nextImage();
+                } else if (e.key === 'ArrowLeft') {
+                    prevImage();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [modalImage, currentImageIndex, localImages, previewData]);
 
     if (!previewData) {
         return null;
@@ -164,23 +192,6 @@ export const ListingPreview: React.FC = () => {
         }
     };
 
-    // Keyboard navigation
-    React.useEffect(() => {
-        const handleKeyPress = (e: KeyboardEvent) => {
-            if (modalImage) {
-                if (e.key === 'Escape') {
-                    closeImageModal();
-                } else if (e.key === 'ArrowRight') {
-                    nextImage();
-                } else if (e.key === 'ArrowLeft') {
-                    prevImage();
-                }
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyPress);
-        return () => window.removeEventListener('keydown', handleKeyPress);
-    }, [modalImage, currentImageIndex, localImages]);
 
     // Düzenle butonuna tıklayınca
     const handleEdit = () => {
@@ -279,15 +290,16 @@ export const ListingPreview: React.FC = () => {
             const createdProperty = await createProperty(finalPropertyData).unwrap();
             console.log('✅ Property created successfully:', createdProperty);
 
-            // Storage'ı ve Redux'ı hemen temizle
+            // Storage'ı temizle ama Redux'ı henüz temizleme (useEffect tetiklenmesin)
             previewStorage.clear();
-            dispatch(clearListingPreviewData());
 
             // Başarılı - modal'ı daha uzun göster, sonra güvenli yönlendirme
             setTimeout(() => {
-                // Önce window.location ile yönlendir (sayfa tamamen yenilensin)
+                // Yönlendirmeden hemen önce Redux'ı temizle
+                dispatch(clearListingPreviewData());
+                // Hemen ardından yönlendir (sayfa tamamen yenilensin)
                 window.location.href = '/my-listings';
-            }, 2000);
+            }, 3000);
 
         } catch (error) {
             console.error('❌ Listing creation error:', error);
