@@ -5,6 +5,7 @@ import { Bell, X, Check, CheckCheck } from 'lucide-react';
 import { useGetUnreadNotificationCountQuery, useGetUnreadNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '@/store/api/notificationApi';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
+import '../navbar/Navbar.css';
 
 const typeIcons = {
     COMPLAINT_APPROVED: '✅',
@@ -109,7 +110,7 @@ export function NotificationBell() {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="navbar-language-button relative"
                 aria-label="Bildirimler"
             >
                 <Bell className="w-5 h-5" />

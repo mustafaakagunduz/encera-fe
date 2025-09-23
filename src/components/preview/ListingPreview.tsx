@@ -66,8 +66,8 @@ export const ListingPreview: React.FC = () => {
         type: 'success'
     });
 
-    // Publishing modal state
-    const [showPublishingModal, setShowPublishingModal] = useState(false);
+    // Publishing state - sadece button loading için
+    const [isPublishing, setIsPublishing] = useState(false);
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setToast({ show: true, message, type });
@@ -79,8 +79,8 @@ export const ListingPreview: React.FC = () => {
 
     // Storage'dan File objelerini yükle
     React.useEffect(() => {
-        // Modal açıkken yönlendirme yapma
-        if (showPublishingModal) {
+        // Publishing işlemi sırasında yönlendirme yapma
+        if (isPublishing) {
             return;
         }
 
@@ -93,7 +93,7 @@ export const ListingPreview: React.FC = () => {
         if (storageData) {
             setLocalImages(storageData.images);
         }
-    }, [previewData, router, showPublishingModal]);
+    }, [previewData, router, isPublishing]);
 
     // Keyboard navigation - Hook sırasını korumak için erken return'den önce
     React.useEffect(() => {
@@ -200,14 +200,14 @@ export const ListingPreview: React.FC = () => {
 
     // İlanı onayla ve yayınla
     const handleConfirm = async () => {
-        if (!previewData) return;
+        if (!previewData || isPublishing) return;
 
         console.log('🚀 Starting listing creation process...');
         console.log('📋 Preview data:', previewData);
         console.log('🖼️ Local images:', localImages);
 
-        // Modal'ı göster - kullanıcıyı kitle
-        setShowPublishingModal(true);
+        // Publishing state'i başlat
+        setIsPublishing(true);
 
         try {
             let finalPropertyData = { ...previewData };
@@ -290,22 +290,18 @@ export const ListingPreview: React.FC = () => {
             const createdProperty = await createProperty(finalPropertyData).unwrap();
             console.log('✅ Property created successfully:', createdProperty);
 
-            // Storage'ı temizle ama Redux'ı henüz temizleme (useEffect tetiklenmesin)
+            // Storage ve Redux'ı temizle
             previewStorage.clear();
+            dispatch(clearListingPreviewData());
 
-            // Başarılı - modal'ı daha uzun göster, sonra güvenli yönlendirme
-            setTimeout(() => {
-                // Yönlendirmeden hemen önce Redux'ı temizle
-                dispatch(clearListingPreviewData());
-                // Hemen ardından yönlendir (sayfa tamamen yenilensin)
-                window.location.href = '/my-listings';
-            }, 3000);
+            // Success ile my-listings'e yönlendir
+            router.push('/my-listings?success=true');
 
         } catch (error) {
             console.error('❌ Listing creation error:', error);
 
-            // Hata olursa modal'ı kapat
-            setShowPublishingModal(false);
+            // Hata olursa publishing state'i kapat
+            setIsPublishing(false);
 
             showToast(
                 isReady ? t('listing.create.error') : 'İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.',
@@ -737,14 +733,17 @@ export const ListingPreview: React.FC = () => {
 
                         <Button
                             onClick={handleConfirm}
-                            disabled={isLoading || isUploadingImages}
+                            disabled={isLoading || isUploadingImages || isPublishing}
                             size="lg"
                             className="flex-1 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed hover:from-blue-700 hover:to-indigo-700"
                         >
-                            {(isLoading || isUploadingImages) ? (
+                            {(isLoading || isUploadingImages || isPublishing) ? (
                                 <>
                                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                    {isReady ? t('listing.publishing') : 'Yayınlanıyor...'}
+                                    {isPublishing
+                                        ? (isReady ? t('listing.create.submitting') : 'İlan yayınlanıyor...')
+                                        : (isReady ? t('listing.publishing') : 'Yayınlanıyor...')
+                                    }
                                 </>
                             ) : (
                                 <>
@@ -820,23 +819,6 @@ export const ListingPreview: React.FC = () => {
                 </div>
             )}
 
-            {/* Publishing Modal - Kullanıcıyı kitle */}
-            {showPublishingModal && (
-                <div
-                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(4px)' }}
-                >
-                    <div className="bg-white rounded-md shadow-2xl p-12 text-center max-w-2xl w-full mx-4 border border-gray-200">
-                        <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-600 mx-auto mb-8"></div>
-                        <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                            {isReady ? t('listing.publishing') : 'İlanınız Yayınlanıyor'}
-                        </h2>
-                        <p className="text-slate-600 text-lg">
-                            {isReady ? t('listing.create.please-wait') : 'Lütfen bekleyin, ilanınız hazırlanıyor...'}
-                        </p>
-                    </div>
-                </div>
-            )}
 
             {/* Toast Notification - En üstte görünsün */}
             {toast.show && (

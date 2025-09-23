@@ -2,7 +2,7 @@
 // src/components/user/MyListings.tsx
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useGetUserPropertiesQuery } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,16 +13,36 @@ import { MyListingsStats } from './MyListingsStats';
 import { MyListingsEmpty } from './MyListingsEmpty';
 import { Search, Plus, Filter } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Toast } from '@/components/ui/toast';
 
 export const MyListings: React.FC = () => {
     // TÜM HOOK'LARI EN BAŞTA ÇAĞIR
     const { t, isReady } = useAppTranslation();
     const { isAuthenticated } = useAuth();
     const { isHydrated } = useSelector((state: RootState) => state.auth);
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'inactive'>('all');
+
+    // Toast state
+    const [toast, setToast] = useState<{
+        show: boolean;
+        message: string;
+        type: 'success' | 'error';
+    }>({
+        show: false,
+        message: '',
+        type: 'success'
+    });
+
+    // Toast state değişim log'u
+    useEffect(() => {
+        console.log('🎯 Toast state changed:', toast);
+    }, [toast]);
 
     const { data, isLoading, error } = useGetUserPropertiesQuery({
         page: currentPage,
@@ -31,6 +51,34 @@ export const MyListings: React.FC = () => {
         // Authentication ve hydration durumu hazır olmadan query çalıştırma
         skip: !isAuthenticated || !isHydrated
     });
+
+    // Success toast functions
+    const showToast = (message: string, type: 'success' | 'error') => {
+        console.log('🔔 showToast called:', { message, type });
+        setToast({ show: true, message, type });
+        console.log('📊 Toast state updated:', { show: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast(prev => ({ ...prev, show: false }));
+    };
+
+    // Success URL parameter kontrolü
+    useEffect(() => {
+        const success = searchParams.get('success');
+        console.log('🔍 MyListings useEffect triggered:', { success, isReady });
+
+        if (success === 'true') {
+            console.log('✅ Success parameter found, showing toast');
+            const message = isReady ? t('listing.create.success') : 'İlanınız başarıyla oluşturuldu!';
+            console.log('📝 Toast message:', message);
+
+            showToast(message, 'success');
+
+            // URL'i temizle
+            router.replace('/my-listings');
+        }
+    }, [searchParams, router, isReady, t]);
 
     // DATA PROCESSING - Hook'lardan sonra
     const properties = data?.content || [];
@@ -161,6 +209,18 @@ export const MyListings: React.FC = () => {
                 />
 
             </div>
+
+            {/* Toast Notification */}
+            {toast.show && (
+                <div className="fixed top-4 right-4 z-50">
+                    <Toast
+                        show={toast.show}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={hideToast}
+                    />
+                </div>
+            )}
         </div>
     );
 };
