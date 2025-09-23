@@ -175,9 +175,28 @@ export const FavoritesPage: React.FC = () => {
                                 key={property.id}
                                 className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
                             >
-                                {/* Property Image Placeholder */}
-                                <div className="aspect-video bg-gray-100 relative">
-                                    <div className="absolute inset-0 flex items-center justify-center">
+                                {/* Property Image */}
+                                <div className="aspect-video bg-gray-100 relative overflow-hidden">
+                                    {property.primaryImageUrl || (property.imageUrls && property.imageUrls.length > 0) ? (
+                                        <img
+                                            src={property.primaryImageUrl || property.imageUrls[0]}
+                                            alt={property.title}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = 'none';
+                                                const fallback = e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement;
+                                                if (fallback) {
+                                                    fallback.style.display = 'flex';
+                                                }
+                                            }}
+                                        />
+                                    ) : null}
+                                    <div
+                                        className="fallback-icon absolute inset-0 flex items-center justify-center"
+                                        style={{
+                                            display: (property.primaryImageUrl || (property.imageUrls && property.imageUrls.length > 0)) ? 'none' : 'flex'
+                                        }}
+                                    >
                                         <Building className="w-12 h-12 text-gray-300" />
                                     </div>
 
