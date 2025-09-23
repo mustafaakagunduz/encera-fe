@@ -107,7 +107,13 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!user || !newComment.trim() || newComment.trim().length < 10) return;
+
+        if (!user) return;
+
+        if (!newComment.trim() || newComment.trim().length < 10) {
+            alert(isReady ? t('property-detail.min-10-chars') : 'En az 10 karakter girmelisiniz.');
+            return;
+        }
 
         try {
             await addComment({
@@ -774,121 +780,170 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 </p>
                             </div>
                         ) : (
-                            <form onSubmit={handleCommentSubmit} className="space-y-8">
-                            {/* Rating Section */}
-                            <div>
-                                <label className="block text-lg font-semibold text-gray-900 mb-4">
-                                    {isReady ? t('property-detail.evaluation') : 'Değerlendirme'}
-                                </label>
-                                <div className="flex items-center gap-2">
-                                    <div className="flex items-center gap-1">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <button
-                                                key={star}
-                                                type="button"
-                                                onClick={() => setNewRating(star)}
-                                                className={`w-8 h-8 transition-all duration-200 hover:scale-110 ${
-                                                    star <= newRating
-                                                        ? 'text-amber-400 hover:text-amber-500'
-                                                        : 'text-gray-300 hover:text-amber-300'
-                                                }`}
-                                            >
-                                                <Star className={`w-8 h-8 ${star <= newRating ? 'fill-current' : ''}`} />
-                                            </button>
-                                        ))}
-                                    </div>
-                                    <div className="ml-4 px-3 py-1 bg-amber-50 rounded-full">
-                                        <span className="text-sm font-medium text-amber-700">
-                                            {newRating}/5 {isReady ? t('property-detail.stars') : 'Yıldız'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
+                            <form onSubmit={handleCommentSubmit} className="space-y-6">
                             {/* Comment Section */}
-                            <div>
-                                <label className="block text-lg font-semibold text-gray-900 mb-4">
+                            <div className="py-6">
+                                <h3 className="text-lg font-medium text-gray-900 mb-4">
                                     {isReady ? t('property-detail.your-comment') : 'Yorumunuz'}
-                                </label>
-                                <textarea
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                    rows={4}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
-                                    placeholder={isReady ? t('property-detail.comment-placeholder-detail') : 'İlan hakkındaki düşüncelerinizi detaylıca paylaşın...'}
-                                    required
-                                />
-                                <div className="text-sm text-gray-500 mt-2">
-                                    {newComment.length}/1000 {isReady ? t('property-detail.char-limit') : 'karakter'} {newComment.length < 10 && (isReady ? t('property-detail.min-10-chars') : '(en az 10 karakter gerekli)')}
+                                </h3>
+
+                                <div className="relative">
+                                    <textarea
+                                        value={newComment}
+                                        onChange={(e) => setNewComment(e.target.value)}
+                                        rows={3}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none text-sm"
+                                        placeholder={isReady ? t('property-detail.comment-placeholder-detail') : 'İlan hakkındaki düşüncelerinizi paylaşın...'}
+                                        required
+                                        maxLength={1000}
+                                    />
+                                </div>
+
+                                <div className="flex justify-between items-center mt-2">
+                                    {/* Star Rating in bottom left */}
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setNewRating(star)}
+                                                    className="transition-all duration-200 hover:scale-105"
+                                                >
+                                                    <Star
+                                                        className={`w-5 h-5 transition-colors duration-200 ${
+                                                            star <= newRating
+                                                                ? 'text-amber-400 fill-current'
+                                                                : 'text-gray-300 hover:text-amber-300'
+                                                        }`}
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Rating Display */}
+                                        <div className="flex items-center gap-1 text-xs text-gray-600">
+                                            <span className="font-medium">{newRating}.0</span>
+                                            <span>
+                                                {newRating === 1 && 'Çok Kötü'}
+                                                {newRating === 2 && 'Kötü'}
+                                                {newRating === 3 && 'Orta'}
+                                                {newRating === 4 && 'İyi'}
+                                                {newRating === 5 && 'Mükemmel'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="text-xs text-gray-500">
+                                        {newComment.length}/1000
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Submit Button */}
-                            <button
-                                type="submit"
-                                disabled={isSubmittingComment || !newComment.trim() || newComment.trim().length < 10}
-                                className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <MessageCircle className="w-5 h-5 mr-2 inline" />
-                                {isSubmittingComment ? (isReady ? t('property-detail.submitting') : 'Gönderiliyor...') : (isReady ? t('property-detail.add-comment') : 'Yorum Ekle')}
-                            </button>
+                            <div className="flex justify-center pt-2">
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingComment || !newComment.trim()}
+                                    className="px-5 py-2 bg-blue-600 text-white font-medium text-sm rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                                >
+                                    {isSubmittingComment ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            <span>{isReady ? t('property-detail.submitting') : 'Gönderiliyor...'}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <MessageCircle className="w-4 h-4" />
+                                            <span>{isReady ? t('property-detail.add-comment') : 'Değerlendirmeyi Gönder'}</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </form>
                         )}
 
-                        {/* Comments List */}
-                        <div className="mt-12">
-                            <div className="flex items-center gap-2 mb-6">
-                                <h3 className="text-xl font-semibold text-gray-900">
-                                    {isReady ? t('property-detail.other-comments') : 'Diğer Yorumlar'}
-                                </h3>
-                                <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-medium rounded-full">
-                                    {commentsData?.totalElements || 0} {isReady ? t('property-detail.comments-count') : 'yorum'}
-                                </span>
-                                {ratingData && ratingData.totalComments > 0 && (
-                                    <div className="flex items-center gap-1 ml-2">
-                                        <Star className="w-4 h-4 text-amber-400 fill-current" />
-                                        <span className="text-sm font-medium text-gray-700">
-                                            {ratingData.averageRating.toFixed(1)}
-                                        </span>
+                        {/* Clean Comments List */}
+                        <div className="mt-12 pt-8 border-t border-gray-100">
+                            {/* Comments Header */}
+                            <div className="flex items-center justify-between mb-8">
+                                <div>
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                        {isReady ? t('property-detail.other-comments') : 'Diğer Yorumlar'}
+                                    </h3>
+                                    <p className="text-sm text-gray-600">
+                                        Kullanıcı deneyimleri ve değerlendirmeleri
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center space-x-6 text-sm text-gray-600">
+                                    <div className="text-center">
+                                        <div className="font-semibold text-gray-900">
+                                            {commentsData?.totalElements || 0}
+                                        </div>
+                                        <div>{isReady ? t('property-detail.comments-count') : 'yorum'}</div>
                                     </div>
-                                )}
+
+                                    {ratingData && ratingData.totalComments > 0 && (
+                                        <div className="text-center">
+                                            <div className="flex items-center space-x-1 justify-center mb-1">
+                                                <Star className="w-4 h-4 text-amber-400 fill-current" />
+                                                <span className="font-semibold text-gray-900">
+                                                    {ratingData.averageRating.toFixed(1)}
+                                                </span>
+                                            </div>
+                                            <div>ortalama</div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             {commentsLoading ? (
-                                <div className="flex justify-center py-8">
-                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                <div className="flex flex-col items-center py-12">
+                                    <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                                    <p className="text-gray-600">Yorumlar yükleniyor...</p>
                                 </div>
                             ) : commentsData && commentsData.content.length > 0 ? (
                                 <div className="space-y-6">
                                     {commentsData.content.map((comment) => (
                                         <div key={comment.id} className="pb-6 border-b border-gray-100 last:border-b-0">
-                                            <div className="flex items-start gap-4">
+                                            <div className="flex items-start space-x-4">
+                                                {/* Simple Avatar */}
                                                 <div className="flex-shrink-0">
-                                                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                                    <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
                                                         <span className="text-white font-semibold text-sm">
                                                             {comment.userFirstName.charAt(0)}{comment.userLastName.charAt(0)}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="flex-1">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <div className="flex items-center gap-3">
+
+                                                <div className="flex-1 min-w-0">
+                                                    {/* Header */}
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <div className="flex items-center space-x-3">
                                                             <h5 className="font-semibold text-gray-900">
                                                                 {comment.userFirstName} {comment.userLastName}
                                                             </h5>
-                                                            <div className="flex items-center gap-1">
+
+                                                            {/* Simple Star Rating */}
+                                                            <div className="flex items-center space-x-1">
                                                                 {[1, 2, 3, 4, 5].map((star) => (
                                                                     <Star
                                                                         key={star}
                                                                         className={`w-4 h-4 ${
-                                                                            star <= comment.rating ? 'text-amber-400 fill-current' : 'text-gray-300'
+                                                                            star <= comment.rating
+                                                                                ? 'text-amber-400 fill-current'
+                                                                                : 'text-gray-300'
                                                                         }`}
                                                                     />
                                                                 ))}
-                                                                <span className="text-sm text-gray-500 ml-1">{comment.rating}.0</span>
+                                                                <span className="text-sm text-gray-500 ml-1">
+                                                                    {comment.rating}.0
+                                                                </span>
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center gap-2">
+
+                                                        <div className="flex items-center space-x-3">
                                                             <span className="text-sm text-gray-500">
                                                                 {new Date(comment.createdAt).toLocaleDateString('tr-TR')}
                                                             </span>
@@ -903,22 +958,29 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <p className="text-gray-700 leading-relaxed">
-                                                        {comment.comment}
-                                                    </p>
+
+                                                    {/* Comment Content */}
+                                                    <div className="mt-2">
+                                                        <p className="text-gray-700 leading-relaxed">
+                                                            {comment.comment}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8">
+                                <div className="text-center py-12">
                                     <div className="inline-flex items-center gap-2 text-gray-500">
-                                        <MessageCircle className="w-4 h-4" />
+                                        <MessageCircle className="w-5 h-5" />
                                         <span className="text-sm font-medium">
-                                            {isReady ? t('property-detail.no-comments-yet') : 'Henüz yorum bulunmuyor.'}
+                                            {isReady ? t('property-detail.no-comments-yet') : 'Henüz yorum bulunmuyor'}
                                         </span>
                                     </div>
+                                    <p className="text-gray-600 text-sm mt-2">
+                                        Bu ilan hakkında ilk değerlendirmeyi siz yapın!
+                                    </p>
                                 </div>
                             )}
                         </div>
