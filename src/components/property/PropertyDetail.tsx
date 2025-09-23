@@ -185,6 +185,34 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
         }
     };
 
+    const getHeatingTypeText = (heatingType: string) => {
+        if (!isReady) {
+            // Fallback Turkish translations when translations are not ready
+            const fallbackTranslations: { [key: string]: string } = {
+                'none': 'Yok',
+                'stove': 'Soba',
+                'natural-gas-stove': 'Doğalgaz Sobası',
+                'floor-heating': 'Yerden Isıtma',
+                'central': 'Merkezi',
+                'central-share': 'Merkezi (Pay Ölçer)',
+                'combi-natural-gas': 'Kombi (Doğalgaz)',
+                'combi-electric': 'Kombi (Elektrikli)',
+                'underfloor-heating': 'Yerden Isıtma',
+                'air-conditioning': 'Klima',
+                'fancoil': 'Fancoil',
+                'solar-energy': 'Güneş Enerjisi',
+                'electric-radiator': 'Elektrikli Radyatör',
+                'geothermal': 'Jeotermal',
+                'fireplace': 'Şömine',
+                'vrv': 'VRV Sistem',
+                'heat-pump': 'Isı Pompası'
+            };
+            return fallbackTranslations[heatingType] || heatingType;
+        }
+
+        return t(`heating.options.${heatingType}`, { defaultValue: heatingType });
+    };
+
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('tr-TR', {
             style: 'currency',
@@ -354,7 +382,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 <div className="flex items-start">
                                     <MapPin className="w-5 h-5 mr-3 text-gray-400 mt-0.5" />
                                     <div>
-                                        <div className="font-medium text-gray-900 mb-1">Konum</div>
+                                        <div className="font-medium text-gray-900 mb-1">{isReady ? t('property-detail.location') : 'Konum'}</div>
                                         <div className="text-gray-600">
                                             {property.neighborhood}, {property.district}, {property.city}
                                         </div>
@@ -364,13 +392,13 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
                             {/* Key Features */}
                             <div className="mb-6 pb-6 border-b border-gray-100">
-                                <div className="font-medium text-gray-900 mb-4">Temel Özellikler</div>
+                                <div className="font-medium text-gray-900 mb-4">{isReady ? t('property-detail.key-features') : 'Temel Özellikler'}</div>
                                 <div className="space-y-4">
                                     {property.grossArea && (
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <Square className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">Brüt Alan</span>
+                                                <span className="text-gray-600">{isReady ? t('property-detail.gross-area') : 'Brüt Alan'}</span>
                                             </div>
                                             <span className="font-medium text-gray-900">{property.grossArea} m²</span>
                                         </div>
@@ -379,7 +407,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <Square className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">Net Alan</span>
+                                                <span className="text-gray-600">{isReady ? t('property-detail.net-area') : 'Net Alan'}</span>
                                             </div>
                                             <span className="font-medium text-gray-900">{property.netArea} m²</span>
                                         </div>
@@ -388,7 +416,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <Home className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">Oda Sayısı</span>
+                                                <span className="text-gray-600">{isReady ? t('property-detail.room-count') : 'Oda Sayısı'}</span>
                                             </div>
                                             <span className="font-medium text-gray-900">
                                                 {property.roomConfiguration.roomCount}+{property.roomConfiguration.hallCount}
@@ -399,7 +427,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <Coffee className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">Banyo Sayısı</span>
+                                                <span className="text-gray-600">{isReady ? t('property-detail.bathroom-count') : 'Banyo Sayısı'}</span>
                                             </div>
                                             <span className="font-medium text-gray-900">{property.bathroomCount}</span>
                                         </div>
@@ -408,27 +436,27 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <Calendar className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">Bina Yaşı</span>
+                                                <span className="text-gray-600">{isReady ? t('property-detail.building-age') : 'Bina Yaşı'}</span>
                                             </div>
-                                            <span className="font-medium text-gray-900">{property.buildingAge} yıl</span>
+                                            <span className="font-medium text-gray-900">{property.buildingAge} {isReady ? t('property-detail.years-old') : 'yıl'}</span>
                                         </div>
                                     )}
                                     {(property.currentFloor !== undefined && property.currentFloor !== null) && (
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <TrendingUp className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">Bulunduğu Kat</span>
+                                                <span className="text-gray-600">{isReady ? t('property-detail.current-floor') : 'Bulunduğu Kat'}</span>
                                             </div>
-                                            <span className="font-medium text-gray-900">{property.currentFloor}. kat</span>
+                                            <span className="font-medium text-gray-900">{property.currentFloor}. {isReady ? t('property-detail.floor') : 'kat'}</span>
                                         </div>
                                     )}
                                     {(property.totalFloors !== undefined && property.totalFloors !== null) && (
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <TrendingUp className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">Toplam Kat</span>
+                                                <span className="text-gray-600">{isReady ? t('property-detail.total-floors') : 'Toplam Kat'}</span>
                                             </div>
-                                            <span className="font-medium text-gray-900">{property.totalFloors} kat</span>
+                                            <span className="font-medium text-gray-900">{property.totalFloors} {isReady ? t('property-detail.floors') : 'kat'}</span>
                                         </div>
                                     )}
                                 </div>
@@ -439,7 +467,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center">
                                         <Eye className="w-4 h-4 mr-2" />
-                                        <span>{property.viewCount} görüntülenme</span>
+                                        <span>{property.viewCount} {isReady ? t('property-detail.view-count') : 'görüntülenme'}</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center">
@@ -458,7 +486,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         {/* Contact Details */}
                         <div>
                             <h3 className="font-semibold text-gray-900 mb-6 text-lg">
-                                {isOwner ? 'İlan Bilgileri' : 'İletişim Bilgileri'}
+                                {isOwner ? (isReady ? t('property-detail.listing-info') : 'İlan Bilgileri') : (isReady ? t('property-detail.contact-info') : 'İletişim Bilgileri')}
                             </h3>
 
                             <div className="space-y-4">
@@ -476,11 +504,11 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                             )}
                                             {isOwner && (
                                                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                                                    Siz
+                                                    {isReady ? t('property-detail.you') : 'Siz'}
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="text-sm text-gray-500">İlan Sahibi</div>
+                                        <div className="text-sm text-gray-500">{isReady ? t('property-detail.listing-owner') : 'İlan Sahibi'}</div>
                                     </div>
                                 </div>
 
@@ -490,9 +518,9 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     </div>
                                     <div>
                                         <div className="font-medium text-gray-900">
-                                            {isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber || 'Telefon bulunamadı'}
+                                            {isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber || (isReady ? t('property-detail.phone-not-found') : 'Telefon bulunamadı')}
                                         </div>
-                                        <div className="text-sm text-gray-500">Telefon Numarası</div>
+                                        <div className="text-sm text-gray-500">{isReady ? t('property-detail.phone-number') : 'Telefon Numarası'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -501,7 +529,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         {/* Action Buttons */}
                         <div>
                             <h3 className="font-semibold text-gray-900 mb-6 text-lg">
-                                {isOwner ? 'İlan Yönetimi' : 'İletişime Geç'}
+                                {isOwner ? (isReady ? t('property-detail.listing-management') : 'İlan Yönetimi') : (isReady ? t('property-detail.get-in-touch') : 'İletişime Geç')}
                             </h3>
 
                             <div className="space-y-4">
@@ -512,7 +540,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                             className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
                                         >
                                             <Phone className="w-4 h-4 mr-2" />
-                                            Hemen Ara
+                                            {isReady ? t('property-detail.call-now') : 'Hemen Ara'}
                                         </a>
 
                                         <Link
@@ -520,7 +548,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                             className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg"
                                         >
                                             <MessageSquare className="w-4 h-4 mr-2" />
-                                            Mesaj Gönder
+                                            {isReady ? t('property-detail.send-message') : 'Mesaj Gönder'}
                                         </Link>
                                     </>
                                 ) : (
@@ -530,12 +558,12 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                             className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors rounded-lg border border-blue-200"
                                         >
                                             <Eye className="w-4 h-4 mr-2" />
-                                            Tüm İlanlarım
+                                            {isReady ? t('property-detail.all-my-listings') : 'Tüm İlanlarım'}
                                         </Link>
 
                                         <div className="bg-gray-50 rounded-lg p-4">
                                             <div className="text-sm text-gray-600">
-                                                Bu sizin ilanınız. Düzenlemek veya silmek için yukarıdaki butonları kullanabilirsiniz.
+                                                {isReady ? t('property-detail.owner-note') : 'Bu sizin ilanınız. Düzenlemek veya silmek için yukarıdaki butonları kullanabilirsiniz.'}
                                             </div>
                                         </div>
                                     </>
@@ -547,40 +575,40 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
                 {/* Property Details Section */}
                 <div className="mt-12 pt-8 border-t border-gray-100">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-8">İlan Detayları</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-8">{isReady ? t('property-detail.property-details') : 'İlan Detayları'}</h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                         {/* Left Column - Basic Info */}
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-6">Temel Bilgiler</h3>
+                            <h3 className="font-semibold text-gray-900 mb-6">{isReady ? t('property-detail.basic-info') : 'Temel Bilgiler'}</h3>
                             <div className="space-y-4">
                                 {property.listingType && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">İlan Türü</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.listing-type') : 'İlan Türü'}</span>
                                         <span className="font-medium text-gray-900">{getListingTypeText(property.listingType)}</span>
                                     </div>
                                 )}
                                 {property.propertyType && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Emlak Türü</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.property-type') : 'Emlak Türü'}</span>
                                         <span className="font-medium text-gray-900">{getPropertyTypeText(property.propertyType)}</span>
                                     </div>
                                 )}
                                 {property.grossArea && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Brüt Alan</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.gross-area') : 'Brüt Alan'}</span>
                                         <span className="font-medium text-gray-900">{property.grossArea} m²</span>
                                     </div>
                                 )}
                                 {property.netArea && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Net Alan</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.net-area') : 'Net Alan'}</span>
                                         <span className="font-medium text-gray-900">{property.netArea} m²</span>
                                     </div>
                                 )}
                                 {property.roomConfiguration && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Oda Sayısı</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.room-count') : 'Oda Sayısı'}</span>
                                         <span className="font-medium text-gray-900">
                                             {property.roomConfiguration.roomCount}+{property.roomConfiguration.hallCount}
                                         </span>
@@ -588,50 +616,52 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 )}
                                 {property.bathroomCount !== undefined && property.bathroomCount !== null && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Banyo Sayısı</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.bathroom-count') : 'Banyo Sayısı'}</span>
                                         <span className="font-medium text-gray-900">{property.bathroomCount}</span>
                                     </div>
                                 )}
                                 {property.buildingAge !== undefined && property.buildingAge !== null && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Bina Yaşı</span>
-                                        <span className="font-medium text-gray-900">{property.buildingAge} yıl</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.building-age') : 'Bina Yaşı'}</span>
+                                        <span className="font-medium text-gray-900">{property.buildingAge} {isReady ? t('property-detail.years-old') : 'yıl'}</span>
                                     </div>
                                 )}
                                 {property.totalFloors !== undefined && property.totalFloors !== null && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Toplam Kat Sayısı</span>
-                                        <span className="font-medium text-gray-900">{property.totalFloors} kat</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.total-floors') : 'Toplam Kat Sayısı'}</span>
+                                        <span className="font-medium text-gray-900">{property.totalFloors} {isReady ? t('property-detail.floors') : 'kat'}</span>
                                     </div>
                                 )}
                                 {property.currentFloor !== undefined && property.currentFloor !== null && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Bulunduğu Kat</span>
-                                        <span className="font-medium text-gray-900">{property.currentFloor}. kat</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.current-floor') : 'Bulunduğu Kat'}</span>
+                                        <span className="font-medium text-gray-900">{property.currentFloor}. {isReady ? t('property-detail.floor') : 'kat'}</span>
                                     </div>
                                 )}
                                 {property.heatingTypes && property.heatingTypes.length > 0 && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Isıtma Türü</span>
-                                        <span className="font-medium text-gray-900">{property.heatingTypes.join(', ')}</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.heating-type') : 'Isıtma Türü'}</span>
+                                        <span className="font-medium text-gray-900">
+                                            {property.heatingTypes.map(getHeatingTypeText).join(', ')}
+                                        </span>
                                     </div>
                                 )}
                                 {property.monthlyFee && property.monthlyFee > 0 && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Aidat</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.monthly-fee') : 'Aidat'}</span>
                                         <span className="font-medium text-gray-900">{formatPrice(property.monthlyFee)}</span>
                                     </div>
                                 )}
                                 {property.deposit && property.deposit > 0 && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Depozito</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.deposit') : 'Depozito'}</span>
                                         <span className="font-medium text-gray-900">{formatPrice(property.deposit)}</span>
                                     </div>
                                 )}
                                 {property.negotiable && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">Pazarlık</span>
-                                        <span className="font-medium text-green-600">Yapılabilir</span>
+                                        <span className="text-gray-600">{isReady ? t('property-detail.negotiable') : 'Pazarlık'}</span>
+                                        <span className="font-medium text-green-600">{isReady ? t('listing.negotiable') : 'Yapılabilir'}</span>
                                     </div>
                                 )}
                             </div>
@@ -639,53 +669,53 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
                         {/* Right Column - Features */}
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-6">Özellikler</h3>
+                            <h3 className="font-semibold text-gray-900 mb-6">{isReady ? t('property-detail.features') : 'Özellikler'}</h3>
                             <div className="grid grid-cols-1 gap-3">
                                 {property.elevator && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
                                         <Briefcase className="w-4 h-4 mr-2 text-green-600" />
-                                        <span className="text-sm text-green-800 font-medium">Asansör</span>
+                                        <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.elevator') : 'Asansör'}</span>
                                     </div>
                                 )}
                                 {property.parking && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
                                         <Car className="w-4 h-4 mr-2 text-green-600" />
-                                        <span className="text-sm text-green-800 font-medium">Otopark</span>
+                                        <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.parking') : 'Otopark'}</span>
                                     </div>
                                 )}
                                 {property.balcony && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
                                         <Home className="w-4 h-4 mr-2 text-green-600" />
-                                        <span className="text-sm text-green-800 font-medium">Balkon</span>
+                                        <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.balcony') : 'Balkon'}</span>
                                     </div>
                                 )}
                                 {property.security && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
                                         <Shield className="w-4 h-4 mr-2 text-green-600" />
-                                        <span className="text-sm text-green-800 font-medium">Güvenlik</span>
+                                        <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.security') : 'Güvenlik'}</span>
                                     </div>
                                 )}
                                 {property.furnished && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
                                         <Coffee className="w-4 h-4 mr-2 text-green-600" />
-                                        <span className="text-sm text-green-800 font-medium">Eşyalı</span>
+                                        <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.furnished') : 'Eşyalı'}</span>
                                     </div>
                                 )}
                                 {property.featured && (
                                     <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
                                         <Star className="w-4 h-4 mr-2 text-yellow-600" />
-                                        <span className="text-sm text-yellow-800 font-medium">VIP İlan</span>
+                                        <span className="text-sm text-yellow-800 font-medium">{isReady ? t('property-detail.vip-listing') : 'VIP İlan'}</span>
                                     </div>
                                 )}
                                 {property.pappSellable && (
                                     <div className="flex items-center p-3 bg-blue-50 rounded-lg">
                                         <CheckCircle className="w-4 h-4 mr-2 text-blue-600" />
-                                        <span className="text-sm text-blue-800 font-medium">Encera Garantili</span>
+                                        <span className="text-sm text-blue-800 font-medium">{isReady ? t('property-detail.encera-guaranteed') : 'Encera Garantili'}</span>
                                     </div>
                                 )}
                                 {!property.elevator && !property.parking && !property.balcony && !property.security && !property.furnished && !property.featured && !property.pappSellable && (
                                     <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                                        <span className="text-sm text-gray-600">Özel özellik bulunmuyor</span>
+                                        <span className="text-sm text-gray-600">{isReady ? t('property-detail.no-special-features') : 'Özel özellik bulunmuyor'}</span>
                                     </div>
                                 )}
                             </div>
@@ -695,7 +725,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                     {/* Description */}
                     {property.description && (
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-4">Açıklama</h3>
+                            <h3 className="font-semibold text-gray-900 mb-4">{isReady ? t('property-detail.description') : 'Açıklama'}</h3>
                             <div className="bg-gray-50 rounded-lg p-6">
                                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                                     {property.description}
@@ -714,7 +744,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 <MessageCircle className="w-5 h-5 text-white" />
                             </div>
                             <h2 className="text-2xl font-bold text-gray-900">
-                                Yorum ve Değerlendirme
+                                {isReady ? t('property-detail.comments-and-rating') : 'Yorum ve Değerlendirme'}
                             </h2>
                         </div>
 
@@ -722,25 +752,25 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         {isOwner ? (
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
                                 <div className="text-blue-600 mb-2 text-lg font-medium">
-                                    📝 İlan Sahibi
+                                    📝 {isReady ? t('property-detail.owner-cannot-comment') : 'İlan Sahibi'}
                                 </div>
                                 <p className="text-blue-700 text-sm">
-                                    Bu sizin ilanınız. Kendi ilanınıza değerlendirme yapamazsınız.
+                                    {isReady ? t('property-detail.owner-cannot-comment-desc') : 'Bu sizin ilanınız. Kendi ilanınıza değerlendirme yapamazsınız.'}
                                 </p>
                                 <p className="text-blue-600 text-xs mt-1">
-                                    Aşağıda diğer kullanıcıların değerlendirmelerini görebilirsiniz.
+                                    {isReady ? t('property-detail.owner-can-see-reviews') : 'Aşağıda diğer kullanıcıların değerlendirmelerini görebilirsiniz.'}
                                 </p>
                             </div>
                         ) : userHasCommented ? (
                             <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                                 <div className="text-green-600 mb-2 text-lg font-medium">
-                                    ✓ Değerlendirme Tamamlandı
+                                    ✓ {isReady ? t('property-detail.evaluation-completed') : 'Değerlendirme Tamamlandı'}
                                 </div>
                                 <p className="text-green-700 text-sm">
-                                    Bu ilan hakkında daha önce değerlendirme yapmışsınız.
+                                    {isReady ? t('property-detail.already-reviewed') : 'Bu ilan hakkında daha önce değerlendirme yapmışsınız.'}
                                 </p>
                                 <p className="text-green-600 text-xs mt-1">
-                                    Her ilan için sadece bir değerlendirme yapabilirsiniz.
+                                    {isReady ? t('property-detail.one-review-per-listing') : 'Her ilan için sadece bir değerlendirme yapabilirsiniz.'}
                                 </p>
                             </div>
                         ) : (
@@ -748,7 +778,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             {/* Rating Section */}
                             <div>
                                 <label className="block text-lg font-semibold text-gray-900 mb-4">
-                                    Değerlendirme
+                                    {isReady ? t('property-detail.evaluation') : 'Değerlendirme'}
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <div className="flex items-center gap-1">
@@ -769,7 +799,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     </div>
                                     <div className="ml-4 px-3 py-1 bg-amber-50 rounded-full">
                                         <span className="text-sm font-medium text-amber-700">
-                                            {newRating}/5 Yıldız
+                                            {newRating}/5 {isReady ? t('property-detail.stars') : 'Yıldız'}
                                         </span>
                                     </div>
                                 </div>
@@ -778,18 +808,18 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             {/* Comment Section */}
                             <div>
                                 <label className="block text-lg font-semibold text-gray-900 mb-4">
-                                    Yorumunuz
+                                    {isReady ? t('property-detail.your-comment') : 'Yorumunuz'}
                                 </label>
                                 <textarea
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
                                     rows={4}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
-                                    placeholder="İlan hakkındaki düşüncelerinizi detaylıca paylaşın..."
+                                    placeholder={isReady ? t('property-detail.comment-placeholder-detail') : 'İlan hakkındaki düşüncelerinizi detaylıca paylaşın...'}
                                     required
                                 />
                                 <div className="text-sm text-gray-500 mt-2">
-                                    {newComment.length}/1000 karakter {newComment.length < 10 && '(en az 10 karakter gerekli)'}
+                                    {newComment.length}/1000 {isReady ? t('property-detail.char-limit') : 'karakter'} {newComment.length < 10 && (isReady ? t('property-detail.min-10-chars') : '(en az 10 karakter gerekli)')}
                                 </div>
                             </div>
 
@@ -800,7 +830,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <MessageCircle className="w-5 h-5 mr-2 inline" />
-                                {isSubmittingComment ? 'Gönderiliyor...' : 'Yorum Ekle'}
+                                {isSubmittingComment ? (isReady ? t('property-detail.submitting') : 'Gönderiliyor...') : (isReady ? t('property-detail.add-comment') : 'Yorum Ekle')}
                             </button>
                         </form>
                         )}
@@ -809,10 +839,10 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         <div className="mt-12">
                             <div className="flex items-center gap-2 mb-6">
                                 <h3 className="text-xl font-semibold text-gray-900">
-                                    Diğer Yorumlar
+                                    {isReady ? t('property-detail.other-comments') : 'Diğer Yorumlar'}
                                 </h3>
                                 <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-medium rounded-full">
-                                    {commentsData?.totalElements || 0} yorum
+                                    {commentsData?.totalElements || 0} {isReady ? t('property-detail.comments-count') : 'yorum'}
                                 </span>
                                 {ratingData && ratingData.totalComments > 0 && (
                                     <div className="flex items-center gap-1 ml-2">
@@ -886,7 +916,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     <div className="inline-flex items-center gap-2 text-gray-500">
                                         <MessageCircle className="w-4 h-4" />
                                         <span className="text-sm font-medium">
-                                            Henüz yorum bulunmuyor.
+                                            {isReady ? t('property-detail.no-comments-yet') : 'Henüz yorum bulunmuyor.'}
                                         </span>
                                     </div>
                                 </div>
@@ -912,7 +942,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                             <CheckCircle className="w-4 h-4 text-blue-500" />
                                         )}
                                     </div>
-                                    <div className="text-sm text-gray-500">Gayrimenkul Uzmanı</div>
+                                    <div className="text-sm text-gray-500">{isReady ? t('property-detail.real-estate-expert') : 'Gayrimenkul Uzmanı'}</div>
                                 </div>
                             </div>
 
@@ -920,7 +950,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
                                 className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
                             >
-                                Profili Görüntüle →
+                                {isReady ? t('property-detail.view-profile') : 'Profili Görüntüle'} →
                             </Link>
                         </div>
                     </div>
