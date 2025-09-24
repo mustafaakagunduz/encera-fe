@@ -179,7 +179,7 @@ export const FavoritesPage: React.FC = () => {
                                 <div className="aspect-video bg-gray-100 relative overflow-hidden">
                                     {property.primaryImageUrl || (property.imageUrls && property.imageUrls.length > 0) ? (
                                         <img
-                                            src={property.primaryImageUrl || property.imageUrls[0]}
+                                            src={property.primaryImageUrl || property.imageUrls?.[0]}
                                             alt={property.title}
                                             className="w-full h-full object-cover"
                                             onError={(e) => {

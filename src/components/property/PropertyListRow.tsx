@@ -233,11 +233,6 @@ export const PropertyListRow: React.FC<PropertyListRowProps> = ({
                             <div className="text-lg sm:text-xl font-bold text-gray-900">
                                 {formatPrice(property.price)}
                             </div>
-                            {property.negotiable && (
-                                <div className="text-xs text-orange-600 font-medium">
-                                    {isReady ? t('listing.negotiable') : 'Negotiable'}
-                                </div>
-                            )}
                             <div className="flex items-center justify-end mt-1 text-xs text-gray-500">
                                 <Eye className="w-3 h-3 mr-1" />
                                 <span>{property.viewCount}</span>

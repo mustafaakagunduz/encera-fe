@@ -37,7 +37,6 @@ export interface PropertyResponse {
     district: string;
     neighborhood: string;
     price: number;
-    negotiable: boolean;
     grossArea?: number;
     netArea?: number;
     elevator: boolean;
@@ -74,7 +73,6 @@ export interface PropertyUpdateRequest {
     district?: string;
     neighborhood?: string;
     price?: number;
-    negotiable?: boolean;
     grossArea?: number;
     netArea?: number;
     elevator?: boolean;

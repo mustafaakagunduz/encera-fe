@@ -152,11 +152,6 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
                         {isReady ? t('my-listings.actions.delete') : 'Sil'}
                     </button>
                 </div>
-                {property.negotiable && (
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                        {isReady ? t('my-listings.negotiable') : 'Pazarlık'}
-                    </span>
-                )}
             </div>
         </div>
     );

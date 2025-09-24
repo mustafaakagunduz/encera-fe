@@ -142,7 +142,6 @@
     },
     "features": "Features",
     "details": "Details",
-    "negotiable": "Negotiable",
     "basic-info": "Basic Information",
     "area": "Area",
     "room-count": "Room Count",
@@ -192,8 +191,7 @@
       "create-listing-title": "Create and publish your real estate listing",
       "price-label": "Price",
       "currency": "TL",
-      "negotiable": "Negotiable",
-      "monthly-fee": "Monthly Fee",
+        "monthly-fee": "Monthly Fee",
       "deposit": "Deposit",
       "description": "Description",
       "description-placeholder": "Write your listing description in detail...",
@@ -346,7 +344,6 @@
 
   "my-listings": {
     "title": "My Listings",
-    "negotiable": "Negotiable",
     "subtitle": "View and manage all your created listings",
     "empty-state": {
       "title": "You don't have any listings yet",
@@ -505,8 +502,7 @@
       "district": "District",
       "neighborhood": "Neighborhood",
       "price-info": "Price Information",
-      "negotiable": "Negotiable",
-      "monthly-fee": "Monthly Fee",
+        "monthly-fee": "Monthly Fee",
       "deposit": "Deposit",
       "property-features": "Property Features",
       "room-info": "Room + Hall",
@@ -611,8 +607,6 @@
   "property-detail": {
     "back-to-listings": "Back to Listings",
     "price": "Price",
-    "negotiable": "Negotiable",
-    "non-negotiable": "Non-negotiable",
     "area": "m² Gross Area",
     "net-area": "m² Net Area",
     "features": "Features",

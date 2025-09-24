@@ -29,7 +29,6 @@ export interface PropertyCreateRequest {
     district: string;
     neighborhood: string;
     price: number;
-    negotiable?: boolean;
     grossArea?: number;
     netArea?: number;
     elevator?: boolean;
@@ -59,7 +58,6 @@ export interface PropertyUpdateRequest {
     district?: string;
     neighborhood?: string;
     price?: number;
-    negotiable?: boolean;
     grossArea?: number;
     netArea?: number;
     elevator?: boolean;
@@ -98,7 +96,6 @@ export interface PropertySearchFilters {
     parking?: boolean;
     balcony?: boolean;
     security?: boolean;
-    negotiable?: boolean;
     featured?: boolean;
     pappSellable?: boolean;
     roomCount?: number;
@@ -117,7 +114,6 @@ export interface PropertyResponse {
     district: string;
     neighborhood: string;
     price: number;
-    negotiable: boolean;
     grossArea?: number;
     netArea?: number;
     elevator: boolean;
@@ -163,7 +159,6 @@ export interface PropertySummaryResponse {
     city: string;
     district: string;
     price: number;
-    negotiable: boolean;
     grossArea?: number;
     elevator: boolean;
     parking: boolean;

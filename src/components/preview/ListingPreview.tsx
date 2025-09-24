@@ -501,11 +501,6 @@ export const ListingPreview: React.FC = () => {
                                 <span className="text-3xl font-bold text-blue-700">
                                     {formatPrice(previewData.price)}
                                 </span>
-                                {previewData.negotiable && (
-                                    <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-sm font-medium">
-                                        {isReady ? t('listing.negotiable') : 'Pazarlık Edilebilir'}
-                                    </span>
-                                )}
                             </div>
 
                             {/* Additional Costs */}

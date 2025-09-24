@@ -81,7 +81,6 @@ export const CreateListingForm: React.FC = () => {
         district: '',
         neighborhood: '',
         price: 0,
-        negotiable: false,
         grossArea: undefined,
         netArea: undefined,
         elevator: false,
@@ -125,7 +124,6 @@ export const CreateListingForm: React.FC = () => {
                 district: previewData.district,
                 neighborhood: previewData.neighborhood,
                 price: previewData.price,
-                negotiable: previewData.negotiable || false,
                 grossArea: previewData.grossArea,
                 netArea: previewData.netArea,
                 elevator: previewData.elevator || false,
@@ -178,7 +176,6 @@ export const CreateListingForm: React.FC = () => {
                 district: existingProperty.district,
                 neighborhood: existingProperty.neighborhood,
                 price: existingProperty.price,
-                negotiable: existingProperty.negotiable,
                 grossArea: existingProperty.grossArea,
                 netArea: existingProperty.netArea,
                 elevator: existingProperty.elevator,
@@ -405,7 +402,6 @@ export const CreateListingForm: React.FC = () => {
             district: formData.district,
             neighborhood: formData.neighborhood,
             price: formData.price,
-            negotiable: formData.negotiable,
             grossArea: formData.grossArea,
             netArea: formData.netArea,
             elevator: formData.elevator,
@@ -842,22 +838,6 @@ export const CreateListingForm: React.FC = () => {
                             </div>
                         </div>
 
-                            {/* Pazarlığa açık */}
-                            <div className="md:col-span-3 mt-4">
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="negotiable"
-                                        name="negotiable"
-                                        checked={Boolean(formData.negotiable)}
-                                        onChange={handleInputChange}
-                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                                    />
-                                    <label htmlFor="negotiable" className="ml-3 text-sm text-gray-900 cursor-pointer">
-                                        {isReady ? t('listing.create.negotiable') : 'Pazarlığa açık'}
-                                    </label>
-                                </div>
-                            </div>
                         </div>
                     </div>
 

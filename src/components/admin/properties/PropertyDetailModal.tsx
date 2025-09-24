@@ -29,7 +29,6 @@ interface Property {
     district: string;
     neighborhood: string;
     price: number;
-    negotiable: boolean;
     grossArea?: number;
     netArea?: number;
     elevator: boolean;
@@ -183,11 +182,6 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                                         Fiyat
                                     </h4>
                                     <p className="text-lg font-bold text-green-600">{formatPrice(property.price)}</p>
-                                    {property.negotiable && (
-                                        <span className="inline-block mt-1 px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded">
-                                            Pazarlık Yapılabilir
-                                        </span>
-                                    )}
                                     {(property.monthlyFee || property.deposit) && (
                                         <div className="mt-2 text-sm text-gray-600">
                                             {property.monthlyFee && <p>Aidat: {formatPrice(property.monthlyFee)}</p>}

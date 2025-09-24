@@ -31,7 +31,6 @@ interface Property {
     district: string;
     neighborhood: string;
     price: number;
-    negotiable: boolean;
     grossArea?: number;
     netArea?: number;
     elevator: boolean;
@@ -296,9 +295,6 @@ export const PendingPropertiesTable: React.FC = () => {
                                             <div className="flex items-center text-sm font-medium text-green-600">
                                                 <DollarSign className="h-4 w-4 mr-1" />
                                                 {formatPrice(property.price)}
-                                                {property.negotiable && (
-                                                    <span className="ml-1 text-xs text-gray-500">(Pazarlık)</span>
-                                                )}
                                             </div>
                                         </div>
                                     </td>

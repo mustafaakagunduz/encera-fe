@@ -356,11 +356,6 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 <div className="text-4xl font-bold text-gray-900 mb-2">
                                     {formatPrice(property.price)}
                                 </div>
-                                {property.negotiable && (
-                                    <div className="text-sm text-orange-600 font-medium">
-                                        {isReady ? t('property-detail.negotiable') : 'Pazarlık yapılabilir'}
-                                    </div>
-                                )}
                             </div>
 
                             {/* Title and Tags */}
@@ -662,12 +657,6 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
                                         <span className="text-gray-600">{isReady ? t('property-detail.deposit') : 'Depozito'}</span>
                                         <span className="font-medium text-gray-900">{formatPrice(property.deposit)}</span>
-                                    </div>
-                                )}
-                                {property.negotiable && (
-                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">{isReady ? t('property-detail.negotiable') : 'Pazarlık'}</span>
-                                        <span className="font-medium text-green-600">{isReady ? t('listing.negotiable') : 'Yapılabilir'}</span>
                                     </div>
                                 )}
                             </div>

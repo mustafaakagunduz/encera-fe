@@ -191,11 +191,6 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
                             </h3>
                             <div className="space-y-2">
                                 <p className="text-2xl font-bold text-green-600">{formatPrice(property.price)}</p>
-                                {property.negotiable && (
-                                    <span className="inline-block px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded">
-                                        {isReady ? t('admin.property-detail.negotiable') : 'Pazarlık Yapılabilir'}
-                                    </span>
-                                )}
                                 {property.monthlyFee && (
                                     <p className="text-sm text-gray-600">{isReady ? t('admin.property-detail.monthly-fee') : 'Aidat'}: {formatPrice(property.monthlyFee)}</p>
                                 )}

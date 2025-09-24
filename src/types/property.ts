@@ -25,7 +25,6 @@ export interface PropertyCreateRequest {
     district: string;
     neighborhood: string;
     price: number;
-    negotiable?: boolean;
     grossArea?: number;
     netArea?: number;
     elevator?: boolean;

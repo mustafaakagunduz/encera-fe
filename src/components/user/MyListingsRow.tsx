@@ -116,11 +116,6 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
             <td className="px-6 py-4">
                 <div className="text-sm font-medium text-gray-900">
                     {formatPrice(property.price)}
-                    {property.negotiable && (
-                        <span className="text-xs text-gray-500 ml-1">
-                            ({isReady ? t('my-listings.negotiable') : 'Pazarlık'})
-                        </span>
-                    )}
                 </div>
             </td>
             <td className="px-6 py-4">

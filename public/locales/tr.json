@@ -151,7 +151,6 @@
     "deposit": "Depozito",
     "publishing": "Yayınlanıyor...",
     "confirm-publish": "Onayla ve Yayınla",
-    "negotiable": "Pazarlık Edilebilir",
     "title": "İlan Başlığı",
     "description": "Açıklama",
     "price": "Fiyat",
@@ -194,7 +193,6 @@
       "create-listing-title": "Emlak ilanınızı oluşturun ve yayınlayın",
       "price-label": "Fiyat",
       "currency": "TL",
-      "negotiable": "Pazarlığa açık",
       "monthly-fee": "Aidat",
       "deposit": "Depozito",
       "description": "Açıklama",
@@ -348,7 +346,6 @@
 
   "my-listings": {
     "title": "İlanlarım",
-    "negotiable": "Pazarlık",
     "subtitle": "Oluşturduğunuz tüm ilanları buradan görüntüleyebilir ve yönetebilirsiniz",
     "empty-state": {
       "title": "Henüz hiç ilanınız yok",
@@ -508,7 +505,6 @@
       "district": "İlçe",
       "neighborhood": "Mahalle",
       "price-info": "Fiyat Bilgileri",
-      "negotiable": "Pazarlık Yapılabilir",
       "monthly-fee": "Aidat",
       "deposit": "Depozito",
       "property-features": "Emlak Özellikleri",
@@ -614,8 +610,6 @@
   "property-detail": {
     "back-to-listings": "İlanlara Geri Dön",
     "price": "Fiyat",
-    "negotiable": "Pazarlık edilebilir",
-    "non-negotiable": "Pazarlık edilemez",
     "area": "m² Brüt Alan",
     "net-area": "m² Net Alan",
     "features": "Özellikler",
