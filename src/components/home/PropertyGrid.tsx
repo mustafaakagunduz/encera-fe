@@ -55,7 +55,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                             <div className="text-center text-gray-400">
                                 <Square className="w-12 h-12 mx-auto mb-2" />
-                                <p className="text-sm">No Image</p>
+                                <p className="text-sm">{t('property-grid.no-image')}</p>
                             </div>
                         </div>
                     )}
@@ -63,7 +63,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                     {/* Featured Badge */}
                     {property.featured && (
                         <div className="absolute top-3 left-3 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            ⭐ Premium
+                            ⭐ {t('property-grid.premium')}
                         </div>
                     )}
 
@@ -127,7 +127,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     onClick={() => window.location.href = `/house/${property.id}`}
                 >
-                    Detayları Görüntüle
+                    {t('property-grid.view-details')}
                 </Button>
             </div>
         </div>
@@ -169,7 +169,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
                         {t('home.properties.no-properties')}
                     </h3>
                     <p className="text-gray-600">
-                        Filtreleri değiştirmeyi deneyin veya daha sonra tekrar kontrol edin.
+                        {t('property-grid.no-properties-desc')}
                     </p>
                 </div>
             </div>

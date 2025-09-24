@@ -749,5 +749,20 @@
       "vrv": "VRV System",
       "heat-pump": "Heat Pump"
     }
+  },
+
+  "property-grid": {
+    "no-image": "No Image",
+    "premium": "Premium",
+    "view-details": "View Details",
+    "no-properties-desc": "Try changing the filters or check back later."
+  },
+
+  "properties-section": {
+    "error-loading": "An error occurred while loading properties.",
+    "results-count": "{{count}} Encera properties found",
+    "search-results": "Results for \"{{query}}\"",
+    "map-view": "Map View",
+    "map-coming-soon": "Map integration coming soon"
   }
 }

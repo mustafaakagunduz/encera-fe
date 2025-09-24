@@ -752,5 +752,20 @@
       "vrv": "VRV Sistem",
       "heat-pump": "Isı Pompası"
     }
+  },
+
+  "property-grid": {
+    "no-image": "Görsel Yok",
+    "premium": "Premium",
+    "view-details": "Detayları Görüntüle",
+    "no-properties-desc": "Filtreleri değiştirmeyi deneyin veya daha sonra tekrar kontrol edin."
+  },
+
+  "properties-section": {
+    "error-loading": "İlanlar yüklenirken bir hata oluştu.",
+    "results-count": "{{count}} Encera ilanı bulundu",
+    "search-results": "\"{{query}}\" için sonuçlar",
+    "map-view": "Harita Görünümü",
+    "map-coming-soon": "Harita entegrasyonu yakında eklenecek"
   }
 }

@@ -270,7 +270,7 @@ const PropertiesSection: React.FC = () => {
             <section className="py-16 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
-                        <p className="text-red-600">İlanlar yüklenirken bir hata oluştu.</p>
+                        <p className="text-red-600">{t('properties-section.error-loading')}</p>
                     </div>
                 </div>
             </section>
@@ -352,11 +352,11 @@ const PropertiesSection: React.FC = () => {
                     {/* Results Count */}
                     <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
                         <span>
-                            {loading ? 'Yükleniyor...' : `${filteredProperties.length} Encera ilanı bulundu`}
+                            {loading ? t('common.loading') : t('properties-section.results-count', { count: filteredProperties.length })}
                         </span>
                         {searchQuery && (
                             <span>
-                                "{searchQuery}" için sonuçlar
+                                {t('properties-section.search-results', { query: searchQuery })}
                             </span>
                         )}
                     </div>
@@ -374,10 +374,10 @@ const PropertiesSection: React.FC = () => {
                     <div className="bg-gray-100 rounded-xl p-8 text-center">
                         <Map className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                            Harita Görünümü
+                            {t('properties-section.map-view')}
                         </h3>
                         <p className="text-gray-600">
-                            Harita entegrasyonu yakında eklenecek
+                            {t('properties-section.map-coming-soon')}
                         </p>
                     </div>
                 )}
