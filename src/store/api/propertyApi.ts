@@ -1,6 +1,7 @@
 // src/store/api/propertyApi.ts
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 
 // Backend'e tam uyumlu types - mevcut types ile uyumlu
 export interface RoomConfiguration {
@@ -204,7 +205,7 @@ export interface PropertySearchRequest {
 
 export const propertyApi = createApi({
     reducerPath: 'propertyApi',
-    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/properties'),
+    baseQuery: createBaseQueryWithAuth(buildApiUrl('properties')),
     tagTypes: ['Property', 'UserProperty', 'PropertyStats'],
     endpoints: (builder) => ({
         // ========== PUBLIC ENDPOINTS ==========

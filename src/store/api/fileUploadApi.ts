@@ -1,5 +1,6 @@
 // src/store/api/fileUploadApi.ts
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 import { createApi } from '@reduxjs/toolkit/query/react';
 
 export interface UploadResponse {
@@ -24,7 +25,7 @@ export interface UploadError {
 
 export const fileUploadApi = createApi({
     reducerPath: 'fileUploadApi',
-    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/upload', true),
+    baseQuery: createBaseQueryWithAuth(buildApiUrl('upload'), true),
     tagTypes: ['Upload'],
     endpoints: (builder) => ({
         // Single file upload

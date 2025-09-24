@@ -1,9 +1,8 @@
 // src/store/api/favoriteApi.ts
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 import { PropertyResponse } from './propertyApi';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
 export interface FavoriteToggleResponse {
     isFavorited: boolean;
@@ -35,7 +34,7 @@ export interface PaginatedFavoritesResponse {
 
 export const favoriteApi = createApi({
     reducerPath: 'favoriteApi',
-    baseQuery: createBaseQueryWithAuth(`${API_BASE_URL}/api/favorites`),
+    baseQuery: createBaseQueryWithAuth(buildApiUrl('favorites')),
     tagTypes: ['Favorite'],
     endpoints: (builder) => ({
         toggleFavorite: builder.mutation<FavoriteToggleResponse, number>({
@@ -94,4 +93,3 @@ export const {
     useRemoveFavoriteMutation,
     useGetFavoriteCountQuery,
 } = favoriteApi;
-

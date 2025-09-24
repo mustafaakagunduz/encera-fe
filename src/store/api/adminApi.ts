@@ -1,6 +1,7 @@
 // src/store/api/adminApi.ts
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 
 // Types for Admin API
 export interface UserResponse {
@@ -98,7 +99,7 @@ export interface PaginatedResponse<T> {
 
 export const adminApi = createApi({
     reducerPath: 'adminApi',
-    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api'),
+    baseQuery: createBaseQueryWithAuth(buildApiUrl()),
     tagTypes: ['AdminUsers', 'AdminProperties', 'AdminStats'],
     endpoints: (builder) => ({
         // ========== USER MANAGEMENT ==========

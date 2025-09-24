@@ -1,10 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 import { RootState } from '../store';
-
-const baseUrl = process.env.NODE_ENV === 'production'
-  ? 'https://your-production-api.com/api'
-  : 'http://localhost:8081/api';
 
 export interface UserProfile {
   id: number;
@@ -105,7 +102,7 @@ export interface ReviewStatsResponse {
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: createBaseQueryWithAuth(`${baseUrl}/user`),
+  baseQuery: createBaseQueryWithAuth(buildApiUrl('user')),
   tagTypes: ['User', 'Review'],
   endpoints: (builder) => ({
     // Get current user profile

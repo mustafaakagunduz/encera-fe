@@ -1,5 +1,6 @@
 // src/store/api/complaintApi.ts
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 import { createApi } from '@reduxjs/toolkit/query/react';
 
 // Types
@@ -58,7 +59,7 @@ export interface ComplaintHandleRequest {
 
 export const complaintApi = createApi({
     reducerPath: 'complaintApi',
-    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/complaints'),
+    baseQuery: createBaseQueryWithAuth(buildApiUrl('complaints')),
     tagTypes: ['Complaint'],
     endpoints: (builder) => ({
         createComplaint: builder.mutation<ComplaintResponse, ComplaintCreateRequest>({

@@ -1,5 +1,6 @@
 // src/store/api/notificationApi.ts
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 import { createApi } from '@reduxjs/toolkit/query/react';
 
 // Types
@@ -30,7 +31,7 @@ export interface NotificationCountResponse {
 
 export const notificationApi = createApi({
     reducerPath: 'notificationApi',
-    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/notifications'),
+    baseQuery: createBaseQueryWithAuth(buildApiUrl('notifications')),
     tagTypes: ['Notification'],
     endpoints: (builder) => ({
         getUserNotifications: builder.query<NotificationsPageResponse, {

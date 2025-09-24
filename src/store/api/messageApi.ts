@@ -1,5 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 
 export interface MessageRequest {
   receiverId: number;
@@ -38,7 +39,7 @@ export interface ConversationResponse {
 
 export const messageApi = createApi({
   reducerPath: 'messageApi',
-  baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/messages'),
+  baseQuery: createBaseQueryWithAuth(buildApiUrl('messages')),
   tagTypes: ['Message', 'Conversation'],
   endpoints: (builder) => ({
     sendMessage: builder.mutation<MessageResponse, MessageRequest>({

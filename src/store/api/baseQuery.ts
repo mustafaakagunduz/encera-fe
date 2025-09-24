@@ -2,9 +2,10 @@
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { setCredentials, logout } from '../slices/authSlice';
+import { API_BASE_URL } from './config';
 
-// Base API URL
-const baseApiUrl = 'http://localhost:8081/api';
+// Base API URL shared across the app (defaults to /api/proxy for prod)
+const baseApiUrl = `${API_BASE_URL}`;
 
 // Base query with auth headers
 const baseQuery = fetchBaseQuery({

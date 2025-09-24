@@ -1,5 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 
 export interface CommentRequest {
     propertyId: number;
@@ -30,7 +31,7 @@ export interface CommentListResponse {
 
 export const commentApi = createApi({
     reducerPath: 'commentApi',
-    baseQuery: createBaseQueryWithAuth('http://localhost:8081/api/comments'),
+    baseQuery: createBaseQueryWithAuth(buildApiUrl('comments')),
     tagTypes: ['Comment'],
     endpoints: (builder) => ({
         addComment: builder.mutation<CommentResponse, CommentRequest>({

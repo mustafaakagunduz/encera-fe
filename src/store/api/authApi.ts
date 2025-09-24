@@ -1,6 +1,7 @@
 // src/store/api/authApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithRetry } from './baseQuery';
+import { buildApiUrl } from './config';
 
 // Types
 export interface RegisterRequest {
@@ -75,7 +76,7 @@ export interface ErrorResponse {
 
 // Auth-specific base query (auth endpoints don't need token refresh)
 const authBaseQuery = fetchBaseQuery({
-    baseUrl: 'http://localhost:8081/api/auth',
+    baseUrl: buildApiUrl('auth'),
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as any).auth.token;
         if (token) {
