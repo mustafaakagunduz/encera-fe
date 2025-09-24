@@ -1,6 +1,6 @@
 const stripTrailingSlash = (value: string) => value.replace(/\/$/, '');
 
-export const API_BASE_URL = stripTrailingSlash(process.env.NEXT_PUBLIC_API_URL || '/api/proxy');
+export const API_BASE_URL = stripTrailingSlash(process.env.NEXT_API_URL || '/api/proxy');
 
 export const buildApiUrl = (path = ''): string => {
   const cleanPath = path.replace(/^\/+/, '');
