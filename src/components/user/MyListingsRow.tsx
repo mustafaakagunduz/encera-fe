@@ -30,8 +30,11 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
         if (window.confirm(isReady ? t('my-listings.actions.delete-confirm') : 'Bu ilanı silmek istediğinizden emin misiniz?')) {
             try {
                 await deleteProperty(property.id).unwrap();
+                console.log('İlan başarıyla silindi');
             } catch (error) {
                 console.error('Silme hatası:', error);
+                const errorMessage = error?.data?.message || 'İlan silinirken bir hata oluştu';
+                alert(errorMessage);
             }
         }
     };

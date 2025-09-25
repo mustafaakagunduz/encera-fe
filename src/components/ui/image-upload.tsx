@@ -54,12 +54,14 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
     // Notify parent component when images change
     React.useEffect(() => {
-        const validImages = images.map(img => ({
-            file: img.isLocal ? img.file : undefined,
-            url: img.url,
-            isPrimary: img.isPrimary,
-            preview: img.preview
-        }));
+        const validImages = images
+            .filter(img => !img.error) // Error olan resimleri filtrele
+            .map(img => ({
+                file: img.isLocal ? img.file : undefined,
+                url: img.url,
+                isPrimary: img.isPrimary,
+                preview: img.preview
+            }));
         onImagesChange(validImages);
     }, [images, onImagesChange]);
 
@@ -348,61 +350,76 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                                     <div className="absolute inset-0 bg-red-500 bg-opacity-90 flex flex-col items-center justify-center text-white text-xs p-2">
                                         <AlertCircle className="w-4 h-4 mb-1" />
                                         <span className="text-center">{image.error}</span>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                retryUpload(index);
-                                            }}
-                                            className="mt-1 px-2 py-1 bg-white text-red-500 rounded text-xs"
-                                        >
-                                            Tekrar Dene
-                                        </button>
+                                        <div className="flex gap-1 mt-1">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    retryUpload(index);
+                                                }}
+                                                className="px-2 py-1 bg-white text-red-500 rounded text-xs"
+                                            >
+                                                Tekrar Dene
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    removeImage(index);
+                                                }}
+                                                className="px-2 py-1 bg-gray-800 text-white rounded text-xs"
+                                            >
+                                                Sil
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
 
                                 {/* Success Indicator */}
                                 {image.url && !image.isUploading && !image.error && (
-                                    <div className="absolute top-2 right-2">
+                                    <div className="absolute top-2 right-8">
                                         <CheckCircle className="w-4 h-4 text-green-500 bg-white rounded-full" />
                                     </div>
                                 )}
                             </div>
 
-                            {/* Controls */}
-                            <div className="absolute top-2 left-2 flex space-x-1">
-                                {/* Primary Image Button */}
+                            {/* Controls - Error durumunda gizli */}
+                            {!image.error && (
+                                <div className="absolute top-2 left-2 flex space-x-1">
+                                    {/* Primary Image Button */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setPrimaryImage(index);
+                                        }}
+                                        className={`
+                                            p-1 rounded-full transition-colors
+                                            ${image.isPrimary
+                                                ? 'bg-yellow-500 text-white'
+                                                : 'bg-white text-gray-600 hover:bg-yellow-100'
+                                            }
+                                        `}
+                                        title={image.isPrimary ? "Birincil fotoğraf" : "Birincil fotoğraf yap"}
+                                    >
+                                        {image.isPrimary ? (
+                                            <Star className="w-3 h-3 fill-current" />
+                                        ) : (
+                                            <StarOff className="w-3 h-3" />
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Remove Button - Error durumunda gizli, error olmadığında hover'da görünür */}
+                            {!image.error && (
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setPrimaryImage(index);
+                                        removeImage(index);
                                     }}
-                                    className={`
-                                        p-1 rounded-full transition-colors
-                                        ${image.isPrimary
-                                            ? 'bg-yellow-500 text-white'
-                                            : 'bg-white text-gray-600 hover:bg-yellow-100'
-                                        }
-                                    `}
-                                    title={image.isPrimary ? "Birincil fotoğraf" : "Birincil fotoğraf yap"}
+                                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
                                 >
-                                    {image.isPrimary ? (
-                                        <Star className="w-3 h-3 fill-current" />
-                                    ) : (
-                                        <StarOff className="w-3 h-3" />
-                                    )}
+                                    <X className="w-3 h-3" />
                                 </button>
-                            </div>
-
-                            {/* Remove Button */}
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeImage(index);
-                                }}
-                                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
-                            >
-                                <X className="w-3 h-3" />
-                            </button>
+                            )}
 
                             {/* Primary Image Label */}
                             {image.isPrimary && (

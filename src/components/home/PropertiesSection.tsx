@@ -14,115 +14,135 @@ const mockProperties = [
         id: 1,
         title: "Merkezi konumda lüks 3+1 daire",
         price: 2500000,
-        currency: "TL",
-        location: {
-            city: "İstanbul",
-            district: "Beşiktaş",
-            neighborhood: "Levent"
-        },
+        city: "İstanbul",
+        district: "Beşiktaş",
+        neighborhood: "Levent",
         propertyType: "RESIDENTIAL",
         listingType: "SALE",
-        roomCount: "3+1",
+        roomConfiguration: {
+            roomCount: 3,
+            hallCount: 1,
+            displayFormat: "3+1"
+        },
         area: 150,
-        images: [],
+        grossArea: 150,
+        imageUrls: ["https://via.placeholder.com/400x300?text=Property+Image"],
+        primaryImageUrl: "https://via.placeholder.com/400x300?text=Property+Image",
         viewCount: 234,
         createdAt: "2024-01-15",
-        isFeatured: true
+        featured: true,
+        pappSellable: true
     },
     {
         id: 2,
         title: "Deniz manzaralı kiralık villa",
         price: 15000,
-        currency: "TL",
-        location: {
-            city: "Antalya",
-            district: "Muratpaşa",
-            neighborhood: "Lara"
-        },
+        city: "Antalya",
+        district: "Muratpaşa",
+        neighborhood: "Lara",
         propertyType: "RESIDENTIAL",
         listingType: "RENT",
-        roomCount: "4+1",
+        roomConfiguration: {
+            roomCount: 4,
+            hallCount: 1,
+            displayFormat: "4+1"
+        },
         area: 250,
-        images: [],
+        grossArea: 250,
+        imageUrls: ["https://via.placeholder.com/400x300?text=Property+Image"],
+        primaryImageUrl: "https://via.placeholder.com/400x300?text=Property+Image",
         viewCount: 156,
         createdAt: "2024-01-14",
-        isFeatured: false
+        featured: false,
+        pappSellable: true
     },
     {
         id: 3,
         title: "İş merkezi kiralık ofis",
         price: 8000,
-        currency: "TL",
-        location: {
-            city: "Ankara",
-            district: "Çankaya",
-            neighborhood: "Kızılay"
-        },
+        city: "Ankara",
+        district: "Çankaya",
+        neighborhood: "Kızılay",
         propertyType: "COMMERCIAL",
         listingType: "RENT",
-        roomCount: "3+1",
+        roomConfiguration: {
+            roomCount: 3,
+            hallCount: 1,
+            displayFormat: "3+1"
+        },
         area: 120,
-        images: [],
+        grossArea: 120,
+        imageUrls: ["https://via.placeholder.com/400x300?text=Property+Image"],
+        primaryImageUrl: "https://via.placeholder.com/400x300?text=Property+Image",
         viewCount: 89,
         createdAt: "2024-01-13",
-        isFeatured: false
+        featured: false,
+        pappSellable: true
     },
     {
         id: 4,
         title: "Yatırımlık arsa imarlı",
         price: 1200000,
-        currency: "TL",
-        location: {
-            city: "İzmir",
-            district: "Bornova",
-            neighborhood: "Erzene"
-        },
+        city: "İzmir",
+        district: "Bornova",
+        neighborhood: "Erzene",
         propertyType: "LAND",
         listingType: "SALE",
-        roomCount: "-",
+        roomConfiguration: null,
         area: 500,
-        images: [],
+        grossArea: 500,
+        imageUrls: ["https://via.placeholder.com/400x300?text=Property+Image"],
+        primaryImageUrl: "https://via.placeholder.com/400x300?text=Property+Image",
         viewCount: 67,
         createdAt: "2024-01-12",
-        isFeatured: true
+        featured: true,
+        pappSellable: true
     },
     {
         id: 5,
         title: "Günlük kiralık lüks apart",
         price: 350,
-        currency: "TL",
-        location: {
-            city: "Muğla",
-            district: "Bodrum",
-            neighborhood: "Merkez"
-        },
+        city: "Muğla",
+        district: "Bodrum",
+        neighborhood: "Merkez",
         propertyType: "RESIDENTIAL",
         listingType: "DAILY_RENTAL",
-        roomCount: "2+1",
+        roomConfiguration: {
+            roomCount: 2,
+            hallCount: 1,
+            displayFormat: "2+1"
+        },
         area: 85,
-        images: [],
+        grossArea: 85,
+        imageUrls: ["https://via.placeholder.com/400x300?text=Property+Image"],
+        primaryImageUrl: "https://via.placeholder.com/400x300?text=Property+Image",
         viewCount: 412,
         createdAt: "2024-01-11",
-        isFeatured: false
+        featured: false,
+        pappSellable: true
     },
     {
         id: 6,
         title: "Şehir merkezinde satılık dükkan",
         price: 800000,
-        currency: "TL",
-        location: {
-            city: "Bursa",
-            district: "Osmangazi",
-            neighborhood: "Heykel"
-        },
+        city: "Bursa",
+        district: "Osmangazi",
+        neighborhood: "Heykel",
         propertyType: "COMMERCIAL",
         listingType: "SALE",
-        roomCount: "1+0",
+        roomConfiguration: {
+            roomCount: 1,
+            hallCount: 0,
+            displayFormat: "1+0"
+        },
         area: 45,
-        images: [],
+        grossArea: 45,
+        imageUrls: ["https://via.placeholder.com/400x300?text=Property+Image"],
+        primaryImageUrl: "https://via.placeholder.com/400x300?text=Property+Image",
         viewCount: 123,
         createdAt: "2024-01-10",
-        isFeatured: false
+        featured: false,
+        pappSellable: true
     }
 ];
 
@@ -155,8 +175,16 @@ const PropertiesSection: React.FC = () => {
 
     // Sadece Encera ilanlarını filtrele
     const enceraProperties = React.useMemo(() => {
-        if (!propertiesData?.content) return [];
-        return propertiesData.content.filter(property => property.pappSellable === true);
+        if (!propertiesData?.content) {
+            console.log('🔍 API data not available, using mock properties');
+            return mockProperties; // Veri yoksa mock data kullan
+        }
+
+        const filtered = propertiesData.content.filter(property => property.pappSellable === true);
+        console.log('🏠 Encera Properties:', filtered);
+        console.log('📷 First property images:', filtered[0]?.primaryImageUrl, filtered[0]?.imageUrls);
+
+        return filtered;
     }, [propertiesData]);
     const [filters, setFilters] = useState<FilterState>({
         propertyType: '',

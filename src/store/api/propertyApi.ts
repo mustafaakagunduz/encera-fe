@@ -30,6 +30,7 @@ export interface PropertyCreateRequest {
     district: string;
     neighborhood: string;
     price: number;
+    negotiable?: boolean;
     grossArea?: number;
     netArea?: number;
     elevator?: boolean;
@@ -59,6 +60,7 @@ export interface PropertyUpdateRequest {
     district?: string;
     neighborhood?: string;
     price?: number;
+    negotiable?: boolean;
     grossArea?: number;
     netArea?: number;
     elevator?: boolean;
@@ -115,6 +117,7 @@ export interface PropertyResponse {
     district: string;
     neighborhood: string;
     price: number;
+    negotiable?: boolean;
     grossArea?: number;
     netArea?: number;
     elevator: boolean;
@@ -362,7 +365,7 @@ export const propertyApi = createApi({
         // Delete property
         deleteProperty: builder.mutation<void, number>({
             query: (id) => ({
-                url: `/user/${id}`,
+                url: `/properties/user/${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: (result, error, id) => [

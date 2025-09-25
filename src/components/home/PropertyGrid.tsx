@@ -20,7 +20,9 @@ interface Property {
         displayFormat: string;
     };
     area: number;
-    images?: string[];
+    imageUrls?: string[];
+    primaryImageUrl?: string;
+    grossArea?: number;
     viewCount: number;
     createdAt: string;
     featured: boolean;
@@ -45,9 +47,9 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
             {/* Image */}
             <div className="relative">
                 <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden">
-                    {property.images && property.images.length > 0 ? (
+                    {property.imageUrls && property.imageUrls.length > 0 ? (
                         <img
-                            src={property.images[0]}
+                            src={property.primaryImageUrl || property.imageUrls[0]}
                             alt={property.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -109,7 +111,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                     </div>
                     <div className="flex items-center gap-1">
                         <Square className="w-4 h-4" />
-                        <span>{property.area} m²</span>
+                        <span>{property.grossArea || property.area} m²</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Eye className="w-4 h-4" />

@@ -31,6 +31,7 @@ import {
 interface FormData extends Omit<PropertyCreateRequest, 'roomConfiguration'> {
     roomCount: string;
     hallCount: string;
+    negotiable: boolean;
 }
 
 interface ImageData {
@@ -90,6 +91,7 @@ export const CreateListingForm: React.FC = () => {
         description: '',
         furnished: false,
         pappSellable: false,
+        negotiable: false,
         roomCount: '',
         hallCount: '',
         monthlyFee: undefined,
@@ -133,6 +135,7 @@ export const CreateListingForm: React.FC = () => {
                 description: previewData.description || '',
                 furnished: previewData.furnished || false,
                 pappSellable: previewData.pappSellable || false,
+                negotiable: previewData.negotiable || false,
                 roomCount: previewData.roomConfiguration?.roomCount?.toString() || '',
                 hallCount: (previewData.roomConfiguration as any)?.hallCount?.toString() || previewData.roomConfiguration?.hallCount?.toString() || '',
                 monthlyFee: previewData.monthlyFee,
@@ -185,6 +188,7 @@ export const CreateListingForm: React.FC = () => {
                 description: existingProperty.description || '',
                 furnished: existingProperty.furnished,
                 pappSellable: existingProperty.pappSellable,
+                negotiable: existingProperty.negotiable || false,
                 roomCount: existingProperty.roomConfiguration?.roomCount?.toString() || '',
                 hallCount: (existingProperty.roomConfiguration as any)?.hallCount?.toString() || existingProperty.roomConfiguration?.hallCount?.toString() || '',
                 monthlyFee: existingProperty.monthlyFee,
@@ -237,7 +241,7 @@ export const CreateListingForm: React.FC = () => {
             const checked = (e.target as HTMLInputElement).checked;
             setFormData(prev => ({ ...prev, [name]: checked }));
         } else if (['grossArea', 'netArea', 'price', 'monthlyFee', 'deposit', 'buildingAge', 'totalFloors', 'currentFloor', 'roomCount', 'hallCount'].includes(name)) {
-            setFormData(prev => ({ ...prev, [name]: value ? Number(value) : undefined }));
+            setFormData(prev => ({ ...prev, [name]: value !== '' ? Number(value) : undefined }));
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
@@ -411,6 +415,7 @@ export const CreateListingForm: React.FC = () => {
             description: formData.description,
             furnished: formData.furnished,
             pappSellable: formData.pappSellable,
+            negotiable: formData.negotiable,
             roomConfiguration,
             monthlyFee: formData.monthlyFee,
             deposit: formData.listingType === ListingType.SALE ? undefined : formData.deposit,
@@ -610,7 +615,7 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="grossArea"
-                                    value={formData.grossArea || ''}
+                                    value={formData.grossArea !== undefined ? formData.grossArea : ''}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
@@ -624,7 +629,7 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="netArea"
-                                    value={formData.netArea || ''}
+                                    value={formData.netArea !== undefined ? formData.netArea : ''}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
@@ -639,7 +644,7 @@ export const CreateListingForm: React.FC = () => {
                                     <input
                                         type="text"
                                         name="roomCount"
-                                        value={formData.propertyType !== PropertyType.RESIDENTIAL ? '' : (formData.roomCount || '')}
+                                        value={formData.propertyType !== PropertyType.RESIDENTIAL ? '' : (formData.roomCount !== undefined ? formData.roomCount : '')}
                                         onChange={handleInputChange}
                                         placeholder={isReady ? t('listing.create.room-placeholder') : 'Oda'}
                                         disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
@@ -653,7 +658,7 @@ export const CreateListingForm: React.FC = () => {
                                     <input
                                         type="text"
                                         name="hallCount"
-                                        value={formData.propertyType !== PropertyType.RESIDENTIAL ? '' : (formData.hallCount || '')}
+                                        value={formData.propertyType !== PropertyType.RESIDENTIAL ? '' : (formData.hallCount !== undefined ? formData.hallCount : '')}
                                         onChange={handleInputChange}
                                         placeholder={isReady ? t('listing.create.living-room-placeholder') : 'Salon'}
                                         disabled={formData.propertyType !== PropertyType.RESIDENTIAL}
@@ -681,7 +686,7 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="buildingAge"
-                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.buildingAge || '')}
+                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.buildingAge !== undefined ? formData.buildingAge : '')}
                                     onChange={handleInputChange}
                                     disabled={formData.propertyType === PropertyType.LAND}
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
@@ -705,7 +710,7 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="totalFloors"
-                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.totalFloors || '')}
+                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.totalFloors !== undefined ? formData.totalFloors : '')}
                                     onChange={handleInputChange}
                                     disabled={formData.propertyType === PropertyType.LAND}
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
@@ -729,7 +734,7 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="currentFloor"
-                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.currentFloor || '')}
+                                    value={formData.propertyType === PropertyType.LAND ? '' : (formData.currentFloor !== undefined ? formData.currentFloor : '')}
                                     onChange={handleInputChange}
                                     disabled={formData.propertyType === PropertyType.LAND}
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
@@ -765,7 +770,7 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="price"
-                                    value={formData.price || ''}
+                                    value={formData.price !== undefined ? formData.price : ''}
                                     onChange={handleInputChange}
                                     className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.price ? 'border-red-500' : 'border-gray-300'
@@ -789,7 +794,7 @@ export const CreateListingForm: React.FC = () => {
                                     value={
                                         formData.propertyType === PropertyType.LAND ||
                                         (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
-                                            ? '' : (formData.monthlyFee || '')
+                                            ? '' : (formData.monthlyFee !== undefined ? formData.monthlyFee : '')
                                     }
                                     onChange={handleInputChange}
                                     disabled={
@@ -821,7 +826,7 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="deposit"
-                                    value={formData.listingType === ListingType.SALE ? '' : (formData.deposit || '')}
+                                    value={formData.listingType === ListingType.SALE ? '' : (formData.deposit !== undefined ? formData.deposit : '')}
                                     onChange={handleInputChange}
                                     disabled={formData.listingType === ListingType.SALE}
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
