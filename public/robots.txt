@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Allow access to specific pages
+Allow: /house/*
+Allow: /property/*
+Allow: /authentication
+Allow: /create-listing
+
+# Disallow admin pages
+Disallow: /admin/
+
+# Disallow API routes
+Disallow: /api/
+
+# Disallow temporary pages
+Disallow: /listing-preview
+
+# Sitemap
+Sitemap: https://encera.com.tr/sitemap.xml
