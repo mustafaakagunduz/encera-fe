@@ -13,7 +13,7 @@ interface SEOProps {
 
 export function generateSEOMetadata({
   title = 'ENCERA - Emlak İlanları',
-  description = 'Emlak sektöründe dijital dönüşüm için PAPP. En güncel emlak ilanları, satılık ve kiralık daire, ev, işyeri ilanları.',
+  description = 'Emlak sektöründe dijital dönüşüm için ENCERA. En güncel emlak ilanları, satılık ve kiralık daire, ev, işyeri ilanları.',
   keywords = 'emlak, gayrimenkul, satılık, kiralık, daire, ev, villa, işyeri, arsa, encera, papp',
   image = '/images/og-default.jpg',
   url = 'https://encera.com.tr',

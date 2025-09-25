@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     title: "ENCERA - Emlak İlanları",
-    description: "Emlak sektöründe dijital dönüşüm için PAPP. En güncel emlak ilanları, satılık ve kiralık daire, ev, işyeri ilanları.",
-    keywords: "emlak, gayrimenkul, satılık, kiralık, daire, ev, villa, işyeri, arsa, encera, papp",
+    description: "Emlak sektöründe dijital dönüşüm için ENCERA. En güncel emlak ilanları, satılık ve kiralık daire, ev, işyeri ilanları.",
+    keywords: "emlak, gayrimenkul, satılık, kiralık, daire, ev, villa, işyeri, arsa, encera, ENCERA",
     authors: [{ name: "PAPP Group" }],
     creator: "PAPP Group",
     publisher: "ENCERA",
