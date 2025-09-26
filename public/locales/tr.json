@@ -672,6 +672,7 @@
     "encera-guaranteed": "Encera Garantili",
     "no-special-features": "Özel özellik bulunmuyor",
     "phone-not-found": "Telefon bulunamadı",
+    "no-images": "Henüz resim eklenmemiş",
     "comments-and-rating": "Yorum ve Değerlendirme",
     "owner-cannot-comment": "İlan Sahibi",
     "owner-cannot-comment-desc": "Bu sizin ilanınız. Kendi ilanınıza değerlendirme yapamazsınız.",
@@ -690,6 +691,8 @@
     "other-comments": "Diğer Yorumlar",
     "comments-count": "yorum",
     "no-comments-yet": "Henüz yorum bulunmuyor",
+    "user-experiences": "Kullanıcı deneyimleri ve değerlendirmeleri",
+    "be-first-reviewer": "Bu ilan hakkında ilk değerlendirmeyi siz yapın!",
     "comments": {
       "title": "Yorumlar",
       "add-comment": "Yorum Ekle",

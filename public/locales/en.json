@@ -669,6 +669,7 @@
     "encera-guaranteed": "Encera Guaranteed",
     "no-special-features": "No special features available",
     "phone-not-found": "Phone not found",
+    "no-images": "No images added yet",
     "comments-and-rating": "Comments and Rating",
     "owner-cannot-comment": "Listing Owner",
     "owner-cannot-comment-desc": "This is your listing. You cannot rate your own listing.",
@@ -687,6 +688,8 @@
     "other-comments": "Other Comments",
     "comments-count": "comments",
     "no-comments-yet": "No comments yet",
+    "user-experiences": "User experiences and reviews",
+    "be-first-reviewer": "Be the first to review this listing!",
     "comments": {
       "title": "Comments",
       "add-comment": "Add Comment",

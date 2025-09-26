@@ -861,7 +861,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         {isReady ? t('property-detail.other-comments') : 'Diğer Yorumlar'}
                                     </h3>
                                     <p className="text-sm text-gray-600">
-                                        Kullanıcı deneyimleri ve değerlendirmeleri
+                                        {isReady ? t('property-detail.user-experiences') : 'Kullanıcı deneyimleri ve değerlendirmeleri'}
                                     </p>
                                 </div>
 
@@ -968,7 +968,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         </span>
                                     </div>
                                     <p className="text-gray-600 text-sm mt-2">
-                                        Bu ilan hakkında ilk değerlendirmeyi siz yapın!
+                                        {isReady ? t('property-detail.be-first-reviewer') : 'Bu ilan hakkında ilk değerlendirmeyi siz yapın!'}
                                     </p>
                                 </div>
                             )}
