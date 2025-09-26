@@ -90,12 +90,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             return;
         }
 
+        console.log('🔵 FRONTEND: Starting phone verification process');
+        console.log('🔵 Phone number:', formData.phoneNumber);
+        console.log('🔵 API function:', sendPhoneVerification);
+
         setPhoneVerificationLoading(true);
         try {
-            await sendPhoneVerification({ phoneNumber: formData.phoneNumber }).unwrap();
+            console.log('🔵 FRONTEND: Sending phone verification request...');
+            const result = await sendPhoneVerification({ phoneNumber: formData.phoneNumber }).unwrap();
+            console.log('🟢 FRONTEND: Phone verification success:', result);
             setShowPhoneVerification(true);
         } catch (error: any) {
-            console.error('Phone verification error:', error);
+            console.error('🔴 FRONTEND: Phone verification error:', error);
+            console.error('🔴 Error details:', {
+                status: error?.status,
+                data: error?.data,
+                message: error?.message,
+                originalStatus: error?.originalStatus
+            });
             setErrors(prev => ({ ...prev, phoneNumber: 'Doğrulama kodu gönderilemedi' }));
         } finally {
             setPhoneVerificationLoading(false);
