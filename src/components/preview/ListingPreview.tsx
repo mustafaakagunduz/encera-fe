@@ -69,6 +69,13 @@ export const ListingPreview: React.FC = () => {
     // Publishing state - sadece button loading için
     const [isPublishing, setIsPublishing] = useState(false);
 
+    // Upload progress state
+    const [uploadProgress, setUploadProgress] = useState<{
+        show: boolean;
+    }>({
+        show: false
+    });
+
     const showToast = (message: string, type: 'success' | 'error') => {
         setToast({ show: true, message, type });
     };
@@ -76,6 +83,20 @@ export const ListingPreview: React.FC = () => {
     const hideToast = () => {
         setToast(prev => ({ ...prev, show: false }));
     };
+
+
+    // Prevent page unload during upload
+    React.useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isPublishing && uploadProgress.show) {
+                e.preventDefault();
+                e.returnValue = isReady ? t('listing.preview.progress.close-warning') : 'İlan yükleme işlemi devam ediyor. Sayfayı kapatmak istediğinizden emin misiniz?';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isPublishing, uploadProgress.show]);
 
     // Storage'dan File objelerini yükle
     React.useEffect(() => {
@@ -218,6 +239,11 @@ export const ListingPreview: React.FC = () => {
                 console.log('📁 Files to upload:', filesToUpload.length);
 
                 if (filesToUpload.length > 0) {
+                    // Show upload progress
+                    setUploadProgress({
+                        show: true
+                    });
+
                     // Önce resimleri sıkıştır (daha hızlı upload için)
                     const files = filesToUpload.map(img => img.file!);
                     console.log('🗜️ Compressing images...', files.length, 'files');
@@ -230,6 +256,7 @@ export const ListingPreview: React.FC = () => {
 
                     const compressedFiles = compressedResults.map(result => result.file);
                     console.log('✅ Images compressed, uploading to S3...', compressedFiles.length, 'files');
+
 
                     // Sıkıştırılmış image'ları S3'e yükle
                     const uploadResponse = await uploadMultipleFiles({
@@ -284,11 +311,17 @@ export const ListingPreview: React.FC = () => {
                 }
             } else {
                 console.log('ℹ️ No local images to upload');
+                // Show progress even if no images to upload
+                setUploadProgress({
+                    show: true
+                });
             }
+
 
             console.log('💾 Creating property in database...', finalPropertyData);
             const createdProperty = await createProperty(finalPropertyData).unwrap();
             console.log('✅ Property created successfully:', createdProperty);
+
 
             // Storage ve Redux'ı temizle
             previewStorage.clear();
@@ -300,7 +333,8 @@ export const ListingPreview: React.FC = () => {
         } catch (error) {
             console.error('❌ Listing creation error:', error);
 
-            // Hata olursa publishing state'i kapat
+            // Hata olursa progress ve publishing state'i kapat
+            setUploadProgress({ show: false });
             setIsPublishing(false);
 
             showToast(
@@ -814,6 +848,31 @@ export const ListingPreview: React.FC = () => {
                 </div>
             )}
 
+            {/* Upload Progress Modal */}
+            {uploadProgress.show && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', backdropFilter: 'blur(4px)' }}
+                >
+                    <div className="relative max-w-md w-full bg-white rounded-lg shadow-2xl overflow-hidden">
+                        <div className="p-8 text-center">
+                            <div className="mb-6">
+                                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                    <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                                </div>
+                            </div>
+
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                {isReady ? t('listing.preview.progress.title') : 'İlanınız Yükleniyor'}
+                            </h3>
+
+                            <p className="text-gray-600">
+                                {isReady ? t('listing.preview.progress.message') : 'İlanınız yüklenirken lütfen bekleyiniz, yükleme işlemi esnasında bu pencereyi kapatmayınız.'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Toast Notification - En üstte görünsün */}
             {toast.show && (

@@ -138,7 +138,12 @@
       "edit": "Edit",
       "confirm": "Confirm and Publish",
       "note": "Your listing will be published after approval and will appear in \"My Listings\" section.",
-      "edit-info": "Your listing can be edited and deleted after publishing"
+      "edit-info": "Your listing can be edited and deleted after publishing",
+      "progress": {
+        "title": "Uploading Your Listing",
+        "message": "Please wait while your listing is being uploaded, do not close this window during the upload process.",
+        "close-warning": "Listing upload is in progress. Are you sure you want to close the page?"
+      }
     },
     "features": "Features",
     "details": "Details",

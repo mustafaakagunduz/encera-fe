@@ -140,7 +140,12 @@
       "edit": "Düzenle",
       "confirm": "Onayla ve Yayınla",
       "note": "İlanınız onaylandıktan sonra yayınlanacak ve \"İlanlarım\" bölümünde görünecektir.",
-      "edit-info": "İlanınız yayınlandıktan sonra düzenlenebilir ve silinebilir"
+      "edit-info": "İlanınız yayınlandıktan sonra düzenlenebilir ve silinebilir",
+      "progress": {
+        "title": "İlanınız Yükleniyor",
+        "message": "İlanınız yüklenirken lütfen bekleyiniz, yükleme işlemi esnasında bu pencereyi kapatmayınız.",
+        "close-warning": "İlan yükleme işlemi devam ediyor. Sayfayı kapatmak istediğinizden emin misiniz?"
+      }
     },
     "features": "Özellikler",
     "details": "Detaylar",
