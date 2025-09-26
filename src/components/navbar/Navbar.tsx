@@ -7,9 +7,10 @@ import { useRouter } from 'next/navigation';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
-import { ChevronDown, User, Globe } from 'lucide-react';
+import { ChevronDown, User, Globe, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NotificationBell } from '@/components/ui/notification-bell';
+import { useGetUnreadCountQuery } from '@/store/api/messageApi';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
@@ -22,6 +23,12 @@ const Navbar: React.FC = () => {
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const languageMenuRef = useRef<HTMLDivElement>(null);
+
+    // Okunmamış mesaj sayısını çek
+    const { data: unreadData } = useGetUnreadCountQuery(undefined, {
+        skip: !isAuthenticated,
+        pollingInterval: 30000, // 30 saniyede bir yenile
+    });
 
     // Menüleri dışarı tıklayınca kapatma
     useEffect(() => {
@@ -56,6 +63,8 @@ const Navbar: React.FC = () => {
         dispatch(logout());
         setIsUserMenuOpen(false);
         router.push('/');
+        // Sayfayı yenile
+        window.location.reload();
     };
 
     const handleCreateListing = () => {
@@ -124,6 +133,22 @@ const Navbar: React.FC = () => {
                             )}
                         </div>
 
+                        {/* Mesaj bildirimi - Sadece giriş yapmış kullanıcılar için */}
+                        {isHydrated && isAuthenticated && (
+                            <Link
+                                href="/messages"
+                                className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-lg hover:bg-gray-100"
+                                title={isReady ? 'Mesajlar' : 'Messages'}
+                            >
+                                <MessageSquare className="w-5 h-5" />
+                                {unreadData && unreadData.unreadCount > 0 && (
+                                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-medium animate-pulse">
+                                        {unreadData.unreadCount > 9 ? '9+' : unreadData.unreadCount}
+                                    </div>
+                                )}
+                            </Link>
+                        )}
+
                         {/* Bildirim Bell'i - Sadece giriş yapmış kullanıcılar için */}
                         {isHydrated && isAuthenticated && <NotificationBell />}
 
@@ -191,10 +216,15 @@ const Navbar: React.FC = () => {
                                                     </Link>
                                                     <Link
                                                         href="/messages"
-                                                        className="navbar-dropdown-item"
+                                                        className="navbar-dropdown-item flex items-center justify-between"
                                                         onClick={() => setIsUserMenuOpen(false)}
                                                     >
-                                                        {isReady ? t('navbar.messages') : 'Mesajlar'}
+                                                        <span>{isReady ? t('navbar.messages') : 'Mesajlar'}</span>
+                                                        {unreadData && unreadData.unreadCount > 0 && (
+                                                            <div className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-medium ml-2">
+                                                                {unreadData.unreadCount > 9 ? '9+' : unreadData.unreadCount}
+                                                            </div>
+                                                        )}
                                                     </Link>
                                                     <Link
                                                         href="/settings"

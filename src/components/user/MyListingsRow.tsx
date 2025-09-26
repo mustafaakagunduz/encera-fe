@@ -31,7 +31,7 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
             try {
                 await deleteProperty(property.id).unwrap();
                 console.log('İlan başarıyla silindi');
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Silme hatası:', error);
                 const errorMessage = error?.data?.message || 'İlan silinirken bir hata oluştu';
                 alert(errorMessage);

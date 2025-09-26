@@ -318,6 +318,8 @@ export const Messages: React.FC = () => {
                                             className={`w-full p-4 text-left hover:bg-gray-50 transition-colors cursor-pointer ${
                                                 selectedConversation === conversation.otherUserId
                                                     ? 'bg-blue-50 border-r-2 border-blue-600'
+                                                    : conversation.hasUnreadMessages
+                                                    ? 'bg-red-50 border-l-2 border-red-400'
                                                     : ''
                                             }`}
                                         >
@@ -334,7 +336,9 @@ export const Messages: React.FC = () => {
                                                         </p>
                                                         <div className="flex items-center gap-1">
                                                             {conversation.hasUnreadMessages && (
-                                                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                                                <div className="bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1 font-medium animate-pulse">
+                                                                    {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
+                                                                </div>
                                                             )}
                                                             <span className="text-xs text-gray-500">
                                                                 {formatMessageTime(conversation.lastMessageTime)}
@@ -351,7 +355,11 @@ export const Messages: React.FC = () => {
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <p className="text-sm text-gray-600 truncate mt-1">
+                                                    <p className={`text-sm truncate mt-1 ${
+                                                        conversation.hasUnreadMessages
+                                                            ? 'text-gray-900 font-medium'
+                                                            : 'text-gray-600'
+                                                    }`}>
                                                         {conversation.lastMessage}
                                                     </p>
                                                     {conversation.propertyTitle && (

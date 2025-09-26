@@ -53,6 +53,16 @@ interface Property {
         hallCount?: number;
         bathroomCount?: number;
     };
+    delegatedToEncera: boolean;
+    delegationDate?: string;
+    delegationActive: boolean;
+    originalOwner?: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        phoneNumber: string;
+        email?: string;
+    };
     owner: {
         id: number;
         firstName: string;
@@ -268,10 +278,39 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                                     İlan Sahibi
                                 </h4>
                                 <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm text-gray-600">Ad Soyad:</span>
-                                        <span className="text-sm font-medium text-gray-900">{property.owner.firstName} {property.owner.lastName}</span>
-                                    </div>
+                                    {property.delegatedToEncera ? (
+                                        <>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-600">Yönetici:</span>
+                                                <span className="text-sm font-medium text-blue-600">Encera</span>
+                                            </div>
+                                            {property.originalOwner && (
+                                                <>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm text-gray-600">Asıl Sahip:</span>
+                                                        <span className="text-sm font-medium text-gray-900">{property.originalOwner.firstName} {property.originalOwner.lastName}</span>
+                                                    </div>
+                                                    {property.originalOwner.phoneNumber && (
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-sm text-gray-600">Telefon:</span>
+                                                            <span className="text-sm font-medium text-gray-900">{property.originalOwner.phoneNumber}</span>
+                                                        </div>
+                                                    )}
+                                                    {property.originalOwner.email && (
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-sm text-gray-600">E-posta:</span>
+                                                            <span className="text-sm font-medium text-gray-900">{property.originalOwner.email}</span>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-600">Ad Soyad:</span>
+                                            <span className="text-sm font-medium text-gray-900">{property.owner.firstName} {property.owner.lastName}</span>
+                                        </div>
+                                    )}
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm text-gray-600">ID:</span>
                                         <span className="text-sm font-medium text-gray-900">#{property.owner.id}</span>

@@ -2,7 +2,7 @@
 
 // src/components/admin/properties/AllPropertiesTable.tsx
 import React, { useState } from 'react';
-import { Search, Building, CheckCircle, Clock, AlertTriangle, Eye } from 'lucide-react';
+import { Search, Building, CheckCircle, Clock, AlertTriangle, Eye, Users, User } from 'lucide-react';
 import { useGetAllAdminPropertiesQuery } from '@/store/api/adminApi';
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +11,7 @@ export const AllPropertiesTable: React.FC = () => {
     const { data: propertiesData, isLoading } = useGetAllAdminPropertiesQuery({ page: 0, size: 50 });
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'reported'>('all');
+    const [ownershipFilter, setOwnershipFilter] = useState<'all' | 'encera' | 'delegated'>('all');
 
     const properties = propertiesData?.content || [];
     const filteredProperties = properties.filter(property => {
@@ -30,7 +31,19 @@ export const AllPropertiesTable: React.FC = () => {
                 break;
         }
 
-        return matchesSearch && matchesStatus;
+        let matchesOwnership = true;
+        switch (ownershipFilter) {
+            case 'encera':
+                // Encera'nın kendi ilanları - pappSellable true olan ama delegatedToEncera false olan
+                matchesOwnership = property.pappSellable === true && property.delegatedToEncera === false;
+                break;
+            case 'delegated':
+                // Encera ile satılsın denilen ilanlar - delegatedToEncera true olan
+                matchesOwnership = property.delegatedToEncera === true;
+                break;
+        }
+
+        return matchesSearch && matchesStatus && matchesOwnership;
     });
 
     const getStatusInfo = (property: any) => {
@@ -62,35 +75,76 @@ export const AllPropertiesTable: React.FC = () => {
     return (
         <div className="space-y-4">
             {/* Header & Filters */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                    Tüm İlanlar ({filteredProperties.length})
-                </h3>
+            <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <h3 className="text-lg font-medium text-gray-900">
+                        Tüm İlanlar ({filteredProperties.length})
+                    </h3>
 
-                <div className="flex gap-3">
-                    {/* Status Filter */}
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as any)}
-                        className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        <option value="all">Tüm Durumlar</option>
-                        <option value="approved">Onaylanmış</option>
-                        <option value="pending">Onay Bekleyen</option>
-                        <option value="reported">Şikayetli</option>
-                    </select>
+                    <div className="flex gap-3">
+                        {/* Status Filter */}
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value as any)}
+                            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="all">Tüm Durumlar</option>
+                            <option value="approved">Onaylanmış</option>
+                            <option value="pending">Onay Bekleyen</option>
+                            <option value="reported">Şikayetli</option>
+                        </select>
 
-                    {/* Search */}
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="İlan ara..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
+                        {/* Search */}
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="İlan ara..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
                     </div>
+                </div>
+
+                {/* Ownership Filter Buttons */}
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        onClick={() => setOwnershipFilter('all')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            ownershipFilter === 'all'
+                                ? 'bg-gray-900 text-white'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                    >
+                        <Building className="h-4 w-4" />
+                        Tüm İlanlar
+                    </button>
+
+                    <button
+                        onClick={() => setOwnershipFilter('encera')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            ownershipFilter === 'encera'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                        }`}
+                    >
+                        <User className="h-4 w-4" />
+                        Encera'nın İlanları
+                    </button>
+
+                    <button
+                        onClick={() => setOwnershipFilter('delegated')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            ownershipFilter === 'delegated'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-green-50 text-green-600 hover:bg-green-100'
+                        }`}
+                    >
+                        <Users className="h-4 w-4" />
+                        Encera ile Satılsın İlanları
+                    </button>
                 </div>
             </div>
 
@@ -141,8 +195,31 @@ export const AllPropertiesTable: React.FC = () => {
                                     <span>{new Date(property.createdAt).toLocaleDateString('tr-TR')}</span>
                                 </div>
 
-                                <div className="text-xs">
-                                    Sahibi: {property.owner.firstName} {property.owner.lastName}
+                                <div className="text-xs space-y-1">
+                                    <div>
+                                        {property.delegatedToEncera ? (
+                                            <div className="space-y-1">
+                                                <div className="text-blue-600 font-medium">
+                                                    Yönetici: Encera
+                                                </div>
+                                                {property.originalOwner && (
+                                                    <div>
+                                                        Asıl Sahip: {property.originalOwner.firstName} {property.originalOwner.lastName}
+                                                        {property.originalOwner.phoneNumber && (
+                                                            <div className="text-gray-500">Tel: {property.originalOwner.phoneNumber}</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                Sahibi: {property.owner.firstName} {property.owner.lastName}
+                                                {property.owner.phoneNumber && (
+                                                    <div className="text-gray-500">Tel: {property.owner.phoneNumber}</div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {property.reportCount > 0 && (

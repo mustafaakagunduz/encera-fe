@@ -150,6 +150,19 @@ export interface PropertyResponse {
         lastName: string;
         phoneNumber: string;
     };
+
+    // Delegasyon sistemi
+    delegatedToEncera?: boolean;
+    delegationDate?: string;
+    delegationActive?: boolean;
+    originalOwner?: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        phoneNumber: string;
+        email: string;
+    };
+
     createdAt: string;
     updatedAt: string;
     lastPublished?: string;
@@ -414,12 +427,41 @@ export const propertyApi = createApi({
                 { type: 'Property', id }
             ],
         }),
+
+        // ========== DELEGASYON SİSTEMİ ==========
+
+        // Encera ilanlarını getir (Admin için)
+        getEnceraProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/encera?page=${page}&size=${size}`,
+            providesTags: ['Property'],
+        }),
+
+        // Kullanıcının Encera'ya devrettiği ilanlar
+        getUserDelegatedProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/user/delegated?page=${page}&size=${size}`,
+            providesTags: ['UserProperty'],
+        }),
+
+        // İlan delegasyonunu değiştir
+        toggleEnceraDelegation: builder.mutation<PropertyResponse, { id: number; delegate: boolean }>({
+            query: ({ id, delegate }) => ({
+                url: `/user/${id}/delegation`,
+                method: 'POST',
+                body: { delegate },
+            }),
+            invalidatesTags: (result, error, { id }) => [
+                'UserProperty',
+                'Property',
+                { type: 'Property', id },
+                { type: 'UserProperty', id: 'LIST' },
+            ],
+        }),
     }),
 });
 
 // Export hooks
 export const {
-    // Public endpoints
+    // Public property queries
     useGetAllPropertiesQuery,
     useGetPropertyByIdQuery,
     useGetPropertiesByListingTypeQuery,
@@ -439,4 +481,9 @@ export const {
     useTogglePropertyStatusMutation,
     useRepublishPropertyMutation,
     useReportPropertyMutation,
+
+    // Delegasyon sistemi
+    useGetEnceraPropertiesQuery,
+    useGetUserDelegatedPropertiesQuery,
+    useToggleEnceraDelegationMutation,
 } = propertyApi;

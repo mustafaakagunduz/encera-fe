@@ -48,6 +48,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     const handleLogout = () => {
         dispatch(logout());
         onClose();
+        // Anasayfaya yönlendir ve yenile
+        window.location.href = '/';
     };
 
     return (

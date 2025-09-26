@@ -11,7 +11,10 @@ export const ApprovedPropertiesTable: React.FC = () => {
 
     const properties = propertiesData?.content || [];
     const filteredProperties = properties.filter(property =>
-        property.title.toLowerCase().includes(searchTerm.toLowerCase())
+        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.owner.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.owner.lastName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     if (isLoading) {
@@ -49,6 +52,24 @@ export const ApprovedPropertiesTable: React.FC = () => {
                                     <p className="text-sm text-gray-500">
                                         {property.city}, {property.district} • {property.viewCount} görüntüleme
                                     </p>
+                                    <div className="text-xs text-gray-600 mt-1">
+                                        {property.delegatedToEncera ? (
+                                            <div className="space-y-1">
+                                                <div className="text-blue-600 font-medium">
+                                                    Yönetici: Encera
+                                                </div>
+                                                {property.originalOwner && (
+                                                    <div>
+                                                        Asıl Sahip: {property.originalOwner.firstName} {property.originalOwner.lastName}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                Sahibi: {property.owner.firstName} {property.owner.lastName}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className="text-right">

@@ -182,7 +182,7 @@ const PropertiesSection: React.FC = () => {
 
         const filtered = propertiesData.content.filter(property => property.pappSellable === true);
         console.log('🏠 Encera Properties:', filtered);
-        console.log('📷 First property images:', filtered[0]?.primaryImageUrl, filtered[0]?.imageUrls);
+        console.log('📷 First property images:', filtered[0]?.primaryImageUrl);
 
         return filtered;
     }, [propertiesData]);

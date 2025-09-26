@@ -3,11 +3,18 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithRetry } from './baseQuery';
 import { buildApiUrl } from './config';
 
+// Import ApiResponse type
+interface ApiResponse<T> {
+    data: T;
+    message: string;
+}
+
 // Types
 export interface RegisterRequest {
     firstName: string;
     lastName: string;
     email: string;
+    phoneNumber: string;
     password: string;
 }
 
@@ -32,6 +39,15 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordRequest {
     token: string;
     newPassword: string;
+}
+
+export interface GuestPhoneVerificationRequest {
+    phoneNumber: string;
+}
+
+export interface GuestPhoneVerificationCodeRequest {
+    phoneNumber: string;
+    verificationCode: string;
 }
 
 export interface AuthResponse {
@@ -74,14 +90,10 @@ export interface ErrorResponse {
     message: string;
 }
 
-// Auth-specific base query (auth endpoints don't need token refresh)
+// Auth-specific base query (auth endpoints typically don't need authentication)
 const authBaseQuery = fetchBaseQuery({
     baseUrl: buildApiUrl('auth'),
-    prepareHeaders: (headers, { getState }) => {
-        const token = (getState() as any).auth.token;
-        if (token) {
-            headers.set('authorization', `Bearer ${token}`);
-        }
+    prepareHeaders: (headers) => {
         headers.set('content-type', 'application/json');
         return headers;
     },
@@ -154,6 +166,20 @@ export const authApi = createApi({
                 body: data,
             }),
         }),
+        sendGuestPhoneVerification: builder.mutation<ApiResponse<null>, GuestPhoneVerificationRequest>({
+            query: (phoneData) => ({
+                url: '/send-phone-verification',
+                method: 'POST',
+                body: phoneData,
+            }),
+        }),
+        verifyGuestPhone: builder.mutation<ApiResponse<null>, GuestPhoneVerificationCodeRequest>({
+            query: (verificationData) => ({
+                url: '/verify-phone',
+                method: 'POST',
+                body: verificationData,
+            }),
+        }),
     }),
 });
 
@@ -168,4 +194,6 @@ export const {
     useLazyValidateResetTokenQuery,
     useRefreshTokenMutation,
     useLogoutMutation,
+    useSendGuestPhoneVerificationMutation,
+    useVerifyGuestPhoneMutation,
 } = authApi;

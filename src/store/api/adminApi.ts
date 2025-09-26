@@ -17,6 +17,8 @@ export interface UserResponse {
 
 export interface AdminStatisticsResponse {
     totalUsers: number;
+    totalProperties: number;
+    delegatedProperties: number;
 }
 
 export interface AdminErrorResponse {
@@ -60,6 +62,17 @@ export interface PropertyResponse {
         firstName: string;
         lastName: string;
         phoneNumber: string;
+        email?: string;
+    };
+    delegatedToEncera: boolean;
+    delegationDate?: string;
+    delegationActive: boolean;
+    originalOwner?: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        phoneNumber: string;
+        email?: string;
     };
     createdAt: string;
     updatedAt: string;
@@ -155,11 +168,17 @@ export const adminApi = createApi({
 
         // Get all properties for admin
         getAllAdminProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
-            query: ({ page = 0, size = 20 }) => `/properties/admin/all?page=${page}&size=${size}`,
+            query: ({ page = 0, size = 20 }) => `/admin/properties?page=${page}&size=${size}`,
             providesTags: [
                 'AdminProperties',
                 { type: 'AdminProperties', id: 'ALL' }
             ],
+        }),
+
+        // Get property by ID (admin)
+        getAdminPropertyById: builder.query<PropertyResponse, number>({
+            query: (id) => `/admin/properties/${id}`,
+            providesTags: (result, error, id) => [{ type: 'AdminProperties', id }],
         }),
 
         // Get approved properties for admin
@@ -274,6 +293,7 @@ export const {
     // Property Management
     useGetPendingApprovalPropertiesQuery,
     useGetAllAdminPropertiesQuery,
+    useGetAdminPropertyByIdQuery,
     useGetApprovedPropertiesQuery,
     useGetReportedPropertiesQuery,
     useApprovePropertyMutation,
