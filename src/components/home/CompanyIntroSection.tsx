@@ -77,25 +77,6 @@ const CompanyIntroSection: React.FC = () => {
                 {/* ========== SECTION 2: MAIN CONTENT (Title, Subtitle, Description, Stats) ========== */}
                 <div className="absolute inset-0 flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full" style={{ paddingTop: 'clamp(120px, 15vh, 180px)' }}>
                     <div className={`text-center transition-all duration-800 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-                        {/* Main Title */}
-                        <h1 className="font-bold leading-tight mb-[1.5vh] lg:mb-[2vh]" style={{ fontSize: 'clamp(1.25rem, 3.5vw, 4rem)' }}>
-                            <span className="text-white drop-shadow-lg">
-                                {companyTitle}
-                            </span>
-                        </h1>
-
-                        {/* Subtitle */}
-                        <div className="relative mb-[1.5vh] lg:mb-[2vh]">
-                            <p className="font-bold text-white drop-shadow-lg leading-relaxed relative z-10" style={{ fontSize: 'clamp(0.8rem, 2.2vw, 2.2rem)' }}>
-                                {companySubtitle}
-                            </p>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/30 to-transparent blur-xl -z-10 scale-110"></div>
-                        </div>
-
-                        {/* Description */}
-                        <p className="text-white drop-shadow-md max-w-4xl mx-auto leading-relaxed mb-[2vh] lg:mb-[3vh]" style={{ fontSize: 'clamp(0.7rem, 1.3vw, 1.4rem)' }}>
-                            {companyDescription}
-                        </p>
 
                         {/* Elegant Statistics Cards */}
                         <div className="grid grid-cols-4 mb-[2vh] lg:mb-[3vh]" style={{ gap: 'clamp(0.3rem, 0.8vw, 1.5rem)' }}>
@@ -172,25 +153,6 @@ const CompanyIntroSection: React.FC = () => {
                     </div>
                 </div>
 
-                {/* ========== SECTION 4: TRUST INDICATORS ========== */}
-                <div className="absolute bottom-8 left-0 right-0 text-center">
-                    <div className={`transition-all duration-800 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-                        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 lg:gap-8 text-blue-900">
-                            <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base font-semibold">
-                                <Award className="w-3 h-3 sm:w-4 sm:h-4 text-blue-800" />
-                                <span>{t('home.company-intro.trust-indicators.licensed')}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base font-semibold">
-                                <Building2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-800" />
-                                <span>{t('home.company-intro.trust-indicators.support')}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base font-semibold">
-                                <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-800" />
-                                <span>{t('home.company-intro.trust-indicators.satisfaction')}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </section>

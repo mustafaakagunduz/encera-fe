@@ -1,12 +1,46 @@
-/* Navbar.css */
-.navbar-container {
-    background-color: rgba(30, 58, 138, 0.9); /* blue-900 with 90% opacity */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+/* Unified Navbar Container */
+.unified-navbar-container {
+    background: linear-gradient(180deg,
+        rgba(30, 58, 138, 0.95) 0%,
+        rgba(30, 58, 138, 0.92) 15%,
+        rgba(30, 58, 138, 0.88) 30%,
+        rgba(30, 58, 138, 0.82) 45%,
+        rgba(30, 58, 138, 0.72) 60%,
+        rgba(30, 58, 138, 0.58) 75%,
+        rgba(30, 58, 138, 0.35) 85%,
+        rgba(30, 58, 138, 0.15) 92%,
+        rgba(30, 58, 138, 0.05) 96%,
+        rgba(30, 58, 138, 0.01) 98%,
+        rgba(30, 58, 138, 0.002) 99%,
+        transparent 100%
+    );
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: white;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    position: relative;
+    left: 0;
+    right: 0;
     z-index: 50;
+    border-bottom: none !important;
+    border: none !important;
+    transform: translateY(0);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Ana sayfada fixed pozisyon */
+.navbar-fixed {
+    position: fixed;
+    top: 0;
+}
+
+/* Diğer sayfalarda sticky pozisyon - scroll hide çalışsın */
+.navbar-static {
+    position: sticky;
+    top: 0;
+}
+
+/* Scroll ile navbar gizleme */
+.navbar-hidden {
+    transform: translateY(-100%) !important;
 }
 
 .navbar-content {
@@ -17,6 +51,7 @@
     display: flex;
     flex-direction: column; /* Varsayılan olarak column */
     min-height: 64px; /* h-16 */
+    gap: 0; /* Satırlar arası boşluğu kaldır */
 }
 
 .navbar-main-row {
@@ -62,9 +97,18 @@
     gap: 4px; /* space-x-1 */
     justify-content: center;
     padding: 16px 0; /* Üst ve alt padding */
+    flex: 1; /* Mobilde de genişlik al */
+    max-width: none; /* Mobilde max-width kısıtlaması kaldır */
 }
 
-/* 1024px ve üzeri için orta grup ana satırda ortalanmış */
+.navbar-search-wrapper {
+    width: 100%;
+    margin: 0 auto;
+    transition: max-width 0.3s ease;
+    position: relative;
+}
+
+/* 1024px ve üzeri için grid düzeni - perfect centering */
 @media (min-width: 1024px) {
     .navbar-content {
         flex-direction: row; /* Desktop'ta tek satır */
@@ -74,16 +118,53 @@
 
     .navbar-main-row {
         width: 100%;
-        position: relative;
-        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr; /* Sol: 1fr, Orta: 2fr (daha geniş), Sağ: 1fr */
+        align-items: center;
+        gap: 16px;
+    }
+
+    .navbar-left-group {
+        justify-self: start; /* Sol tarafta hizala */
     }
 
     .navbar-center-group {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        padding: 0; /* Desktop'ta padding kaldır */
+        justify-self: center; /* Tam ortada hizala */
+        max-width: none; /* Kısıtlamayı kaldır */
+        width: 100%;
+        padding: 0;
+        position: relative;
+    }
+
+    .navbar-center-group .navbar-search-wrapper {
+        max-width: clamp(600px, 65vw, 1200px) !important; /* Desktop'ta daha geniş başlat */
+        width: 100% !important;
+    }
+
+    .navbar-right-group {
+        justify-self: end; /* Sağ tarafta hizala */
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+/* Ekran büyüdükçe arama çubuğunu daha tutarlı genişlet */
+@media (min-width: 1280px) {
+    .navbar-center-group .navbar-search-wrapper {
+        max-width: clamp(700px, 70vw, 1400px) !important;
+    }
+}
+
+@media (min-width: 1536px) {
+    .navbar-center-group .navbar-search-wrapper {
+        max-width: clamp(800px, 75vw, 1600px) !important;
+    }
+}
+
+@media (min-width: 1920px) {
+    .navbar-center-group .navbar-search-wrapper {
+        max-width: clamp(900px, 80vw, 1800px) !important; /* Tam ekranda en geniş */
     }
 }
 
@@ -136,8 +217,8 @@
 .navbar-user-button {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
+    gap: 4px;
+    padding: 4px 8px;
     border-radius: 6px;
     font-size: 0.875rem;
     font-weight: 500;
@@ -149,8 +230,8 @@
 }
 
 .navbar-user-button:hover {
-    background-color: #93c5fd;
-    color: #1e40af;
+    background-color: rgba(147, 197, 253, 0.2);
+    color: white;
 }
 
 .navbar-user-avatar {
@@ -252,6 +333,209 @@
     margin: 4px 0;
 }
 
+/* Mobil responsive düzenlemeler */
+@media (max-width: 767px) {
+    .navbar-main-row {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Minimal gap */
+    }
+
+    .navbar-left-group {
+        flex-shrink: 0;
+        min-width: auto;
+    }
+
+    .navbar-center-group {
+        flex: 1;
+        padding: 0;
+        margin: 0 8px; /* Sol ve sağdan minimal margin */
+        min-width: 0; /* Flexbox shrinking için */
+    }
+
+    .navbar-center-group .relative {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .navbar-center-group input {
+        font-size: 0.875rem; /* Mobilde daha küçük font */
+        padding: 8px 12px; /* Mobilde daha kompakt padding */
+    }
+
+    .navbar-right-group,
+    .mobile-only {
+        flex-shrink: 0;
+    }
+
+    /* Mobilde property-type bölümü için düzenleme */
+    .property-type-section .flex {
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .property-type-link {
+        font-size: 1rem; /* Mobilde de büyük font */
+        padding: 6px 12px; /* Daha kompakt padding */
+    }
+}
+
+/* Mobile/Desktop visibility controls */
+.mobile-only {
+    display: block;
+}
+
+.desktop-only {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .mobile-only {
+        display: none;
+    }
+
+    .desktop-only {
+        display: flex;
+    }
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.mobile-menu-content {
+    position: absolute;
+    top: 64px; /* navbar height */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(30, 58, 138, 0.95); /* blue-900 with transparency */
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Mobile Menu Sections */
+.mobile-menu-section {
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 16px;
+}
+
+.mobile-menu-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobile-menu-section-header:hover {
+    color: #93c5fd; /* blue-200 */
+}
+
+.mobile-menu-section-content {
+    padding-left: 29px; /* Align with icon */
+    margin-top: 8px;
+}
+
+/* Mobile Menu Items */
+.mobile-menu-item {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.mobile-menu-item:hover {
+    color: #93c5fd; /* blue-200 */
+    padding-left: 8px;
+}
+
+.mobile-menu-item.active {
+    color: #60a5fa; /* blue-400 */
+    font-weight: 600;
+}
+
+.mobile-menu-item.admin-item {
+    background-color: rgba(59, 130, 246, 0.2);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 8px 0;
+    font-weight: 600;
+}
+
+.mobile-menu-item.logout-item {
+    color: #f87171; /* red-400 */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 8px;
+    padding-top: 16px;
+}
+
+/* Mobile Menu Links */
+.mobile-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 16px 0;
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.mobile-menu-link:hover {
+    color: #93c5fd; /* blue-200 */
+    padding-left: 8px;
+}
+
+/* Mobile CTA Button */
+.mobile-menu-cta-button {
+    width: 100%;
+    background-color: #dc2626; /* red-600 */
+    color: white;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu-cta-button:hover {
+    background-color: #b91c1c; /* red-700 */
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
 /* Responsive için mobil menü gizleme */
 .navbar-mobile-placeholder {
     display: block;
@@ -260,5 +544,122 @@
 @media (min-width: 768px) {
     .navbar-mobile-placeholder {
         display: none;
+    }
+}
+
+/* Diğer sayfalarda ekstra padding - gradient efekti için */
+.navbar-with-extra-padding {
+    padding-bottom: 20px !important; /* Ana sayfadaki property-type-section padding'ini simüle et */
+}
+
+/* Property Type Section - Unified part of navbar */
+.property-type-section {
+    /* No separate background - part of unified gradient */
+    position: relative;
+    padding-bottom: 12px; /* Extra padding for gradual fade */
+    padding-top: 8px; /* Üstten biraz boşluk ekle */
+    margin-top: -4px; /* Üst satırla yakın ama çok yapışık değil */
+}
+
+.property-type-link {
+    color: white;
+    font-weight: 500;
+    font-size: 1.125rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: transparent;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    opacity: 0.9;
+}
+
+.property-type-link:hover {
+    color: #e0e7ff; /* indigo-100 */
+    background: transparent;
+    transform: translateY(-3px);
+    opacity: 1;
+}
+
+/* Scroll to Top Button */
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    /* Animasyon özellikleri */
+    animation: slideInUp 0.5s ease-out forwards;
+    transition: all 0.3s ease;
+}
+
+/* Buton görünme animasyonu */
+@keyframes slideInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(100px) scale(0.8);
+    }
+    60% {
+        opacity: 0.8;
+        transform: translateY(-10px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Buton kaybolma animasyonu */
+@keyframes slideOutDown {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    40% {
+        opacity: 0.8;
+        transform: translateY(-10px) scale(0.95);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100px) scale(0.8);
+    }
+}
+
+/* Kaybolma animasyonu için sınıf */
+.scroll-to-top-btn.hiding {
+    animation: slideOutDown 0.4s ease-in forwards;
+}
+
+.scroll-to-top-btn:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(30, 58, 138, 0.5);
+}
+
+.scroll-to-top-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+/* Mobile için daha küçük buton */
+@media (max-width: 768px) {
+    .scroll-to-top-btn {
+        width: 45px;
+        height: 45px;
+        bottom: 15px;
+        right: 15px;
     }
 }

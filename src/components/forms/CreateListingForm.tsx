@@ -303,7 +303,9 @@ export const CreateListingForm: React.FC = () => {
             ...prev,
             city: location.city,
             district: location.district,
-            neighborhood: location.neighborhood
+            neighborhood: location.neighborhood,
+            // Ankara dışında bir il seçilirse pappSellable'ı sıfırla
+            pappSellable: location.city === 'Ankara' ? prev.pappSellable : false
         }));
 
         // Clear location errors
@@ -1027,32 +1029,34 @@ export const CreateListingForm: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Ençera Premium */}
-                    <div>
-                        <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
-                            <Crown className="w-6 h-6 mr-3 text-yellow-600" />
-                            {isReady ? t('listing.create.encera-premium') : 'Ençera Premium'}
-                        </h2>
+                    {/* Ençera Premium - Sadece Ankara seçildiğinde görünür */}
+                    {formData.city === 'Ankara' && (
+                        <div>
+                            <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
+                                <Crown className="w-6 h-6 mr-3 text-yellow-600" />
+                                {isReady ? t('listing.create.encera-premium') : 'Ençera Premium'}
+                            </h2>
 
-                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-6">
-                            <div className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    id="pappSellable"
-                                    name="pappSellable"
-                                    checked={Boolean(formData.pappSellable)}
-                                    onChange={handleInputChange}
-                                    className="w-5 h-5 text-yellow-600 border-yellow-300 rounded focus:ring-yellow-500"
-                                />
-                                <label htmlFor="pappSellable" className="ml-4 flex items-center text-base font-medium text-gray-900 pointer-events-none">
-                                    {isReady ? t('listing.create.encera-sellable') : 'Ençera ile satılsın'}
-                                </label>
+                            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-6">
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id="pappSellable"
+                                        name="pappSellable"
+                                        checked={Boolean(formData.pappSellable)}
+                                        onChange={handleInputChange}
+                                        className="w-5 h-5 text-yellow-600 border-yellow-300 rounded focus:ring-yellow-500"
+                                    />
+                                    <label htmlFor="pappSellable" className="ml-4 flex items-center text-base font-medium text-gray-900 pointer-events-none">
+                                        {isReady ? t('listing.create.encera-sellable') : 'Ençera ile satılsın'}
+                                    </label>
+                                </div>
+                                <p className="mt-2 ml-9 text-sm text-gray-600">
+                                    {isReady ? t('listing.create.encera-sellable-description') : 'İlanınızı Ençera üzerinden satış sürecinde profesyonel destek alabilirsiniz.'}
+                                </p>
                             </div>
-                            <p className="mt-2 ml-9 text-sm text-gray-600">
-                                {isReady ? t('listing.create.encera-sellable-description') : 'İlanınızı Ençera üzerinden satış sürecinde profesyonel destek alabilirsiniz.'}
-                            </p>
                         </div>
-                    </div>
+                    )}
 
                     {/* Fotoğraflar */}
                     <div>
