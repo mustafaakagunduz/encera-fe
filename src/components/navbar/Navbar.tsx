@@ -28,6 +28,7 @@ const Navbar: React.FC = () => {
     const [lastScrollY, setLastScrollY] = useState(0);
     const [showScrollToTop, setShowScrollToTop] = useState(false);
     const [isHiding, setIsHiding] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const userMenuRef = useRef<HTMLDivElement>(null);
     const languageMenuRef = useRef<HTMLDivElement>(null);
 
@@ -141,6 +142,20 @@ const Navbar: React.FC = () => {
         });
     };
 
+    const handleNavbarSearch = () => {
+        if (!searchQuery.trim()) return;
+
+        console.log('🔍 Navbar search triggered:', searchQuery.trim());
+        const encodedQuery = encodeURIComponent(searchQuery.trim());
+        router.push(`/search?q=${encodedQuery}`);
+    };
+
+    const handleNavbarKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleNavbarSearch();
+        }
+    };
+
     return (
         <>
         <nav className={`unified-navbar-container ${pathname !== '/' ? 'navbar-with-extra-padding navbar-static' : 'navbar-fixed'} ${pathname !== '/' && !isNavbarVisible ? 'navbar-hidden' : ''}`}>
@@ -161,13 +176,16 @@ const Navbar: React.FC = () => {
                                 <div className="flex items-center">
                                     <input
                                         type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onKeyPress={handleNavbarKeyPress}
                                         placeholder={isReady ? t('home.company-intro.cta-button') : 'Gayrimenkul Ara...'}
                                         className="w-full bg-transparent border-none outline-none px-4 py-2 text-white placeholder-white focus:placeholder-transparent font-medium text-base"
-                                        onClick={() => {
-                                            console.log('Search clicked - future feature');
-                                        }}
                                     />
-                                    <button className="bg-blue-900 hover:bg-blue-800 rounded-full p-2 transition-all duration-300 transform hover:scale-105 group flex-shrink-0">
+                                    <button
+                                        onClick={handleNavbarSearch}
+                                        className="bg-blue-900 hover:bg-blue-800 rounded-full p-2 transition-all duration-300 transform hover:scale-105 group flex-shrink-0"
+                                    >
                                         <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform duration-300" />
                                     </button>
                                 </div>
