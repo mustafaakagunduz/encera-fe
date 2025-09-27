@@ -168,12 +168,15 @@
       "city": "City",
       "district": "District",
       "neighborhood": "Neighborhood",
+      "street": "Street",
       "select-city": "Select city",
       "select-district": "Select district",
       "select-neighborhood": "Select neighborhood",
       "search-city": "Search city...",
       "search-district": "Search district...",
-      "search-neighborhood": "Search neighborhood..."
+      "search-neighborhood": "Search neighborhood...",
+      "street-placeholder": "Enter street name...",
+      "select-neighborhood-first": "Please select a neighborhood first."
     },
     "create": {
       "title": "Create Listing",

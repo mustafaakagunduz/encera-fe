@@ -32,6 +32,7 @@ interface FormData extends Omit<PropertyCreateRequest, 'roomConfiguration'> {
     roomCount: string;
     hallCount: string;
     negotiable: boolean;
+    street?: string;
 }
 
 interface ImageData {
@@ -81,6 +82,7 @@ export const CreateListingForm: React.FC = () => {
         city: '',
         district: '',
         neighborhood: '',
+        street: '',
         price: 0,
         grossArea: undefined,
         netArea: undefined,
@@ -125,6 +127,7 @@ export const CreateListingForm: React.FC = () => {
                 city: previewData.city,
                 district: previewData.district,
                 neighborhood: previewData.neighborhood,
+                street: (previewData as any).street || '',
                 price: previewData.price,
                 grossArea: previewData.grossArea,
                 netArea: previewData.netArea,
@@ -178,6 +181,7 @@ export const CreateListingForm: React.FC = () => {
                 city: existingProperty.city,
                 district: existingProperty.district,
                 neighborhood: existingProperty.neighborhood,
+                street: (existingProperty as any).street || '',
                 price: existingProperty.price,
                 grossArea: existingProperty.grossArea,
                 netArea: existingProperty.netArea,
@@ -298,12 +302,13 @@ export const CreateListingForm: React.FC = () => {
         }
     };
 
-    const handleLocationChange = (location: { city: string; district: string; neighborhood: string }) => {
+    const handleLocationChange = (location: { city: string; district: string; neighborhood: string; street?: string }) => {
         setFormData(prev => ({
             ...prev,
             city: location.city,
             district: location.district,
             neighborhood: location.neighborhood,
+            street: location.street || prev.street,
             // Ankara dışında bir il seçilirse pappSellable'ı sıfırla
             pappSellable: location.city === 'Ankara' ? prev.pappSellable : false
         }));
@@ -374,6 +379,14 @@ export const CreateListingForm: React.FC = () => {
             newErrors.description = isReady ? t('common.error') : 'Bu alan zorunludur';
         }
 
+        if (!formData.grossArea || formData.grossArea <= 0) {
+            newErrors.grossArea = isReady ? t('common.error') : 'Bu alan zorunludur';
+        }
+
+        if (!formData.netArea || formData.netArea <= 0) {
+            newErrors.netArea = isReady ? t('common.error') : 'Bu alan zorunludur';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -407,6 +420,7 @@ export const CreateListingForm: React.FC = () => {
             city: formData.city,
             district: formData.district,
             neighborhood: formData.neighborhood,
+            street: formData.street,
             price: formData.price,
             grossArea: formData.grossArea,
             netArea: formData.netArea,
@@ -516,7 +530,7 @@ export const CreateListingForm: React.FC = () => {
                             {/* İlan Başlığı */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                                    {isReady ? t('listing.create.listing-title') : 'İlan Başlığı'}
+                                    {isReady ? t('listing.create.listing-title') : 'İlan Başlığı'}<span className="text-black font-bold">(*)</span>
                                 </label>
                                 <input
                                     type="text"
@@ -589,6 +603,7 @@ export const CreateListingForm: React.FC = () => {
                                 selectedCity={formData.city}
                                 selectedDistrict={formData.district}
                                 selectedNeighborhood={formData.neighborhood}
+                                selectedStreet={formData.street}
                                 onLocationChange={handleLocationChange}
                                 errors={{
                                     city: errors.city,
@@ -612,29 +627,35 @@ export const CreateListingForm: React.FC = () => {
                             {/* Brüt Alan */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                                    {isReady ? t('listing.create.gross-area') : 'Brüt Alan (m²)'}
+                                    {isReady ? t('listing.create.gross-area') : 'Brüt Alan (m²)'}<span className="text-black font-bold">(*)</span>
                                 </label>
                                 <input
                                     type="text"
                                     name="grossArea"
                                     value={formData.grossArea !== undefined ? formData.grossArea : ''}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        errors.grossArea ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 />
+                                {errors.grossArea && <p className="mt-1 text-sm text-red-600">{errors.grossArea}</p>}
                             </div>
 
                             {/* Net Alan */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                                    {isReady ? t('listing.create.net-area') : 'Net Alan (m²)'}
+                                    {isReady ? t('listing.create.net-area') : 'Net Alan (m²)'}<span className="text-black font-bold">(*)</span>
                                 </label>
                                 <input
                                     type="text"
                                     name="netArea"
                                     value={formData.netArea !== undefined ? formData.netArea : ''}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        errors.netArea ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 />
+                                {errors.netArea && <p className="mt-1 text-sm text-red-600">{errors.netArea}</p>}
                             </div>
 
                             {/* Oda Sayısı - Konut için aktif */}
@@ -767,7 +788,7 @@ export const CreateListingForm: React.FC = () => {
                             {/* Fiyat */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                                    {isReady ? t('listing.create.price-label') : 'Fiyat'} ({isReady ? t('listing.create.currency') : 'TL'})
+                                    {isReady ? t('listing.create.price-label') : 'Fiyat'} ({isReady ? t('listing.create.currency') : 'TL'})<span className="text-black font-bold">(*)</span>
                                 </label>
                                 <input
                                     type="text"
@@ -1080,7 +1101,7 @@ export const CreateListingForm: React.FC = () => {
                     <div>
                         <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
                             <FileText className="w-6 h-6 mr-3 text-blue-600" />
-                            {isReady ? t('listing.create.description') : 'Açıklama'}
+                            {isReady ? t('listing.create.description') : 'Açıklama'}<span className="text-black font-bold">(*)</span>
                         </h2>
                         <div className="bg-gray-50 rounded-lg p-6">
                             <textarea

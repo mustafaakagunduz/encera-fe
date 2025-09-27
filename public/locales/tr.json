@@ -170,12 +170,15 @@
       "city": "İl",
       "district": "İlçe",
       "neighborhood": "Mahalle",
+      "street": "Sokak",
       "select-city": "İl seçiniz",
       "select-district": "İlçe seçiniz",
       "select-neighborhood": "Mahalle seçiniz",
       "search-city": "İl ara...",
       "search-district": "İlçe ara...",
-      "search-neighborhood": "Mahalle ara..."
+      "search-neighborhood": "Mahalle ara...",
+      "street-placeholder": "Sokak adını giriniz...",
+      "select-neighborhood-first": "Önce mahalle seçimi yapınız."
     },
     "create": {
       "title": "İlan Ver",

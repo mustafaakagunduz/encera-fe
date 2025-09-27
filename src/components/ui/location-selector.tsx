@@ -11,10 +11,12 @@ interface LocationSelectorProps {
     selectedCity?: string;
     selectedDistrict?: string;
     selectedNeighborhood?: string;
+    selectedStreet?: string;
     onLocationChange: (location: {
         city: string;
         district: string;
         neighborhood: string;
+        street?: string;
     }) => void;
     errors?: {
         city?: string;
@@ -28,6 +30,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                                                                       selectedCity,
                                                                       selectedDistrict,
                                                                       selectedNeighborhood,
+                                                                      selectedStreet,
                                                                       onLocationChange,
                                                                       errors,
                                                                       disabled = false
@@ -149,7 +152,8 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         onLocationChange({
             city: city.name,
             district: '',
-            neighborhood: ''
+            neighborhood: '',
+            street: ''
         });
 
         setShowCityDropdown(false);
@@ -171,7 +175,8 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         onLocationChange({
             city: selectedCity || '',
             district: district.name,
-            neighborhood: ''
+            neighborhood: '',
+            street: ''
         });
 
         setShowDistrictDropdown(false);
@@ -194,14 +199,25 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         onLocationChange({
             city: selectedCity || '',
             district: selectedDistrict || '',
-            neighborhood: neighborhood.name
+            neighborhood: neighborhood.name,
+            street: selectedStreet
         });
         setShowNeighborhoodDropdown(false);
         setNeighborhoodSearch('');
     };
 
+    // Sokak değişimi
+    const handleStreetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        onLocationChange({
+            city: selectedCity || '',
+            district: selectedDistrict || '',
+            neighborhood: selectedNeighborhood || '',
+            street: e.target.value
+        });
+    };
+
     // Popüler şehirler listesi
-    const popularCities = ['İstanbul', 'Ankara', 'İzmir', 'Bursa'];
+    const popularCities = ['Ankara', 'İstanbul', 'İzmir', 'Bursa'];
     
     // Filtrelenmiş listeler
     const filteredCities = cities
@@ -242,7 +258,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             {/* İl Seçimi */}
             <div className="relative" ref={cityDropdownRef}>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                    {isReady ? t('listing.location-fields.city') : 'İl'}
+                    {isReady ? t('listing.location-fields.city') : 'İl'}<span className="text-black font-bold">(*)</span>
                 </label>
                 <div className="relative">
                     <Button
@@ -300,7 +316,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             {/* İlçe Seçimi */}
             <div className="relative" ref={districtDropdownRef}>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                    {isReady ? t('listing.location-fields.district') : 'İlçe'}
+                    {isReady ? t('listing.location-fields.district') : 'İlçe'}<span className="text-black font-bold">(*)</span>
                 </label>
                 <div className="relative">
                     <Button
@@ -358,7 +374,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             {/* Mahalle Seçimi */}
             <div className="relative" ref={neighborhoodDropdownRef}>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                    {isReady ? t('listing.location-fields.neighborhood') : 'Mahalle'}
+                    {isReady ? t('listing.location-fields.neighborhood') : 'Mahalle'}<span className="text-black font-bold">(*)</span>
                 </label>
                 <div className="relative">
                     <Button
@@ -410,6 +426,30 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                 </div>
                 {errors?.neighborhood && (
                     <p className="mt-1 text-sm text-red-600">{errors.neighborhood}</p>
+                )}
+            </div>
+
+            {/* Sokak Girişi */}
+            <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                    {isReady ? t('listing.location-fields.street') : 'Sokak'}
+                </label>
+                <input
+                    type="text"
+                    value={selectedStreet || ''}
+                    onChange={handleStreetChange}
+                    disabled={disabled || !selectedNeighborhood}
+                    placeholder={isReady ? t('listing.location-fields.street-placeholder') : 'Sokak adını giriniz...'}
+                    className={`w-full px-4 py-3 border rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        disabled || !selectedNeighborhood
+                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                            : 'border-gray-300 bg-white text-gray-900'
+                    }`}
+                />
+                {(!selectedNeighborhood && !disabled) && (
+                    <p className="mt-1 text-xs text-gray-500">
+                        {isReady ? t('listing.location-fields.select-neighborhood-first') : 'Önce mahalle seçimi yapınız.'}
+                    </p>
                 )}
             </div>
         </div>

@@ -29,6 +29,7 @@ export interface PropertyCreateRequest {
     city: string;
     district: string;
     neighborhood: string;
+    street?: string;
     price: number;
     negotiable?: boolean;
     grossArea?: number;
@@ -59,6 +60,7 @@ export interface PropertyUpdateRequest {
     city?: string;
     district?: string;
     neighborhood?: string;
+    street?: string;
     price?: number;
     negotiable?: boolean;
     grossArea?: number;
@@ -90,6 +92,7 @@ export interface PropertySearchFilters {
     city?: string;
     district?: string;
     neighborhood?: string;
+    street?: string;
     minPrice?: number;
     maxPrice?: number;
     minArea?: number;
@@ -116,6 +119,7 @@ export interface PropertyResponse {
     city: string;
     district: string;
     neighborhood: string;
+    street?: string;
     price: number;
     negotiable?: boolean;
     grossArea?: number;

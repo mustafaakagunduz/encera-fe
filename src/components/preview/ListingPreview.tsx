@@ -515,7 +515,7 @@ export const ListingPreview: React.FC = () => {
                                     <MapPin className="w-4 h-4" />
                                 </div>
                                 <span className="text-base">
-                                    {previewData.neighborhood}, {previewData.district}, {previewData.city}
+                                    {previewData.street && `${previewData.street}, `}{previewData.neighborhood}, {previewData.district}, {previewData.city}
                                 </span>
                             </div>
 

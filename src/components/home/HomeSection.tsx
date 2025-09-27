@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
-import { Building2, Users, MapPin, Award, ArrowRight, CheckCircle } from 'lucide-react';
 import PropertyGrid from './PropertyGrid';
 import PropertyFilterModal from './PropertyFilterModal';
 import { useGetAllPropertiesQuery } from '@/store/api/propertyApi';
@@ -62,28 +61,6 @@ const HomeSection: React.FC = () => {
         }
     }, [isReady]);
 
-    const stats = [
-        {
-            icon: Award,
-            value: t('home.company-intro.stats.experience'),
-            label: t('home.company-intro.stats.experience-label')
-        },
-        {
-            icon: Building2,
-            value: t('home.company-intro.stats.properties'),
-            label: t('home.company-intro.stats.properties-label')
-        },
-        {
-            icon: MapPin,
-            value: t('home.company-intro.stats.cities'),
-            label: t('home.company-intro.stats.cities-label')
-        },
-        {
-            icon: Users,
-            value: t('home.company-intro.stats.customers'),
-            label: t('home.company-intro.stats.customers-label')
-        }
-    ];
 
     const applyFilters = (newFilters: FilterState) => {
         setFilters(newFilters);
@@ -157,7 +134,7 @@ const HomeSection: React.FC = () => {
     // i18n yüklenene kadar loading göster
     if (!isReady) {
         return (
-            <section className="relative min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/images/company-intro-bg.webp)' }}>
+            <section className="relative min-h-screen bg-gray-50">
                 <div className="flex items-center justify-center w-full h-full">
                     <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-800/20 border-t-blue-800"></div>
                 </div>
@@ -166,59 +143,13 @@ const HomeSection: React.FC = () => {
     }
 
     return (
-        <section className="relative h-screen bg-cover bg-center bg-no-repeat overflow-hidden" style={{ backgroundImage: 'url(/images/company-intro-bg.webp)' }}>
-            {/* Subtle Background Pattern */}
-            <div className="absolute inset-0 opacity-[0.03]">
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232563eb' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"
-                    }}
-                ></div>
-            </div>
+        <section className="relative h-screen bg-gray-50 overflow-hidden">
 
             <div className="relative h-full flex flex-col">
-                {/* Premium Badge */}
-                <div className="relative z-10 pt-32 lg:pt-36 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 md:px-6 lg:px-8 py-1.5 md:py-3 lg:py-4 rounded-full bg-blue-100/50 border border-blue-200/50 backdrop-blur-sm">
-                        <CheckCircle className="w-3 h-3 md:w-5 md:h-5 text-blue-700" />
-                        <span className="text-blue-800 font-semibold text-xs md:text-base">{t('home.company-intro.badge')}</span>
-                    </div>
-                </div>
-
-                {/* Main Content - Two Column Layout */}
+                {/* Main Content - Single Column Layout */}
                 <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 w-full items-center">
-
-                        {/* Sol Taraf - İstatistikler */}
-                        <div className={`text-center lg:text-left transition-all duration-800 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-                            <div className="grid grid-cols-2 gap-4 mb-8">
-                                {stats.map((stat, index) => {
-                                    const Icon = stat.icon;
-                                    return (
-                                        <div
-                                            key={index}
-                                            className="group relative bg-blue-100/80 backdrop-blur-sm border border-blue-200/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 rounded-xl p-4"
-                                            style={{
-                                                animationDelay: `${index * 150}ms`
-                                            }}
-                                        >
-                                            <div className="text-center flex flex-col items-center justify-center h-full">
-                                                <h3 className="font-bold text-blue-900 mb-1 text-xl lg:text-2xl">
-                                                    {stat.value}
-                                                </h3>
-                                                <p className="text-blue-800 font-semibold leading-tight text-xs lg:text-sm">
-                                                    {stat.label}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                        </div>
-
-                        {/* Sağ Taraf - İlanlar */}
+                    <div className="w-full">
+                        {/* İlanlar */}
                         <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl p-6 h-[500px] lg:h-[600px] overflow-hidden">
                             {error ? (
                                 <div className="flex items-center justify-center h-full">
