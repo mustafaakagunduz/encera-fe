@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -156,6 +157,8 @@ const Navbar: React.FC = () => {
         }
     };
 
+    const brandLabel = isReady ? t('navbar.brand') : 'PAPP';
+
     return (
         <>
         <nav className={`unified-navbar-container ${pathname !== '/' ? 'navbar-with-extra-padding navbar-static' : 'navbar-fixed'} ${pathname !== '/' && !isNavbarVisible ? 'navbar-hidden' : ''}`}>
@@ -164,8 +167,15 @@ const Navbar: React.FC = () => {
                 <div className="navbar-main-row">
                     {/* Sol grup - Logo */}
                     <div className="navbar-left-group">
-                        <Link href="/" className="navbar-logo">
-                            {isReady ? t('navbar.brand') : 'PAPP'}
+                        <Link href="/" className="navbar-logo" aria-label={brandLabel}>
+                            <Image
+                                src="/images/logo.png"
+                                alt={brandLabel}
+                                width={157}
+                                height={90}
+                                priority
+                                className="navbar-logo-image"
+                            />
                         </Link>
                     </div>
 
