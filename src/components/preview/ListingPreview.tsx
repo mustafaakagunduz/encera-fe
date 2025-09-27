@@ -505,7 +505,7 @@ export const ListingPreview: React.FC = () => {
 
                     {/* Title and Location */}
                     <div className="mb-8">
-                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight break-words">
                             {previewData.title}
                         </h2>
 

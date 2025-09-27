@@ -769,5 +769,11 @@
     "search-results": "Results for \"{{query}}\"",
     "map-view": "Map View",
     "map-coming-soon": "Map integration coming soon"
+  },
+
+  "favorites": {
+    "added-success": "Property successfully added to your favorites list",
+    "removed-success": "Property removed from your favorites list",
+    "error": "An error occurred during the favorite operation"
   }
 }

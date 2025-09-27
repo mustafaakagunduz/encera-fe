@@ -772,5 +772,11 @@
     "search-results": "\"{{query}}\" için sonuçlar",
     "map-view": "Harita Görünümü",
     "map-coming-soon": "Harita entegrasyonu yakında eklenecek"
+  },
+
+  "favorites": {
+    "added-success": "İlan başarıyla favoriler listenize eklendi",
+    "removed-success": "İlan favoriler listenizden çıkarıldı",
+    "error": "Favori işlemi sırasında bir hata oluştu"
   }
 }

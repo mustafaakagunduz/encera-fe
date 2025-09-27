@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
-import { MapPin, Bed, Square, Eye, Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { MapPin, Bed, Square, Heart } from 'lucide-react';
+import { useToggleFavoriteMutation, useGetFavoriteStatusQuery } from '@/store/api/favoriteApi';
+import { Toast } from '@/components/ui/toast';
 
 interface Property {
     id: number;
@@ -35,15 +36,46 @@ interface PropertyGridProps {
     hasMore?: boolean;
 }
 
-const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
+const PropertyCard: React.FC<{
+    property: Property;
+    onShowToast: (message: string, type: 'success' | 'error') => void;
+}> = ({ property, onShowToast }) => {
     const { t } = useAppTranslation();
+
+    // Favorite functionality
+    const { data: favoriteStatus } = useGetFavoriteStatusQuery(property.id, {
+        skip: false
+    });
+    const [toggleFavorite, { isLoading: isToggling }] = useToggleFavoriteMutation();
+
+    const handleFavoriteToggle = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+            const result = await toggleFavorite(property.id).unwrap();
+
+            // Show appropriate toast message based on the result
+            if (result.isFavorited) {
+                onShowToast(t('favorites.added-success'), 'success');
+            } else {
+                onShowToast(t('favorites.removed-success'), 'success');
+            }
+        } catch (error) {
+            console.error('Favorilere ekleme/çıkarma hatası:', error);
+            onShowToast(t('favorites.error'), 'error');
+        }
+    };
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('tr-TR').format(price);
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+        <div
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+            onClick={() => window.location.href = `/house/${property.id}`}
+        >
             {/* Image */}
             <div className="relative">
                 <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden">
@@ -70,12 +102,22 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                     )}
 
                     {/* Favorite Button */}
-                    <button className="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors">
-                        <Heart className="w-4 h-4 text-gray-600" />
+                    <button
+                        className="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors disabled:opacity-50"
+                        onClick={handleFavoriteToggle}
+                        disabled={isToggling}
+                    >
+                        <Heart
+                            className={`w-4 h-4 transition-colors ${
+                                favoriteStatus?.isFavorited
+                                    ? 'text-red-500 fill-current'
+                                    : 'text-gray-600'
+                            }`}
+                        />
                     </button>
 
-                    {/* Property Type Badge */}
-                    <div className="absolute bottom-3 left-3 bg-blue-600 text-white px-2 py-1 rounded-md text-xs font-medium">
+                    {/* Property Type Badge - Moved to top left */}
+                    <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded-md text-xs font-medium">
                         {t(`my-listings.listing-types.${property.listingType}`)}
                     </div>
                 </div>
@@ -83,13 +125,6 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
 
             {/* Content */}
             <div className="p-5">
-                {/* Price */}
-                <div className="mb-3">
-                    <span className="text-2xl font-bold text-gray-900">
-                        {formatPrice(property.price)} ₺
-                    </span>
-                </div>
-
                 {/* Title */}
                 <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
                     {property.title}
@@ -113,24 +148,14 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
                         <Square className="w-4 h-4" />
                         <span>{property.grossArea || property.area} m²</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        <span>{property.viewCount}</span>
-                    </div>
                 </div>
 
-                {/* Property Type */}
-                <div className="text-xs text-gray-500 mb-4">
-                    {t(`my-listings.property-types.${property.propertyType}`)}
+                {/* Price */}
+                <div className="mt-auto">
+                    <span className="text-2xl font-bold text-gray-900">
+                        {formatPrice(property.price)} ₺
+                    </span>
                 </div>
-
-                {/* Action Button */}
-                <Button
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => window.location.href = `/house/${property.id}`}
-                >
-                    {t('property-grid.view-details')}
-                </Button>
             </div>
         </div>
     );
@@ -144,10 +169,29 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
 }) => {
     const { t } = useAppTranslation();
 
+    // Toast state
+    const [toast, setToast] = useState<{
+        show: boolean;
+        message: string;
+        type: 'success' | 'error';
+    }>({
+        show: false,
+        message: '',
+        type: 'success'
+    });
+
+    const showToast = (message: string, type: 'success' | 'error') => {
+        setToast({ show: true, message, type });
+    };
+
+    const hideToast = () => {
+        setToast(prev => ({ ...prev, show: false }));
+    };
+
     if (loading && properties.length === 0) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {Array.from({ length: 8 }).map((_, index) => (
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
+                {Array.from({ length: 12 }).map((_, index) => (
                     <div key={index} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                         <div className="aspect-[4/3] bg-gray-200 animate-pulse" />
                         <div className="p-5 space-y-3">
@@ -181,9 +225,9 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
     return (
         <div>
             {/* Property Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-6 mb-8">
                 {properties.map((property) => (
-                    <PropertyCard key={property.id} property={property} />
+                    <PropertyCard key={property.id} property={property} onShowToast={showToast} />
                 ))}
             </div>
 
@@ -207,6 +251,14 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
                     </Button>
                 </div>
             )}
+
+            {/* Toast Notification */}
+            <Toast
+                show={toast.show}
+                message={toast.message}
+                type={toast.type}
+                onClose={hideToast}
+            />
         </div>
     );
 };

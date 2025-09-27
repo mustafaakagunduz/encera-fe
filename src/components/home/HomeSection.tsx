@@ -143,30 +143,23 @@ const HomeSection: React.FC = () => {
     }
 
     return (
-        <section className="relative h-screen bg-gray-50 overflow-hidden">
+        <section className="relative min-h-screen bg-gray-50">
 
             <div className="relative h-full flex flex-col">
-                {/* Main Content - Single Column Layout */}
-                <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-                    <div className="w-full">
-                        {/* İlanlar */}
-                        <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl p-6 h-[500px] lg:h-[600px] overflow-hidden">
-                            {error ? (
-                                <div className="flex items-center justify-center h-full">
-                                    <p className="text-red-600">{t('properties-section.error-loading')}</p>
-                                </div>
-                            ) : (
-                                <div className="h-full overflow-y-auto custom-scrollbar">
-                                    <PropertyGrid
-                                        properties={filteredProperties}
-                                        loading={loading}
-                                        onLoadMore={() => {}}
-                                        hasMore={false}
-                                    />
-                                </div>
-                            )}
+                {/* Main Content - Full Screen Layout */}
+                <div className="flex-1 px-4 sm:px-6 lg:px-8 pt-40 pb-8 max-w-7xl mx-auto w-full">
+                    {error ? (
+                        <div className="flex items-center justify-center h-full">
+                            <p className="text-red-600">{t('properties-section.error-loading')}</p>
                         </div>
-                    </div>
+                    ) : (
+                        <PropertyGrid
+                            properties={filteredProperties}
+                            loading={loading}
+                            onLoadMore={() => {}}
+                            hasMore={false}
+                        />
+                    )}
                 </div>
             </div>
 
@@ -178,23 +171,6 @@ const HomeSection: React.FC = () => {
                 currentFilters={filters}
             />
 
-            {/* Custom Scrollbar Styles */}
-            <style jsx>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: #f1f5f9;
-                    border-radius: 3px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: #cbd5e1;
-                    border-radius: 3px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: #94a3b8;
-                }
-            `}</style>
         </section>
     );
 };

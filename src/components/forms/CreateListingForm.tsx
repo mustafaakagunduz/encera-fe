@@ -538,11 +538,17 @@ export const CreateListingForm: React.FC = () => {
                                     value={formData.title}
                                     onChange={handleInputChange}
                                     placeholder={isReady ? t('listing.create.listing-title-placeholder') : 'Örn: Merkezi konumda satılık 3+1 daire'}
+                                    maxLength={255}
                                     className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.title ? 'border-red-500' : 'border-gray-300'
                                     }`}
                                 />
-                                {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+                                <div className="mt-1">
+                                    <p className={`text-xs ${formData.title.length > 230 ? 'text-red-500' : formData.title.length > 200 ? 'text-yellow-500' : 'text-gray-500'}`}>
+                                        {formData.title.length}/255
+                                    </p>
+                                    {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
+                                </div>
                             </div>
 
                             {/* İlan Tipi */}
