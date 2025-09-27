@@ -458,6 +458,4 @@ export const {
 
     // Delegasyon sistemi
     useGetEnceraPropertiesQuery,
-    useGetUserDelegatedPropertiesQuery,
-    useToggleEnceraDelegationMutation,
 } = propertyApi;

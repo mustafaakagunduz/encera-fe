@@ -1,6 +1,7 @@
 // src/store/api/pappSellableRequestApi.ts
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { createBaseQueryWithAuth } from './baseQuery';
+import { buildApiUrl } from './config';
 
 export interface PappSellableRequestResponse {
     id: number;
@@ -45,7 +46,7 @@ interface PaginatedResponse<T> {
 
 export const pappSellableRequestApi = createApi({
     reducerPath: 'pappSellableRequestApi',
-    baseQuery: createBaseQueryWithAuth(),
+    baseQuery: createBaseQueryWithAuth(buildApiUrl()),
     tagTypes: ['PappSellableRequest', 'PappSellableRequestStats'],
     endpoints: (builder) => ({
         // ========== USER ENDPOINTS ==========

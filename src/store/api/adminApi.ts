@@ -63,6 +63,7 @@ export interface PropertyResponse {
         lastName: string;
         phoneNumber: string;
         email?: string;
+        role: string;
     };
     createdAt: string;
     updatedAt: string;
