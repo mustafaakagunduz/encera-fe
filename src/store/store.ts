@@ -11,6 +11,7 @@ import { messageApi } from './api/messageApi';
 import { fileUploadApi } from './api/fileUploadApi';
 import { complaintApi } from './api/complaintApi';
 import { notificationApi } from './api/notificationApi';
+import { pappSellableRequestApi } from './api/pappSellableRequestApi';
 import authReducer from './slices/authSlice';
 import listingPreviewReducer from './slices/listingPreviewSlice'; // Yeni slice import
 
@@ -28,6 +29,7 @@ export const store = configureStore({
         [fileUploadApi.reducerPath]: fileUploadApi.reducer,
         [complaintApi.reducerPath]: complaintApi.reducer,
         [notificationApi.reducerPath]: notificationApi.reducer,
+        [pappSellableRequestApi.reducerPath]: pappSellableRequestApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(
@@ -40,7 +42,8 @@ export const store = configureStore({
             messageApi.middleware,
             fileUploadApi.middleware,
             complaintApi.middleware,
-            notificationApi.middleware
+            notificationApi.middleware,
+            pappSellableRequestApi.middleware
         ),
 });
 

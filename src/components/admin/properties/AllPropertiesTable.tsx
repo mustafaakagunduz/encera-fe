@@ -11,7 +11,7 @@ export const AllPropertiesTable: React.FC = () => {
     const { data: propertiesData, isLoading } = useGetAllAdminPropertiesQuery({ page: 0, size: 50 });
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'reported'>('all');
-    const [ownershipFilter, setOwnershipFilter] = useState<'all' | 'encera' | 'delegated'>('all');
+    const [ownershipFilter, setOwnershipFilter] = useState<'all' | 'encera' | 'papp'>('all');
 
     const properties = propertiesData?.content || [];
     const filteredProperties = properties.filter(property => {
@@ -34,12 +34,12 @@ export const AllPropertiesTable: React.FC = () => {
         let matchesOwnership = true;
         switch (ownershipFilter) {
             case 'encera':
-                // Encera'nın kendi ilanları - pappSellable true olan ama delegatedToEncera false olan
-                matchesOwnership = property.pappSellable === true && property.delegatedToEncera === false;
+                // Encera'nın kendi ilanları - admin kullanıcıları tarafından oluşturulan pappSellable ilanlar
+                matchesOwnership = property.pappSellable === true && property.owner?.role === 'ADMIN';
                 break;
-            case 'delegated':
-                // Encera ile satılsın denilen ilanlar - delegatedToEncera true olan
-                matchesOwnership = property.delegatedToEncera === true;
+            case 'papp':
+                // Kullanıcıların pappSellable=true ilanları
+                matchesOwnership = property.pappSellable === true && property.owner?.role === 'USER';
                 break;
         }
 
@@ -135,15 +135,15 @@ export const AllPropertiesTable: React.FC = () => {
                     </button>
 
                     <button
-                        onClick={() => setOwnershipFilter('delegated')}
+                        onClick={() => setOwnershipFilter('papp')}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            ownershipFilter === 'delegated'
+                            ownershipFilter === 'papp'
                                 ? 'bg-green-600 text-white'
                                 : 'bg-green-50 text-green-600 hover:bg-green-100'
                         }`}
                     >
                         <Users className="h-4 w-4" />
-                        Encera ile Satılsın İlanları
+                        Papp Sellable İlanları
                     </button>
                 </div>
             </div>
@@ -197,28 +197,17 @@ export const AllPropertiesTable: React.FC = () => {
 
                                 <div className="text-xs space-y-1">
                                     <div>
-                                        {property.delegatedToEncera ? (
-                                            <div className="space-y-1">
-                                                <div className="text-blue-600 font-medium">
-                                                    Yönetici: Encera
+                                        <div>
+                                            Sahibi: {property.owner.firstName} {property.owner.lastName}
+                                            {property.owner.phoneNumber && (
+                                                <div className="text-gray-500">Tel: {property.owner.phoneNumber}</div>
+                                            )}
+                                            {property.pappSellable && (
+                                                <div className="text-blue-600 font-medium mt-1">
+                                                    Papp Sellable
                                                 </div>
-                                                {property.originalOwner && (
-                                                    <div>
-                                                        Asıl Sahip: {property.originalOwner.firstName} {property.originalOwner.lastName}
-                                                        {property.originalOwner.phoneNumber && (
-                                                            <div className="text-gray-500">Tel: {property.originalOwner.phoneNumber}</div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                Sahibi: {property.owner.firstName} {property.owner.lastName}
-                                                {property.owner.phoneNumber && (
-                                                    <div className="text-gray-500">Tel: {property.owner.phoneNumber}</div>
-                                                )}
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 

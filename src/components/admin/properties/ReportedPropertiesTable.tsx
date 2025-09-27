@@ -62,22 +62,14 @@ export const ReportedPropertiesTable: React.FC = () => {
                                         {property.city}, {property.district}
                                     </p>
                                     <div className="text-xs text-gray-600 mb-1">
-                                        {property.delegatedToEncera ? (
-                                            <div className="space-y-1">
-                                                <div className="text-blue-600 font-medium">
-                                                    Yönetici: Encera
+                                        <div>
+                                            Sahibi: {property.owner.firstName} {property.owner.lastName}
+                                            {property.pappSellable && (
+                                                <div className="text-blue-600 font-medium mt-1">
+                                                    Papp Sellable
                                                 </div>
-                                                {property.originalOwner && (
-                                                    <div>
-                                                        Asıl Sahip: {property.originalOwner.firstName} {property.originalOwner.lastName}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                Sahibi: {property.owner.firstName} {property.owner.lastName}
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                     <p className="text-sm text-red-600 font-medium">
                                         {property.reportCount} şikayet • Son şikayet: {property.lastReportedAt ? new Date(property.lastReportedAt).toLocaleDateString('tr-TR') : 'Bilinmiyor'}

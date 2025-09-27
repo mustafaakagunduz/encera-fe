@@ -53,22 +53,14 @@ export const ApprovedPropertiesTable: React.FC = () => {
                                         {property.city}, {property.district} • {property.viewCount} görüntüleme
                                     </p>
                                     <div className="text-xs text-gray-600 mt-1">
-                                        {property.delegatedToEncera ? (
-                                            <div className="space-y-1">
-                                                <div className="text-blue-600 font-medium">
-                                                    Yönetici: Encera
+                                        <div>
+                                            Sahibi: {property.owner.firstName} {property.owner.lastName}
+                                            {property.pappSellable && (
+                                                <div className="text-blue-600 font-medium mt-1">
+                                                    Papp Sellable
                                                 </div>
-                                                {property.originalOwner && (
-                                                    <div>
-                                                        Asıl Sahip: {property.originalOwner.firstName} {property.originalOwner.lastName}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                Sahibi: {property.owner.firstName} {property.owner.lastName}
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

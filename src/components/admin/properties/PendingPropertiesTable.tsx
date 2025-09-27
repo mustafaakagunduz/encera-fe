@@ -48,16 +48,6 @@ interface Property {
     reported: boolean;
     reportCount: number;
     lastReportedAt?: string;
-    delegatedToEncera: boolean;
-    delegationDate?: string;
-    delegationActive: boolean;
-    originalOwner?: {
-        id: number;
-        firstName: string;
-        lastName: string;
-        phoneNumber: string;
-        email?: string;
-    };
     owner: {
         id: number;
         firstName: string;
@@ -318,20 +308,12 @@ export const PendingPropertiesTable: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="ml-2">
-                                                {property.delegatedToEncera ? (
-                                                    <div className="space-y-1">
-                                                        <div className="text-sm font-medium text-blue-600">
-                                                            Yönetici: Encera
-                                                        </div>
-                                                        {property.originalOwner && (
-                                                            <div className="text-xs text-gray-600">
-                                                                Asıl Sahip: {property.originalOwner.firstName} {property.originalOwner.lastName}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-sm font-medium text-gray-900">
-                                                        {property.owner.firstName} {property.owner.lastName}
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {property.owner.firstName} {property.owner.lastName}
+                                                </div>
+                                                {property.pappSellable && (
+                                                    <div className="text-xs text-blue-600 font-medium">
+                                                        Papp Sellable
                                                     </div>
                                                 )}
                                                 <div className="text-xs text-gray-500">

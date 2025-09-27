@@ -18,7 +18,7 @@ export interface UserResponse {
 export interface AdminStatisticsResponse {
     totalUsers: number;
     totalProperties: number;
-    delegatedProperties: number;
+    pappSellableProperties: number;
 }
 
 export interface AdminErrorResponse {
@@ -58,16 +58,6 @@ export interface PropertyResponse {
     reportCount: number;
     lastReportedAt?: string;
     owner: {
-        id: number;
-        firstName: string;
-        lastName: string;
-        phoneNumber: string;
-        email?: string;
-    };
-    delegatedToEncera: boolean;
-    delegationDate?: string;
-    delegationActive: boolean;
-    originalOwner?: {
         id: number;
         firstName: string;
         lastName: string;
@@ -276,6 +266,24 @@ export const adminApi = createApi({
             query: () => '/properties/admin/stats',
             providesTags: ['AdminStats'],
         }),
+
+        // Get Encera properties (admin created pappSellable properties)
+        getEnceraProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/admin/properties/encera?page=${page}&size=${size}`,
+            providesTags: [
+                'AdminProperties',
+                { type: 'AdminProperties', id: 'ENCERA' }
+            ],
+        }),
+
+        // Get Papp Sellable properties (user created pappSellable properties)
+        getPappSellableProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/admin/properties/papp-sellable?page=${page}&size=${size}`,
+            providesTags: [
+                'AdminProperties',
+                { type: 'AdminProperties', id: 'PAPP' }
+            ],
+        }),
     }),
 });
 
@@ -302,4 +310,6 @@ export const {
     useAdminUpdatePropertyMutation,
     useAdminDeletePropertyMutation,
     useGetPropertyStatisticsQuery,
+    useGetEnceraPropertiesQuery,
+    useGetPappSellablePropertiesQuery,
 } = adminApi;
