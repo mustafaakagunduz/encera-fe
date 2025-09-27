@@ -134,7 +134,7 @@ const HomeSection: React.FC = () => {
     // i18n yüklenene kadar loading göster
     if (!isReady) {
         return (
-            <section className="relative min-h-screen bg-gray-50">
+            <section className="relative min-h-screen">
                 <div className="flex items-center justify-center w-full h-full">
                     <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-800/20 border-t-blue-800"></div>
                 </div>
@@ -143,7 +143,7 @@ const HomeSection: React.FC = () => {
     }
 
     return (
-        <section className="relative min-h-screen bg-gray-50">
+        <section className="relative min-h-screen">
 
             <div className="relative h-full flex flex-col">
                 {/* Main Content - Full Screen Layout */}

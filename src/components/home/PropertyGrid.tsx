@@ -5,6 +5,7 @@ import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { MapPin, Bed, Square, Heart } from 'lucide-react';
 import { useToggleFavoriteMutation, useGetFavoriteStatusQuery } from '@/store/api/favoriteApi';
 import { Toast } from '@/components/ui/toast';
+import { Button } from '@/components/ui/button';
 
 interface Property {
     id: number;
@@ -73,7 +74,7 @@ const PropertyCard: React.FC<{
 
     return (
         <div
-            className="rounded-xl shadow-sm overflow-hidden group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+            className="rounded-xl shadow-sm overflow-hidden group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer bg-white"
             onClick={() => window.location.href = `/house/${property.id}`}
         >
             {/* Image */}
@@ -124,7 +125,7 @@ const PropertyCard: React.FC<{
             </div>
 
             {/* Content */}
-            <div className="p-5">
+            <div className="p-5 bg-white">
                 {/* Title */}
                 <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
                     {property.title}
