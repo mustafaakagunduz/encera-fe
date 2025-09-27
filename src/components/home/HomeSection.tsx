@@ -147,7 +147,7 @@ const HomeSection: React.FC = () => {
 
             <div className="relative h-full flex flex-col">
                 {/* Main Content - Full Screen Layout */}
-                <div className="flex-1 px-4 sm:px-6 lg:px-8 pt-40 pb-8 max-w-7xl mx-auto w-full">
+                <div className="flex-1 px-4 sm:px-6 lg:px-8 pt-40 pb-8 max-w-7xl 2xl:max-w-[1900px] mx-auto w-full">
                     {error ? (
                         <div className="flex items-center justify-center h-full">
                             <p className="text-red-600">{t('properties-section.error-loading')}</p>

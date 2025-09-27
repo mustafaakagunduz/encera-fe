@@ -73,7 +73,7 @@ const PropertyCard: React.FC<{
 
     return (
         <div
-            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+            className="rounded-xl shadow-sm overflow-hidden group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
             onClick={() => window.location.href = `/house/${property.id}`}
         >
             {/* Image */}
@@ -190,9 +190,9 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
 
     if (loading && properties.length === 0) {
         return (
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:!grid-cols-6 min-[1900px]:grid-cols-6 gap-6">
                 {Array.from({ length: 12 }).map((_, index) => (
-                    <div key={index} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm">
                         <div className="aspect-[4/3] bg-gray-200 animate-pulse" />
                         <div className="p-5 space-y-3">
                             <div className="h-6 bg-gray-200 rounded animate-pulse" />
@@ -225,7 +225,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
     return (
         <div>
             {/* Property Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-6 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:!grid-cols-6 min-[1900px]:grid-cols-6 gap-6 mb-8">
                 {properties.map((property) => (
                     <PropertyCard key={property.id} property={property} onShowToast={showToast} />
                 ))}
