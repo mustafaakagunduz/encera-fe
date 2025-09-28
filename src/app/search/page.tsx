@@ -6,6 +6,9 @@ import { useSearchParams } from 'next/navigation';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { smartSearchService, SmartSearchResponse, PropertySummary } from '@/services/smartSearchService';
 import { Search, AlertCircle, Clock, Target, MapPin, TrendingUp, Loader2 } from 'lucide-react';
+import { SearchResultsHeader } from '@/components/search/SearchResultsHeader';
+import { SearchResultsContainer } from '@/components/search/SearchResultsContainer';
+import { PropertyType, PropertySearchFilters } from '@/store/api/propertyApi';
 
 const SearchResultsPage: React.FC = () => {
     const { t } = useAppTranslation();
@@ -14,27 +17,143 @@ const SearchResultsPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(0);
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [sortBy, setSortBy] = useState('relevance');
+
+    // Filter states
+    const [filters, setFilters] = useState<PropertySearchFilters>(() => {
+        const urlFilters: PropertySearchFilters = { propertyType: PropertyType.RESIDENTIAL };
+
+        // URL parametrelerini okuyup filter objesine dönüştür
+        if (searchParams.get('listingType')) {
+            urlFilters.listingType = searchParams.get('listingType') as any;
+        }
+        if (searchParams.get('city')) {
+            urlFilters.city = searchParams.get('city')!;
+        }
+        if (searchParams.get('district')) {
+            urlFilters.district = searchParams.get('district')!;
+        }
+        if (searchParams.get('minPrice')) {
+            urlFilters.minPrice = parseInt(searchParams.get('minPrice')!);
+        }
+        if (searchParams.get('maxPrice')) {
+            urlFilters.maxPrice = parseInt(searchParams.get('maxPrice')!);
+        }
+        if (searchParams.get('minArea')) {
+            urlFilters.minArea = parseInt(searchParams.get('minArea')!);
+        }
+        if (searchParams.get('maxArea')) {
+            urlFilters.maxArea = parseInt(searchParams.get('maxArea')!);
+        }
+        if (searchParams.get('roomCount')) {
+            urlFilters.roomCount = parseInt(searchParams.get('roomCount')!);
+        }
+        if (searchParams.get('hallCount')) {
+            urlFilters.hallCount = parseInt(searchParams.get('hallCount')!);
+        }
+
+        return urlFilters;
+    });
+
+    const [tempFilters, setTempFilters] = useState<PropertySearchFilters>(filters);
 
     const query = searchParams.get('q') || '';
 
     useEffect(() => {
         if (query) {
-            performSearch(query, currentPage);
+            performSearch(query, currentPage, filters);
         }
-    }, [query, currentPage]);
+    }, [query, currentPage, filters]);
 
-    const performSearch = async (searchQuery: string, page: number = 0) => {
+    useEffect(() => {
+        setTempFilters(filters);
+    }, [filters]);
+
+    const handleFiltersChange = (newFilters: PropertySearchFilters) => {
+        setTempFilters(newFilters);
+    };
+
+    const applyFilters = (filtersToApply?: PropertySearchFilters) => {
+        const finalFilters = filtersToApply || tempFilters;
+        setFilters(finalFilters);
+        setCurrentPage(0);
+    };
+
+    const clearFilters = () => {
+        const clearedFilters: PropertySearchFilters = { propertyType: PropertyType.RESIDENTIAL };
+        setFilters(clearedFilters);
+        setTempFilters(clearedFilters);
+        setCurrentPage(0);
+    };
+
+    const handleSortChange = (newSort: string) => {
+        setSortBy(newSort);
+        setCurrentPage(0);
+        if (query) {
+            performSearch(query, 0, filters);
+        }
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const performSearch = async (searchQuery: string, page: number = 0, appliedFilters?: PropertySearchFilters) => {
         setLoading(true);
         setError(null);
 
         try {
+            // TODO: Gelecekte smartSearchService'i filtreleri de alacak şekilde güncelleyebiliriz
+            // Şimdilik sadece temel arama yapıyor, filtreleme client-side olabilir
             const result = await smartSearchService.smartSearch(searchQuery, page, 20);
+
+            // Eğer filtre uygulanmışsa, sonuçları client-side filtrele
+            if (appliedFilters && hasActiveFilters(appliedFilters)) {
+                const filteredContent = result.results.content.filter((property: any) => {
+                    return applyClientSideFilters(property, appliedFilters);
+                });
+
+                result.results.content = filteredContent;
+                result.totalResults = filteredContent.length;
+                result.results.totalElements = filteredContent.length;
+                result.results.totalPages = Math.ceil(filteredContent.length / 20);
+            }
+
             setSearchResults(result);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Arama sırasında bir hata oluştu');
         } finally {
             setLoading(false);
         }
+    };
+
+    const hasActiveFilters = (filterObj: PropertySearchFilters) => {
+        return Object.keys(filterObj).some(key => {
+            const value = filterObj[key as keyof PropertySearchFilters];
+            return value !== undefined && value !== null && value !== '' && key !== 'propertyType';
+        });
+    };
+
+    const applyClientSideFilters = (property: any, appliedFilters: PropertySearchFilters) => {
+        // Fiyat filtresi
+        if (appliedFilters.minPrice && property.price < appliedFilters.minPrice) return false;
+        if (appliedFilters.maxPrice && property.price > appliedFilters.maxPrice) return false;
+
+        // Alan filtresi
+        if (appliedFilters.minArea && property.grossArea && property.grossArea < appliedFilters.minArea) return false;
+        if (appliedFilters.maxArea && property.grossArea && property.grossArea > appliedFilters.maxArea) return false;
+
+        // Oda sayısı filtresi
+        if (appliedFilters.roomCount && property.roomCount && property.roomCount < appliedFilters.roomCount) return false;
+        if (appliedFilters.hallCount && property.hallCount && property.hallCount < appliedFilters.hallCount) return false;
+
+        // Konum filtresi
+        if (appliedFilters.city && property.city !== appliedFilters.city) return false;
+        if (appliedFilters.district && property.district !== appliedFilters.district) return false;
+
+        return true;
     };
 
     const formatPrice = (price: number): string => {
@@ -89,162 +208,33 @@ const SearchResultsPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">
-                                "{searchResults.originalQuery}" için arama sonuçları
-                            </h1>
-                            <p className="text-gray-600 mt-1">
-                                {searchResults.totalResults} sonuç bulundu ({searchResults.searchTimeMs}ms)
-                            </p>
-                        </div>
+            <SearchResultsHeader
+                searchResults={searchResults}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+                sortBy={sortBy}
+                onSortChange={handleSortChange}
+                filters={tempFilters}
+                onFiltersChange={handleFiltersChange}
+                onClearFilters={clearFilters}
+                onApplyFilters={applyFilters}
+                onShowMobileFilters={() => setShowMobileFilters(true)}
+            />
 
-                        {/* Category Badge */}
-                        <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border ${smartSearchService.getCategoryColor(searchResults.detectedCategory)}`}>
-                            <Target className="w-4 h-4 mr-2" />
-                            {smartSearchService.getCategoryDisplayName(searchResults.detectedCategory)}
-                        </div>
-                    </div>
-
-                    {/* Search Analysis */}
-                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
-                        {searchResults.locationKeywords.length > 0 && (
-                            <div className="flex items-center">
-                                <MapPin className="w-4 h-4 mr-1" />
-                                Konum: {searchResults.locationKeywords.join(', ')}
-                            </div>
-                        )}
-                        <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
-                            Arama süresi: {searchResults.searchTimeMs}ms
-                        </div>
-                        <div className="flex items-center">
-                            <TrendingUp className="w-4 h-4 mr-1" />
-                            Relevans sıralaması aktif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Results */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {searchResults.results.content.length === 0 ? (
-                    <div className="text-center py-12">
-                        <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-xl font-medium text-gray-900 mb-2">Sonuç bulunamadı</h3>
-                        <p className="text-gray-600">
-                            "{searchResults.originalQuery}" araması için hiç ilan bulunamadı.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {searchResults.results.content.map((property: PropertySummary) => (
-                            <div
-                                key={property.id}
-                                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                                onClick={() => window.open(`/house/${property.id}`, '_self')}
-                            >
-                                {/* Property Image */}
-                                <div className="relative h-48 bg-gray-200">
-                                    {property.primaryImageUrl ? (
-                                        <img
-                                            src={property.primaryImageUrl}
-                                            alt={property.title}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                            <div className="text-center">
-                                                <div className="text-4xl mb-2">🏠</div>
-                                                <p className="text-sm">Fotoğraf yok</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {property.featured && (
-                                        <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs font-medium">
-                                            Öne Çıkan
-                                        </div>
-                                    )}
-                                    {property.pappSellable && (
-                                        <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">
-                                            PAPP
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Property Info */}
-                                <div className="p-4">
-                                    <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-                                        {property.title}
-                                    </h3>
-
-                                    <div className="flex items-center text-gray-600 mb-2">
-                                        <MapPin className="w-4 h-4 mr-1" />
-                                        <span className="text-sm">
-                                            {property.city}, {property.district}
-                                        </span>
-                                    </div>
-
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="text-2xl font-bold text-blue-600">
-                                            {formatPrice(property.price)}
-                                        </span>
-                                        {property.negotiable && (
-                                            <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-                                                Pazarlık
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Property Details */}
-                                    <div className="flex items-center justify-between text-sm text-gray-600">
-                                        <div className="flex items-center gap-3">
-                                            {property.roomCount && (
-                                                <span>{property.roomCount}+{property.hallCount || 0}</span>
-                                            )}
-                                            {property.grossArea && (
-                                                <span>{property.grossArea} m²</span>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center">
-                                            <span className="text-xs">{property.viewCount} görüntülenme</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* Pagination */}
-                {searchResults.results.totalPages > 1 && (
-                    <div className="flex justify-center mt-8">
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                                disabled={currentPage === 0}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Önceki
-                            </button>
-
-                            <span className="px-4 py-2 text-sm text-gray-700">
-                                {currentPage + 1} / {searchResults.results.totalPages}
-                            </span>
-
-                            <button
-                                onClick={() => setCurrentPage(Math.min(searchResults.results.totalPages - 1, currentPage + 1))}
-                                disabled={currentPage >= searchResults.results.totalPages - 1}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Sonraki
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
+            {/* Container */}
+            <SearchResultsContainer
+                searchResults={searchResults}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+                isLoading={false}
+                error={null}
+                filters={tempFilters}
+                onFiltersChange={handleFiltersChange}
+                onClearFilters={clearFilters}
+                onApplyFilters={applyFilters}
+                showMobileFilters={showMobileFilters}
+                onCloseMobileFilters={() => setShowMobileFilters(false)}
+            />
         </div>
     );
 };

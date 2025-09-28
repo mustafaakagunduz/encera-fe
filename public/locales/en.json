@@ -52,7 +52,8 @@
     "residential": "Property",
     "commercial": "Commercial",
     "land": "Land",
-    "phone": "Phone"
+    "phone": "Phone",
+    "all": "All"
   },
 
   "auth": {
@@ -775,5 +776,29 @@
     "added-success": "Property successfully added to your favorites list",
     "removed-success": "Property removed from your favorites list",
     "error": "An error occurred during the favorite operation"
+  },
+
+  "search": {
+    "results-for": "search results for",
+    "results-found": "results found",
+    "no-results": "No search results found",
+    "no-results-for": "no listings found for search",
+    "error-title": "Search Error",
+    "error-message": "A problem occurred while loading search results. Please refresh the page or try again later.",
+    "refresh-page": "Refresh Page",
+    "sort-relevance": "Most Related",
+    "sort-price-low": "Lowest Price",
+    "sort-price-high": "Highest Price",
+    "sort-area-large": "Largest Area",
+    "clear-filters": "Clear Filters",
+    "filters": "Filters",
+    "results-range": "of, total",
+    "results": "results",
+    "previous": "Previous",
+    "next": "Next",
+    "close": "Close",
+    "featured": "VIP",
+    "encera-sellable": "ENCERA",
+    "viewing": "views"
   }
 }

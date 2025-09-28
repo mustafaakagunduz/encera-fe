@@ -98,7 +98,7 @@ class SmartSearchService {
         totalResults: data.totalElements || 0,
         searchTimeMs: 50, // Mock değer
         results: {
-          content: data.content || [],
+          content: this.mapBackendToPropertySummary(data.content || []),
           totalElements: data.totalElements || 0,
           totalPages: data.totalPages || 0,
           number: data.number || 0,
@@ -115,6 +115,31 @@ class SmartSearchService {
       console.error('Smart search failed:', error);
       throw new Error(`Arama sırasında bir hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
     }
+  }
+
+  /**
+   * Backend PropertySummaryResponse'i PropertySummary'ye dönüştür
+   */
+  private mapBackendToPropertySummary(backendData: any[]): PropertySummary[] {
+    return backendData.map((item: any) => ({
+      id: item.id,
+      title: item.title,
+      city: item.city,
+      district: item.district,
+      neighborhood: item.neighborhood || '',
+      price: item.price,
+      propertyType: item.propertyType,
+      listingType: item.listingType,
+      primaryImageUrl: item.primaryImageUrl,
+      grossArea: item.grossArea,
+      roomCount: item.roomConfiguration?.roomCount,
+      hallCount: item.roomConfiguration?.hallCount,
+      negotiable: item.negotiable || false,
+      featured: item.featured || false,
+      pappSellable: item.pappSellable || false,
+      viewCount: item.viewCount || 0,
+      createdAt: item.createdAt,
+    }));
   }
 
   /**

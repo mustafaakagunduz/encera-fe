@@ -32,6 +32,15 @@
     top: 0;
 }
 
+/* Ana sayfada orijinal yükseklik */
+.navbar-fixed .navbar-content {
+    min-height: 64px !important; /* Ana sayfada orijinal yükseklik */
+}
+
+.navbar-fixed .navbar-main-row {
+    height: 64px !important; /* Ana sayfada orijinal yükseklik */
+}
+
 /* Diğer sayfalarda sticky pozisyon - scroll hide çalışsın */
 .navbar-static {
     position: sticky;
@@ -50,7 +59,7 @@
     padding-right: 24px;
     display: flex;
     flex-direction: column; /* Varsayılan olarak column */
-    min-height: 64px; /* h-16 */
+    min-height: 80px; /* h-20 - diğer sayfalarda daha yüksek */
     gap: 0; /* Satırlar arası boşluğu kaldır */
 }
 
@@ -58,7 +67,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 64px; /* h-16 */
+    height: 80px; /* h-20 - diğer sayfalarda daha yüksek */
 }
 
 /* Sol grup - Logo */
@@ -435,7 +444,7 @@
 
 .mobile-menu-content {
     position: absolute;
-    top: 64px; /* navbar height */
+    top: 80px; /* navbar height - diğer sayfalarda daha yüksek */
     left: 0;
     right: 0;
     bottom: 0;
@@ -443,6 +452,11 @@
     backdrop-filter: blur(10px);
     padding: 20px;
     overflow-y: auto;
+}
+
+/* Ana sayfada mobil menü için orijinal yükseklik */
+.navbar-fixed .mobile-menu-content {
+    top: 64px !important; /* Ana sayfada orijinal yükseklik */
 }
 
 /* Mobile Menu Sections */
@@ -570,7 +584,7 @@
 
 /* Diğer sayfalarda ekstra padding - gradient efekti için */
 .navbar-with-extra-padding {
-    padding-bottom: 20px !important; /* Ana sayfadaki property-type-section padding'ini simüle et */
+    padding-bottom: 32px !important; /* Ana sayfadaki property-type-section padding'ini simüle et */
 }
 
 /* Property Type Section - Unified part of navbar */

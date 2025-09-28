@@ -778,5 +778,29 @@
     "added-success": "İlan başarıyla favoriler listenize eklendi",
     "removed-success": "İlan favoriler listenizden çıkarıldı",
     "error": "Favori işlemi sırasında bir hata oluştu"
+  },
+
+  "search": {
+    "results-for": "için arama sonuçları",
+    "results-found": "sonuç bulundu",
+    "no-results": "Arama sonucu bulunamadı",
+    "no-results-for": "araması için hiç ilan bulunamadı",
+    "error-title": "Arama Hatası",
+    "error-message": "Arama sonuçları yüklenirken bir sorun yaşandı. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.",
+    "refresh-page": "Sayfayı Yenile",
+    "sort-relevance": "En Alakalı",
+    "sort-price-low": "En Düşük Fiyat",
+    "sort-price-high": "En Yüksek Fiyat",
+    "sort-area-large": "En Büyük Alan",
+    "clear-filters": "Filtreleri Temizle",
+    "filters": "Filtreler",
+    "results-range": "arası, toplam",
+    "results": "sonuç",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "close": "Kapat",
+    "featured": "VIP",
+    "encera-sellable": "ENCERA",
+    "viewing": "görüntülenme"
   }
 }

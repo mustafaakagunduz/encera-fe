@@ -264,9 +264,16 @@ export const propertyApi = createApi({
                     if (value !== undefined && value !== null && value !== '' &&
                         key !== 'sort' && key !== 'page' && key !== 'size') {
 
-                        // roomCount'u minRoomCount olarak gönder
                         if (key === 'roomCount') {
-                            params.append('minRoomCount', value.toString());
+                            const roomValue = value.toString();
+
+                            // Backend için minimum oda sayısını ayarla
+                            params.append('minRoomCount', roomValue);
+
+                            // Kullanıcı net değer girdiğinde üst sınırı da aynı değere sabitle
+                            if (filters.maxRoomCount === undefined || filters.maxRoomCount === null || filters.maxRoomCount === '') {
+                                params.append('maxRoomCount', roomValue);
+                            }
                         } else if (key === 'maxRoomCount') {
                             params.append('maxRoomCount', value.toString());
                         } else {

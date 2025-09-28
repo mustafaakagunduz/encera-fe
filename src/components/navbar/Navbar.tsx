@@ -149,6 +149,14 @@ const Navbar: React.FC = () => {
         console.log('🔍 Navbar search triggered:', searchQuery.trim());
         const encodedQuery = encodeURIComponent(searchQuery.trim());
         router.push(`/search?q=${encodedQuery}`);
+
+        // Arama sonuçları sayfasına geçerken arama çubuğunu temizle ve focus'u kaldır
+        setSearchQuery('');
+
+        // Input elementinin focus'unu kaldır
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
     };
 
     const handleNavbarKeyPress = (e: React.KeyboardEvent) => {
