@@ -271,7 +271,7 @@ export const propertyApi = createApi({
                             params.append('minRoomCount', roomValue);
 
                             // Kullanıcı net değer girdiğinde üst sınırı da aynı değere sabitle
-                            if (filters.maxRoomCount === undefined || filters.maxRoomCount === null || filters.maxRoomCount === '') {
+                            if (filters.maxRoomCount === undefined || filters.maxRoomCount === null) {
                                 params.append('maxRoomCount', roomValue);
                             }
                         } else if (key === 'maxRoomCount') {
