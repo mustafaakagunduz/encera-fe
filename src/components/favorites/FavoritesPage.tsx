@@ -42,8 +42,12 @@ export const FavoritesPage: React.FC = () => {
     const handleRemoveFavorite = async (propertyId: number) => {
         try {
             await removeFavorite(propertyId).unwrap();
+            // Cache'i manuel olarak yenile - RTK Query'nin invalidation'ı yeterli olmayabilir
+            refetch();
         } catch (error) {
             console.error('Favorilerden kaldırma hatası:', error);
+            // Hata durumunda da cache'i yenile
+            refetch();
         }
     };
 

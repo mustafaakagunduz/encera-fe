@@ -60,7 +60,7 @@ export const favoriteApi = createApi({
                 url: '',
                 params: { page, size },
             }),
-            providesTags: ['Favorite'],
+            providesTags: [{ type: 'Favorite', id: 'LIST' }],
         }),
 
         getUserFavoriteIds: builder.query<FavoriteIdsResponse, void>({
