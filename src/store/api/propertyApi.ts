@@ -50,6 +50,7 @@ export interface PropertyCreateRequest {
     totalFloors?: number;
     currentFloor?: number;
     heatingTypes?: string[];
+    facades?: string[];
     imageUrls?: string[];
     primaryImageUrl?: string;
 }
@@ -82,6 +83,7 @@ export interface PropertyUpdateRequest {
     totalFloors?: number;
     currentFloor?: number;
     heatingTypes?: string[];
+    facades?: string[];
     imageUrls?: string[];
     primaryImageUrl?: string;
     approved?: boolean; // YENİ EKLENEN - İlan editlendiğinde pending durumuna geçmesi için
@@ -149,6 +151,7 @@ export interface PropertyResponse {
     totalFloors?: number;
     currentFloor?: number;
     heatingTypes?: string[];
+    facades?: string[];
     imageUrls?: string[];
     primaryImageUrl?: string;
     owner: {

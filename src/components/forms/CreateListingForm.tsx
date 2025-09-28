@@ -33,6 +33,7 @@ interface FormData extends Omit<PropertyCreateRequest, 'roomConfiguration'> {
     hallCount: string;
     negotiable: boolean;
     street?: string;
+    facades: string[];
 }
 
 interface ImageData {
@@ -857,14 +858,9 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="price"
-<<<<<<< Updated upstream
-                                    value={formData.price !== undefined && formData.price !== null ? formData.price : ''}
-                                    onChange={handleInputChange}
-=======
                                     value={formData.price !== undefined ? formatNumberWithSeparators(formData.price) : ''}
                                     onChange={handlePriceInputChange}
                                     placeholder="Örn: 2.750.000"
->>>>>>> Stashed changes
                                     className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.price ? 'border-red-500' : 'border-gray-300'
                                     }`}
@@ -887,11 +883,7 @@ export const CreateListingForm: React.FC = () => {
                                     value={
                                         formData.propertyType === PropertyType.LAND ||
                                         (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
-<<<<<<< Updated upstream
-                                            ? '' : (formData.monthlyFee !== undefined && formData.monthlyFee !== null ? formData.monthlyFee : '')
-=======
                                             ? '' : (formData.monthlyFee !== undefined ? formatNumberWithSeparators(formData.monthlyFee) : '')
->>>>>>> Stashed changes
                                     }
                                     onChange={handlePriceInputChange}
                                     placeholder="Örn: 1.500"
@@ -924,14 +916,9 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="deposit"
-<<<<<<< Updated upstream
-                                    value={formData.listingType === ListingType.SALE ? '' : (formData.deposit !== undefined && formData.deposit !== null ? formData.deposit : '')}
-                                    onChange={handleInputChange}
-=======
                                     value={formData.listingType === ListingType.SALE ? '' : (formData.deposit !== undefined ? formatNumberWithSeparators(formData.deposit) : '')}
                                     onChange={handlePriceInputChange}
                                     placeholder="Örn: 25.000"
->>>>>>> Stashed changes
                                     disabled={formData.listingType === ListingType.SALE}
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         formData.listingType === ListingType.SALE 
