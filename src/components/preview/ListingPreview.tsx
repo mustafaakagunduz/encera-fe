@@ -623,21 +623,7 @@ export const ListingPreview: React.FC = () => {
                                         </span>
                                     </div>
 
-                                    {/* Monthly Fee */}
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-600">{isReady ? t('listing.create.monthly-fee') : 'Aidat'}</span>
-                                        <span className="text-gray-900 font-semibold">
-                                            {previewData.monthlyFee ? formatPrice(previewData.monthlyFee) : '-'}
-                                        </span>
-                                    </div>
 
-                                    {/* Deposit */}
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-600">{isReady ? t('listing.create.deposit') : 'Depozito'}</span>
-                                        <span className="text-gray-900 font-semibold">
-                                            {previewData.deposit ? formatPrice(previewData.deposit) : '-'}
-                                        </span>
-                                    </div>
                                     </div>
                                 </div>
 

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useGetPropertyByIdQuery } from '@/store/api/propertyApi';
 import { useApprovePropertyMutation, useRejectPropertyMutation } from '@/store/api/adminApi';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { PropertyImageGallery } from '@/components/ui/property-image-gallery';
 import { useRouter } from 'next/navigation';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import {
@@ -83,7 +84,8 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
         try {
             await approveProperty(propertyId).unwrap();
             setShowConfirm({show: false, type: 'approve'});
-            // Optionally show success message or refresh data
+            // Redirect to admin properties page after approval
+            router.push('/admin/properties');
         } catch (error) {
             console.error('Approval error:', error);
         }
@@ -93,7 +95,8 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
         try {
             await rejectProperty(propertyId).unwrap();
             setShowConfirm({show: false, type: 'reject'});
-            // Optionally show success message or refresh data
+            // Redirect to admin properties page after rejection
+            router.push('/admin/properties');
         } catch (error) {
             console.error('Rejection error:', error);
         }
@@ -126,9 +129,10 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
         );
     }
 
+
     return (
-        <AdminLayout 
-            title={isReady ? t('admin.property-detail.title') : 'İlan Detayı'} 
+        <AdminLayout
+            title={isReady ? t('admin.property-detail.title') : 'İlan Detayı'}
             subtitle={`#${property.id} - ${property.title}`}
         >
             {/* Back Button */}
@@ -170,6 +174,16 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
                         </div>
                     </div>
 
+                    {/* İlan Resimleri */}
+                    <div className="bg-white rounded-lg shadow-sm border p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">{isReady ? t('admin.property-detail.property-images') : 'İlan Resimleri'}</h3>
+                        <PropertyImageGallery
+                            images={property.imageUrls || []}
+                            primaryImageUrl={property.primaryImageUrl}
+                            title={property.title}
+                        />
+                    </div>
+
                     {/* Konum ve Fiyat */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -181,6 +195,9 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
                                 <p className="text-gray-700"><strong>{isReady ? t('admin.property-detail.city') : 'Şehir'}:</strong> {property.city}</p>
                                 <p className="text-gray-700"><strong>{isReady ? t('admin.property-detail.district') : 'İlçe'}:</strong> {property.district}</p>
                                 <p className="text-gray-700"><strong>{isReady ? t('admin.property-detail.neighborhood') : 'Mahalle'}:</strong> {property.neighborhood}</p>
+                                {property.street && (
+                                    <p className="text-gray-700"><strong>{isReady ? t('admin.property-detail.street') : 'Sokak'}:</strong> {property.street}</p>
+                                )}
                             </div>
                         </div>
 
@@ -227,6 +244,12 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
                                     <p className="text-xl font-bold text-gray-800">{property.netArea} m²</p>
                                 </div>
                             )}
+                            {(property.roomConfiguration?.bathroomCount !== undefined && property.roomConfiguration?.bathroomCount !== null) && (
+                                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                                    <h4 className="font-medium text-gray-900 mb-2">{isReady ? t('admin.property-detail.bathroom-count') : 'Banyo Sayısı'}</h4>
+                                    <p className="text-xl font-bold text-gray-800">{property.roomConfiguration.bathroomCount}</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Diğer Özellikler */}
@@ -251,7 +274,41 @@ export const AdminPropertyDetail: React.FC<AdminPropertyDetailProps> = ({ proper
                                 <Star className="h-4 w-4 mr-2" />
                                 {isReady ? t('admin.property-detail.furnished') : 'Eşyalı'}
                             </div>
+                            {property.negotiable !== undefined && (
+                                <div className={`flex items-center px-3 py-2 rounded-lg text-sm ${property.negotiable ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-500'}`}>
+                                    <DollarSign className="h-4 w-4 mr-2" />
+                                    {isReady ? t('admin.property-detail.negotiable') : 'Pazarlık'}
+                                </div>
+                            )}
                         </div>
+
+                        {/* Isıtma Türleri */}
+                        {property.heatingTypes && property.heatingTypes.length > 0 && (
+                            <div className="mt-6">
+                                <h4 className="font-medium text-gray-900 mb-3">{isReady ? t('admin.property-detail.heating-types') : 'Isıtma Türleri'}</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {property.heatingTypes.map((type, index) => (
+                                        <span key={index} className="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded-full">
+                                            {isReady ? t(`heating.options.${type}`) : type}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Cephe Türleri */}
+                        {property.facades && property.facades.length > 0 && (
+                            <div className="mt-6">
+                                <h4 className="font-medium text-gray-900 mb-3">{isReady ? t('admin.property-detail.facade-types') : 'Cephe Türleri'}</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {property.facades.map((type, index) => (
+                                        <span key={index} className="px-3 py-1 bg-teal-100 text-teal-800 text-sm font-medium rounded-full">
+                                            {isReady ? t(`facade.options.${type}`) : type}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Açıklama */}

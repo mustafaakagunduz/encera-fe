@@ -39,7 +39,9 @@ export interface PropertyResponse {
     city: string;
     district: string;
     neighborhood: string;
+    street?: string;
     price: number;
+    negotiable?: boolean;
     grossArea?: number;
     netArea?: number;
     elevator: boolean;
@@ -57,6 +59,20 @@ export interface PropertyResponse {
     reported: boolean;
     reportCount: number;
     lastReportedAt?: string;
+    roomConfiguration?: {
+        roomCount: number;
+        hallCount: number;
+        bathroomCount?: number;
+    };
+    monthlyFee?: number;
+    deposit?: number;
+    buildingAge?: number;
+    totalFloors?: number;
+    currentFloor?: number;
+    heatingTypes?: string[];
+    facades?: string[];
+    imageUrls?: string[];
+    primaryImageUrl?: string;
     owner: {
         id: number;
         firstName: string;

@@ -548,7 +548,13 @@
       "reject": "Reject Property",
       "approve-confirm": "Are you sure you want to approve this property?",
       "reject-confirm": "Are you sure you want to reject this property?",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "property-images": "Property Images",
+      "street": "Street",
+      "bathroom-count": "Bathroom Count",
+      "heating-types": "Heating Types",
+      "facade-types": "Facade Types",
+      "negotiable": "Negotiable"
     }
   },
 

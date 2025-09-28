@@ -56,6 +56,13 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     const { data: property, isLoading, error } = useGetPropertyByIdQuery(propertyId);
     const [deleteProperty] = useDeletePropertyMutation();
 
+    // Debug - property objesi ve street field'ını kontrol et
+    if (property) {
+        console.log('PropertyDetail - Property Object:', property);
+        console.log('PropertyDetail - Street:', property.street);
+        console.log('PropertyDetail - Street type:', typeof property.street);
+    }
+
     // Kullanıcının bu ilanın sahibi olup olmadığını kontrol et
     const isOwner = Boolean(user && property && user.id === property.owner.id);
 
@@ -404,8 +411,9 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     <div>
                                         <div className="font-medium text-gray-900 mb-1">{isReady ? t('property-detail.location') : 'Konum'}</div>
                                         <div className="text-gray-600">
-                                            {property.neighborhood}, {property.district}, {property.city}
+                                            {property.street && `${property.street}, `}{property.neighborhood}, {property.district}, {property.city}
                                         </div>
+
                                     </div>
                                 </div>
                             </div>

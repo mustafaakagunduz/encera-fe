@@ -550,7 +550,13 @@
       "reject": "İlanı Reddet",
       "approve-confirm": "Bu ilanı onaylamak istediğinizden emin misiniz?",
       "reject-confirm": "Bu ilanı reddetmek istediğinizden emin misiniz?",
-      "cancel": "İptal"
+      "cancel": "İptal",
+      "property-images": "İlan Resimleri",
+      "street": "Sokak",
+      "bathroom-count": "Banyo Sayısı",
+      "heating-types": "Isıtma Türleri",
+      "facade-types": "Cephe Türleri",
+      "negotiable": "Pazarlık"
     }
   },
 
