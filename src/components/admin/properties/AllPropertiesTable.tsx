@@ -1,19 +1,50 @@
 'use client';
 
 // src/components/admin/properties/AllPropertiesTable.tsx
-import React, { useState } from 'react';
-import { Search, Building, CheckCircle, Clock, AlertTriangle, Eye, Users, User } from 'lucide-react';
-import { useGetAllAdminPropertiesQuery } from '@/store/api/adminApi';
+import React, { useState, useMemo } from 'react';
+import { Search, Building, CheckCircle, Clock, AlertTriangle, Eye, Users, User, Trash2 } from 'lucide-react';
+import {
+    useGetAllAdminPropertiesQuery,
+    useAdminDeletePropertyMutation,
+    useGetPendingApprovalPropertiesQuery,
+    useGetReportedPropertiesQuery
+} from '@/store/api/adminApi';
 import { useRouter } from 'next/navigation';
 
 export const AllPropertiesTable: React.FC = () => {
     const router = useRouter();
-    const { data: propertiesData, isLoading } = useGetAllAdminPropertiesQuery({ page: 0, size: 50 });
+    // Fetch from multiple endpoints to get all properties
+    const { data: approvedData, isLoading: approvedLoading } = useGetAllAdminPropertiesQuery({ page: 0, size: 1000 });
+    const { data: pendingData, isLoading: pendingLoading } = useGetPendingApprovalPropertiesQuery({ page: 0, size: 1000 });
+    const { data: reportedData, isLoading: reportedLoading } = useGetReportedPropertiesQuery({ page: 0, size: 1000 });
+
+    const [deleteProperty] = useAdminDeletePropertyMutation();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'reported'>('all');
     const [ownershipFilter, setOwnershipFilter] = useState<'all' | 'encera' | 'papp'>('all');
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
-    const properties = propertiesData?.content || [];
+    const isLoading = approvedLoading || pendingLoading || reportedLoading;
+
+    // Combine all properties from different endpoints
+    const allProperties = useMemo(() => {
+        const approved = approvedData?.content || [];
+        const pending = pendingData?.content || [];
+        const reported = reportedData?.content || [];
+
+        // Create a Map to avoid duplicates (some properties might be both reported and approved)
+        const propertyMap = new Map();
+
+        [...approved, ...pending, ...reported].forEach(property => {
+            if (!propertyMap.has(property.id)) {
+                propertyMap.set(property.id, property);
+            }
+        });
+
+        return Array.from(propertyMap.values());
+    }, [approvedData, pendingData, reportedData]);
+
+    const properties = allProperties;
     const filteredProperties = properties.filter(property => {
         const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             property.city.toLowerCase().includes(searchTerm.toLowerCase());
@@ -45,6 +76,21 @@ export const AllPropertiesTable: React.FC = () => {
 
         return matchesSearch && matchesStatus && matchesOwnership;
     });
+
+    const handleDeleteProperty = async (propertyId: number, propertyTitle: string) => {
+        if (confirm(`"${propertyTitle}" ilanını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`)) {
+            try {
+                setDeletingId(propertyId);
+                await deleteProperty(propertyId).unwrap();
+                // Success feedback could be added here if needed
+            } catch (error) {
+                console.error('İlan silme hatası:', error);
+                alert('İlan silinirken bir hata oluştu. Lütfen tekrar deneyin.');
+            } finally {
+                setDeletingId(null);
+            }
+        }
+    };
 
     const getStatusInfo = (property: any) => {
         if (property.reported) {
@@ -162,16 +208,29 @@ export const AllPropertiesTable: React.FC = () => {
                                         {statusInfo.text}
                                     </span>
                                 </div>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        router.push(`/admin/property/${property.id}`);
-                                    }}
-                                    className="p-1 text-gray-400 hover:text-gray-600 rounded relative z-10"
-                                    title="Detayları Görüntüle"
-                                >
-                                    <Eye className="h-4 w-4" />
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            router.push(`/admin/property/${property.id}`);
+                                        }}
+                                        className="p-1 text-gray-400 hover:text-gray-600 rounded relative z-10"
+                                        title="Detayları Görüntüle"
+                                    >
+                                        <Eye className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteProperty(property.id, property.title);
+                                        }}
+                                        disabled={deletingId === property.id}
+                                        className="p-1 text-red-400 hover:text-red-600 rounded relative z-10 disabled:opacity-50"
+                                        title="İlanı Sil"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
                             </div>
 
                             <h4 className="font-medium text-gray-900 mb-2 line-clamp-2">
@@ -198,9 +257,15 @@ export const AllPropertiesTable: React.FC = () => {
                                 <div className="text-xs space-y-1">
                                     <div>
                                         <div>
-                                            Sahibi: {property.owner.firstName} {property.owner.lastName}
-                                            {property.owner.phoneNumber && (
-                                                <div className="text-gray-500">Tel: {property.owner.phoneNumber}</div>
+                                            {property.owner ? (
+                                                <>
+                                                    Sahibi: {property.owner.firstName} {property.owner.lastName}
+                                                    {property.owner.phoneNumber && (
+                                                        <div className="text-gray-500">Tel: {property.owner.phoneNumber}</div>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <div className="text-gray-500">Sahip bilgisi yok</div>
                                             )}
                                             {property.pappSellable && (
                                                 <div className="text-blue-600 font-medium mt-1">

@@ -159,7 +159,7 @@ export const adminApi = createApi({
 
         // Get all properties for admin
         getAllAdminProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
-            query: ({ page = 0, size = 20 }) => `/admin/properties?page=${page}&size=${size}`,
+            query: ({ page = 0, size = 20 }) => `/properties/admin/approved?page=${page}&size=${size}`,
             providesTags: [
                 'AdminProperties',
                 { type: 'AdminProperties', id: 'ALL' }
@@ -168,7 +168,7 @@ export const adminApi = createApi({
 
         // Get property by ID (admin)
         getAdminPropertyById: builder.query<PropertyResponse, number>({
-            query: (id) => `/admin/properties/${id}`,
+            query: (id) => `/properties/public/${id}`,
             providesTags: (result, error, id) => [{ type: 'AdminProperties', id }],
         }),
 
