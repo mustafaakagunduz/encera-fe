@@ -3,7 +3,7 @@
 'use client';
 
 import React from 'react';
-import { PropertyResponse } from '@/store/api/propertyApi';
+import { PropertyResponse, useGetUserStatsQuery } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import {
     Building2,
@@ -15,17 +15,22 @@ import {
 } from 'lucide-react';
 
 interface MyListingsStatsProps {
-    properties: PropertyResponse[];
+    activeTab?: 'my-properties' | 'delegated-properties';
+    isAdmin?: boolean;
 }
 
-export const MyListingsStats: React.FC<MyListingsStatsProps> = ({ properties }) => {
+export const MyListingsStats: React.FC<MyListingsStatsProps> = ({ activeTab = 'my-properties', isAdmin = false }) => {
     const { t, isReady } = useAppTranslation();
 
-    const totalProperties = properties.length;
-    const approvedProperties = properties.filter(p => p.approved && p.active).length;
-    const pendingProperties = properties.filter(p => !p.approved && p.active).length;
-    const inactiveProperties = properties.filter(p => !p.active).length;
-    const totalViews = properties.reduce((sum, p) => sum + p.viewCount, 0);
+    // Global user stats API'sini kullan
+    const { data: userStats, isLoading } = useGetUserStatsQuery();
+
+    // Loading durumunda varsayılan değerler
+    const totalProperties = userStats?.totalProperties || 0;
+    const approvedProperties = userStats?.approvedProperties || 0;
+    const pendingProperties = userStats?.pendingApprovalProperties || 0;
+    const inactiveProperties = userStats?.inactiveProperties || 0;
+    const totalViews = userStats?.totalViews || 0;
 
     const stats = [
         {

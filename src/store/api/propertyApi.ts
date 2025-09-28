@@ -41,6 +41,7 @@ export interface PropertyCreateRequest {
     description?: string;
     furnished?: boolean;
     pappSellable?: boolean;
+    delegatedToEncera?: boolean;
     roomConfiguration?: RoomConfiguration;
     bathroomCount?: number;
     monthlyFee?: number;
@@ -72,6 +73,7 @@ export interface PropertyUpdateRequest {
     description?: string;
     furnished?: boolean;
     pappSellable?: boolean;
+    delegatedToEncera?: boolean;
     roomConfiguration?: RoomConfiguration;
     bathroomCount?: number;
     monthlyFee?: number;
@@ -132,6 +134,7 @@ export interface PropertyResponse {
     featured: boolean;
     pappSellable: boolean;
     furnished: boolean;
+    delegatedToEncera: boolean;
     roomConfiguration?: RoomConfiguration;
     bathroomCount?: number;
     monthlyFee?: number;
@@ -190,9 +193,11 @@ export interface CreatePropertyResponse {
 
 export interface PropertyStatsResponse {
     totalProperties: number;
-    approvedProperties: number;
-    pendingProperties: number;
     activeProperties: number;
+    approvedProperties: number;
+    pendingApprovalProperties: number;
+    inactiveProperties: number;
+    totalViews: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -436,6 +441,12 @@ export const propertyApi = createApi({
             providesTags: ['Property'],
         }),
 
+        // Yetkilendirilmiş ilanları getir (Admin için)
+        getDelegatedProperties: builder.query<PaginatedResponse<PropertyResponse>, { page?: number; size?: number }>({
+            query: ({ page = 0, size = 20 }) => `/admin/delegated-properties?page=${page}&size=${size}`,
+            providesTags: ['Property'],
+        }),
+
 
     }),
 });
@@ -465,4 +476,5 @@ export const {
 
     // Delegasyon sistemi
     useGetEnceraPropertiesQuery,
+    useGetDelegatedPropertiesQuery,
 } = propertyApi;

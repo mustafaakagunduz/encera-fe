@@ -130,7 +130,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
         }
     };
 
-    const isEncera = property?.owner ? isEnceraUser(property.owner) || property?.pappSellable : false;
+    const isEncera = property?.delegatedToEncera || false;
 
     // Kullanıcının daha önce bu ilana yorum yapıp yapmadığını kontrol et
     const userHasCommented = React.useMemo(() => {

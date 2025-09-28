@@ -3,7 +3,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useGetUserPropertiesQuery } from '@/store/api/propertyApi';
+import { useGetUserPropertiesQuery, useGetDelegatedPropertiesQuery } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAuth } from '@/hooks/useAuth';
 import { useSelector } from 'react-redux';
@@ -19,7 +19,7 @@ import { Toast } from '@/components/ui/toast';
 export const MyListings: React.FC = () => {
     // TÜM HOOK'LARI EN BAŞTA ÇAĞIR
     const { t, isReady } = useAppTranslation();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { isHydrated } = useSelector((state: RootState) => state.auth);
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -27,6 +27,7 @@ export const MyListings: React.FC = () => {
     const [pageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'inactive'>('all');
+    const [activeTab, setActiveTab] = useState<'my-properties' | 'delegated-properties'>('my-properties');
 
     // Toast state
     const [toast, setToast] = useState<{
@@ -44,12 +45,23 @@ export const MyListings: React.FC = () => {
         console.log('🎯 Toast state changed:', toast);
     }, [toast]);
 
+    // Admin kontrolü
+    const isAdmin = user?.role === 'ADMIN';
+
     const { data, isLoading, error } = useGetUserPropertiesQuery({
         page: currentPage,
         size: pageSize
     }, {
         // Authentication ve hydration durumu hazır olmadan query çalıştırma
-        skip: !isAuthenticated || !isHydrated
+        skip: !isAuthenticated || !isHydrated || (isAdmin && activeTab !== 'my-properties')
+    });
+
+    // Yetkilendirilmiş ilanlar (sadece admin için)
+    const { data: delegatedData, isLoading: delegatedLoading, error: delegatedError } = useGetDelegatedPropertiesQuery({
+        page: currentPage,
+        size: pageSize
+    }, {
+        skip: !isAuthenticated || !isHydrated || !isAdmin || activeTab !== 'delegated-properties'
     });
 
     // Success toast functions
@@ -81,9 +93,13 @@ export const MyListings: React.FC = () => {
     }, [searchParams, router, isReady, t]);
 
     // DATA PROCESSING - Hook'lardan sonra
-    const properties = data?.content || [];
-    const totalElements = data?.totalElements || 0;
-    const totalPages = data?.totalPages || 0;
+    const currentData = activeTab === 'delegated-properties' ? delegatedData : data;
+    const currentLoading = activeTab === 'delegated-properties' ? delegatedLoading : isLoading;
+    const currentError = activeTab === 'delegated-properties' ? delegatedError : error;
+
+    const properties = currentData?.content || [];
+    const totalElements = currentData?.totalElements || 0;
+    const totalPages = currentData?.totalPages || 0;
 
     // Filtreleme - useMemo ile optimize et
     const filteredProperties = useMemo(() => {
@@ -102,7 +118,7 @@ export const MyListings: React.FC = () => {
     }, [properties, searchTerm, statusFilter]);
 
     // Loading state - authentication hazır olmadan veya data yüklenirken
-    if (!isHydrated || !isAuthenticated || isLoading) {
+    if (!isHydrated || !isAuthenticated || currentLoading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
                 <div className="container mx-auto px-4 py-8">
@@ -120,7 +136,7 @@ export const MyListings: React.FC = () => {
         );
     }
 
-    if (error) {
+    if (currentError) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
                 <div className="container mx-auto px-4 py-8">
@@ -162,7 +178,43 @@ export const MyListings: React.FC = () => {
                 </div>
 
                 {/* Stats */}
-                <MyListingsStats properties={properties} />
+                <MyListingsStats activeTab={activeTab} isAdmin={isAdmin} />
+
+                {/* Admin Tabs */}
+                {isAdmin && (
+                    <div className="mb-6">
+                        <div className="border-b border-gray-200">
+                            <nav className="-mb-px flex space-x-8">
+                                <button
+                                    onClick={() => {
+                                        setActiveTab('my-properties');
+                                        setCurrentPage(0);
+                                    }}
+                                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                        activeTab === 'my-properties'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    Bana Ait İlanlar
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setActiveTab('delegated-properties');
+                                        setCurrentPage(0);
+                                    }}
+                                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                        activeTab === 'delegated-properties'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    Yetkilendirildiğim İlanlar
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                )}
 
                 {/* Filters & Search */}
                 <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
