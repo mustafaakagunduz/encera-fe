@@ -105,8 +105,7 @@ const SearchResultsPage: React.FC = () => {
         setError(null);
 
         try {
-            // TODO: Gelecekte smartSearchService'i filtreleri de alacak şekilde güncelleyebiliriz
-            // Şimdilik sadece temel arama yapıyor, filtreleme client-side olabilir
+
             const result = await smartSearchService.smartSearch(searchQuery, page, 20);
 
             // Eğer filtre uygulanmışsa, sonuçları client-side filtrele
