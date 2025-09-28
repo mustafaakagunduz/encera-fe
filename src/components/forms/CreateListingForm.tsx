@@ -102,18 +102,26 @@ export const CreateListingForm: React.FC = () => {
         totalFloors: undefined,
         currentFloor: undefined,
         heatingTypes: [],
+        facades: [],
     });
 
     const [errors, setErrors] = useState<FormErrors>({});
     const [heatingDropdownOpen, setHeatingDropdownOpen] = useState(false);
+    const [facadeDropdownOpen, setFacadeDropdownOpen] = useState(false);
     const [images, setImages] = useState<ImageData[]>([]);
 
     // Heating options
     const heatingOptions = [
-        'none', 'stove', 'natural-gas-stove', 'floor-heating', 'central', 
-        'central-share', 'combi-natural-gas', 'combi-electric', 'underfloor-heating', 
-        'air-conditioning', 'fancoil', 'solar-energy', 'electric-radiator', 
+        'none', 'stove', 'natural-gas-stove', 'floor-heating', 'central',
+        'central-share', 'combi-natural-gas', 'combi-electric', 'underfloor-heating',
+        'air-conditioning', 'fancoil', 'solar-energy', 'electric-radiator',
         'geothermal', 'fireplace', 'vrv', 'heat-pump'
+    ];
+
+    // Facade options
+    const facadeOptions = [
+        'north', 'south', 'east', 'west', 'northeast', 'northwest',
+        'southeast', 'southwest'
     ];
 
     const previewData = useAppSelector(selectListingPreviewData);
@@ -147,6 +155,7 @@ export const CreateListingForm: React.FC = () => {
                 totalFloors: previewData.totalFloors,
                 currentFloor: previewData.currentFloor,
                 heatingTypes: previewData.heatingTypes || [],
+                facades: previewData.facades || [],
             });
 
             // Storage'dan image verilerini yükle (File objelerle birlikte)
@@ -201,6 +210,7 @@ export const CreateListingForm: React.FC = () => {
                 totalFloors: existingProperty.totalFloors,
                 currentFloor: existingProperty.currentFloor,
                 heatingTypes: existingProperty.heatingTypes || [],
+                facades: existingProperty.facades || [],
             });
 
             // Set images from existing property
@@ -267,6 +277,7 @@ export const CreateListingForm: React.FC = () => {
                     newData.balcony = false;
                     newData.furnished = false;
                     newData.heatingTypes = [];
+                    newData.facades = [];
                 }
                 // İş yeri seçildiğinde bu alanları temizle
                 else if (value === PropertyType.COMMERCIAL) {
@@ -331,6 +342,15 @@ export const CreateListingForm: React.FC = () => {
         }));
     };
 
+    const handleFacadeToggle = (facadeType: string) => {
+        setFormData(prev => ({
+            ...prev,
+            facades: prev.facades?.includes(facadeType)
+                ? prev.facades.filter(type => type !== facadeType)
+                : [...(prev.facades || []), facadeType]
+        }));
+    };
+
     const handleFeatureToggle = (featureName: string, condition: boolean = true) => {
         if (!condition) return;
 
@@ -348,9 +368,46 @@ export const CreateListingForm: React.FC = () => {
         }));
     };
 
+    const removeFacadeType = (facadeType: string) => {
+        setFormData(prev => ({
+            ...prev,
+            facades: prev.facades?.filter(type => type !== facadeType) || []
+        }));
+    };
+
     const handleImagesChange = React.useCallback((newImages: ImageData[]) => {
         setImages(newImages);
     }, []);
+
+    // Format number with thousand separators (2750000 -> 2.750.000)
+    const formatNumberWithSeparators = (value: string | number): string => {
+        if (!value) return '';
+        const numStr = value.toString().replace(/[^\d]/g, ''); // Only keep digits
+        if (!numStr) return '';
+        return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
+    // Remove separators and return plain number (2.750.000 -> 2750000)
+    const removeNumberSeparators = (value: string): string => {
+        return value.replace(/\./g, '');
+    };
+
+    // Handle price input changes with formatting
+    const handlePriceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const plainNumber = removeNumberSeparators(value);
+
+        // Update formData with plain number for backend
+        setFormData(prev => ({
+            ...prev,
+            [name]: plainNumber !== '' ? Number(plainNumber) : undefined
+        }));
+
+        // Clear error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
 
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};
@@ -439,6 +496,7 @@ export const CreateListingForm: React.FC = () => {
             totalFloors: formData.totalFloors,
             currentFloor: formData.currentFloor,
             heatingTypes: formData.heatingTypes,
+            facades: formData.facades,
             imageUrls: images.filter(img => img.url).map(img => img.url!),
             primaryImageUrl: images.find(img => img.isPrimary)?.url,
         };
@@ -799,8 +857,14 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="price"
+<<<<<<< Updated upstream
                                     value={formData.price !== undefined && formData.price !== null ? formData.price : ''}
                                     onChange={handleInputChange}
+=======
+                                    value={formData.price !== undefined ? formatNumberWithSeparators(formData.price) : ''}
+                                    onChange={handlePriceInputChange}
+                                    placeholder="Örn: 2.750.000"
+>>>>>>> Stashed changes
                                     className={`w-full px-4 py-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.price ? 'border-red-500' : 'border-gray-300'
                                     }`}
@@ -823,9 +887,14 @@ export const CreateListingForm: React.FC = () => {
                                     value={
                                         formData.propertyType === PropertyType.LAND ||
                                         (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
+<<<<<<< Updated upstream
                                             ? '' : (formData.monthlyFee !== undefined && formData.monthlyFee !== null ? formData.monthlyFee : '')
+=======
+                                            ? '' : (formData.monthlyFee !== undefined ? formatNumberWithSeparators(formData.monthlyFee) : '')
+>>>>>>> Stashed changes
                                     }
-                                    onChange={handleInputChange}
+                                    onChange={handlePriceInputChange}
+                                    placeholder="Örn: 1.500"
                                     disabled={
                                         formData.propertyType === PropertyType.LAND ||
                                         (formData.propertyType === PropertyType.RESIDENTIAL && formData.listingType === ListingType.SALE)
@@ -855,8 +924,14 @@ export const CreateListingForm: React.FC = () => {
                                 <input
                                     type="text"
                                     name="deposit"
+<<<<<<< Updated upstream
                                     value={formData.listingType === ListingType.SALE ? '' : (formData.deposit !== undefined && formData.deposit !== null ? formData.deposit : '')}
                                     onChange={handleInputChange}
+=======
+                                    value={formData.listingType === ListingType.SALE ? '' : (formData.deposit !== undefined ? formatNumberWithSeparators(formData.deposit) : '')}
+                                    onChange={handlePriceInputChange}
+                                    placeholder="Örn: 25.000"
+>>>>>>> Stashed changes
                                     disabled={formData.listingType === ListingType.SALE}
                                     className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         formData.listingType === ListingType.SALE 
@@ -1044,6 +1119,77 @@ export const CreateListingForm: React.FC = () => {
                                                     type="button"
                                                     onClick={() => removeHeatingType(type)}
                                                     className="ml-2 text-blue-600 hover:text-blue-800"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Cephe - Çoklu Seçim - Arsa için deaktif */}
+                            <div className="md:col-span-3">
+                                <label className={`block text-sm font-medium mb-2 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-900'}`}>
+                                    {isReady ? t('listing.create.facade-types') : 'Cephe'}
+                                </label>
+                                <div className="relative" data-dropdown-container>
+                                    <button
+                                        type="button"
+                                        onClick={() => formData.propertyType !== PropertyType.LAND && setFacadeDropdownOpen(!facadeDropdownOpen)}
+                                        disabled={formData.propertyType === PropertyType.LAND}
+                                        className={`w-full px-4 py-3 border rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between ${
+                                            formData.propertyType === PropertyType.LAND
+                                                ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                                                : 'border-gray-300 bg-white'
+                                        }`}
+                                    >
+                                        <span className={formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-500'}>
+                                            {formData.propertyType === PropertyType.LAND
+                                                ? 'Arsa için uygulanmaz'
+                                                : (formData.facades && formData.facades.length > 0
+                                                    ? `${formData.facades.length} ${isReady ? t('listing.create.items-selected') : 'seçim yapıldı'}`
+                                                    : (isReady ? t('listing.create.facade-placeholder') : 'Cephe türlerini seçiniz'))
+                                            }
+                                        </span>
+                                        <ChevronDown className={`w-5 h-5 ${formData.propertyType === PropertyType.LAND ? 'text-gray-400' : 'text-gray-400'}`} />
+                                    </button>
+
+                                    {facadeDropdownOpen && formData.propertyType !== PropertyType.LAND && (
+                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                            {facadeOptions.map((option) => (
+                                                <label
+                                                    key={option}
+                                                    className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={Boolean(formData.facades?.includes(option) || false)}
+                                                        onChange={() => handleFacadeToggle(option)}
+                                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3"
+                                                    />
+                                                    <span className="text-sm text-gray-900">
+                                                        {isReady ? t(`facade.options.${option}`) : option}
+                                                    </span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Selected facade types display - Sadece arsa değilse göster */}
+                                {formData.facades && formData.facades.length > 0 && formData.propertyType !== PropertyType.LAND && (
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                        {formData.facades.map((type) => (
+                                            <span
+                                                key={type}
+                                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                            >
+                                                {isReady ? t(`facade.options.${type}`) : type}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeFacadeType(type)}
+                                                    className="ml-2 text-green-600 hover:text-green-800"
                                                 >
                                                     <X className="w-3 h-3" />
                                                 </button>

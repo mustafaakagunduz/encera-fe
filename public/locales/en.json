@@ -216,6 +216,8 @@
       "current-floor": "Current Floor", 
       "heating-types": "Heating",
       "heating-placeholder": "Select heating types",
+      "facade-types": "Facade",
+      "facade-placeholder": "Select facade types",
       "items-selected": "items selected",
       "heating-types-selected": "heating types selected",
       "years": "years",
@@ -572,6 +574,19 @@
     }
   },
 
+  "facade": {
+    "options": {
+      "north": "North",
+      "south": "South",
+      "east": "East",
+      "west": "West",
+      "northeast": "Northeast",
+      "northwest": "Northwest",
+      "southeast": "Southeast",
+      "southwest": "Southwest"
+    }
+  },
+
   "filters": {
     "title": "Filters",
     "listing-type": "Listing Type",
@@ -647,6 +662,7 @@
     "current-floor": "Current Floor",
     "total-floors": "Total Floors",
     "heating-type": "Heating Type",
+    "facade-type": "Facade",
     "monthly-fee": "Monthly Fee",
     "deposit": "Deposit",
     "property-details": "Property Details",

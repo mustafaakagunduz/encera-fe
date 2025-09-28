@@ -219,6 +219,25 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
         return t(`heating.options.${heatingType}`, { defaultValue: heatingType });
     };
 
+    const getFacadeTypeText = (facadeType: string) => {
+        if (!isReady) {
+            // Fallback Turkish translations when translations are not ready
+            const fallbackTranslations: { [key: string]: string } = {
+                'north': 'Kuzey',
+                'south': 'Güney',
+                'east': 'Doğu',
+                'west': 'Batı',
+                'northeast': 'Kuzeydoğu',
+                'northwest': 'Kuzeybatı',
+                'southeast': 'Güneydoğu',
+                'southwest': 'Güneybatı'
+            };
+            return fallbackTranslations[facadeType] || facadeType;
+        }
+
+        return t(`facade.options.${facadeType}`, { defaultValue: facadeType });
+    };
+
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('tr-TR', {
             style: 'currency',
@@ -644,6 +663,14 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         <span className="text-gray-600">{isReady ? t('property-detail.heating-type') : 'Isıtma Türü'}</span>
                                         <span className="font-medium text-gray-900">
                                             {property.heatingTypes.map(getHeatingTypeText).join(', ')}
+                                        </span>
+                                    </div>
+                                )}
+                                {property.facades && property.facades.length > 0 && (
+                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                                        <span className="text-gray-600">{isReady ? t('property-detail.facade-type') : 'Cephe'}</span>
+                                        <span className="font-medium text-gray-900">
+                                            {property.facades.map(getFacadeTypeText).join(', ')}
                                         </span>
                                     </div>
                                 )}

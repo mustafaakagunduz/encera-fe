@@ -217,6 +217,8 @@
       "current-floor": "Bulunduğu Kat",
       "heating-types": "Isıtma",
       "heating-placeholder": "Isıtma türlerini seçiniz",
+      "facade-types": "Cephe",
+      "facade-placeholder": "Cephe türlerini seçiniz",
       "items-selected": "seçim yapıldı",
       "heating-types-selected": "ısıtma türü seçildi",
       "years": "yıl",
@@ -574,6 +576,19 @@
     }
   },
 
+  "facade": {
+    "options": {
+      "north": "Kuzey",
+      "south": "Güney",
+      "east": "Doğu",
+      "west": "Batı",
+      "northeast": "Kuzeydoğu",
+      "northwest": "Kuzeybatı",
+      "southeast": "Güneydoğu",
+      "southwest": "Güneybatı"
+    }
+  },
+
   "filters": {
     "title": "Filtreler",
     "listing-type": "İlan Türü",
@@ -649,6 +664,7 @@
     "current-floor": "Bulunduğu Kat",
     "total-floors": "Toplam Kat",
     "heating-type": "Isıtma Türü",
+    "facade-type": "Cephe",
     "monthly-fee": "Aidat",
     "deposit": "Depozito",
     "property-details": "İlan Detayları",

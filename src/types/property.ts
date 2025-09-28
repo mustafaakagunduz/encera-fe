@@ -41,6 +41,7 @@ export interface PropertyCreateRequest {
     totalFloors?: number;
     currentFloor?: number;
     heatingTypes?: string[];
+    facades?: string[];
 }
 
 export interface PropertyResponse extends PropertyCreateRequest {
