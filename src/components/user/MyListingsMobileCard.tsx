@@ -1,9 +1,10 @@
 // src/components/user/MyListingsMobileCard.tsx
 'use client';
 
-import React from 'react';
-import { PropertyResponse, ListingType, PropertyType, useDeletePropertyMutation } from '@/store/api/propertyApi';
+import React, { useState, useEffect, useRef } from 'react';
+import { PropertyResponse, ListingType, PropertyType, PropertyStatus, useDeletePropertyMutation, useMarkPropertyAsSoldMutation, useMarkPropertyAsRemovedMutation, useCleanupPropertyImagesMutation } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
+import { usePropertyStatus } from '@/hooks/usePropertyStatus';
 import {
     Eye,
     Edit,
@@ -11,7 +12,10 @@ import {
     MapPin,
     Tag,
     TrendingUp,
-    Trash2
+    Trash2,
+    MoreVertical,
+    PackageX,
+    ShoppingCart
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -22,18 +26,107 @@ interface MyListingsMobileCardProps {
 export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ property }) => {
     const { t, isReady } = useAppTranslation();
     const [deleteProperty] = useDeletePropertyMutation();
+    const [markAsSold] = useMarkPropertyAsSoldMutation();
+    const [markAsRemoved] = useMarkPropertyAsRemovedMutation();
+    const [cleanupImages] = useCleanupPropertyImagesMutation();
+    const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const handleDelete = async () => {
-        if (window.confirm(isReady ? t('my-listings.actions.delete-confirm') : 'Bu ilanı silmek istediğinizden emin misiniz?')) {
+    // Get the effective status (original or overridden)
+    const effectiveStatus = usePropertyStatus(property.id, property.status);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleMarkAsSold = async () => {
+        if (window.confirm('Bu ilanı "Satıldı" olarak işaretlemek istediğinizden emin misiniz?\n\n• İlan favorilerde soluk görünecek\n• Ana fotoğraf dışındaki fotoğraflar silinecek\n• İlan bilgileri korunacak')) {
             try {
-                await deleteProperty(property.id).unwrap();
-            } catch (error) {
-                console.error('Silme hatası:', error);
+                // 1. Mark property as sold
+                await markAsSold({ propertyId: property.id, propertyData: property }).unwrap();
+
+                // 2. Clean up images (keep only primary image)
+                try {
+                    await cleanupImages({ propertyId: property.id, keepOnlyPrimary: true }).unwrap();
+                } catch (imageError: any) {
+                    console.log('Image cleanup failed (endpoint may not exist yet):', imageError);
+                    // Don't show error to user, image cleanup is secondary
+                }
+
+                setShowDropdown(false);
+                alert('İlan başarıyla "Satıldı" olarak işaretlendi.\nAna fotoğraf dışındaki fotoğraflar temizlendi.');
+            } catch (error: any) {
+                console.error('Satıldı işaretleme hatası:', error);
+                if (error?.status === 404 || error?.status === 500) {
+                    alert('Backend\'de status güncelleme özelliği henüz implement edilmemiş.\nBackend developer\'a PropertyUpdateRequest\'e "status" field\'ını eklemesini söyleyin.');
+                } else {
+                    const errorMessage = error?.data?.message || 'İlan satıldı olarak işaretlenirken bir hata oluştu';
+                    alert(errorMessage);
+                }
+            }
+        }
+    };
+
+    const handleMarkAsRemoved = async () => {
+        if (window.confirm('Bu ilanı kaldırmak istediğinizden emin misiniz?\n\n• Favorilerde değilse: Tamamen silinecek\n• Favorilerde varsa: Kaldırıldı olarak işaretlenecek\n• Gereksiz fotoğraflar silinecek')) {
+            try {
+                // İlk önce hard delete deneyelim, 400 hatası alırsak soft delete yapalım
+                try {
+                    await deleteProperty(property.id).unwrap();
+                    setShowDropdown(false);
+                    alert('İlan başarıyla silindi.');
+                } catch (deleteError: any) {
+                    if (deleteError?.status === 400) {
+                        // Favorilerde varsa soft delete yap
+                        try {
+                            // 1. Mark as removed
+                            await markAsRemoved({ propertyId: property.id, propertyData: property }).unwrap();
+
+                            // 2. Clean up images (keep only primary image)
+                            try {
+                                await cleanupImages({ propertyId: property.id, keepOnlyPrimary: true }).unwrap();
+                            } catch (imageError: any) {
+                                console.log('Image cleanup failed (endpoint may not exist yet):', imageError);
+                            }
+
+                            setShowDropdown(false);
+                            alert('İlan başkalarının favorilerinde bulunduğu için "Kaldırıldı" olarak işaretlendi.\nAna fotoğraf dışındaki fotoğraflar temizlendi.');
+                        } catch (markError: any) {
+                            if (markError?.status === 404 || markError?.status === 500) {
+                                alert('Soft delete özelliği henüz backend\'de implement edilmemiş.\nİlan favorilerde bulunduğu için silinemedi.\nBackend developer\'a PropertyUpdateRequest\'e "status" field\'ını eklemesini söyleyin.');
+                            } else {
+                                throw markError;
+                            }
+                        }
+                    } else {
+                        throw deleteError;
+                    }
+                }
+            } catch (error: any) {
+                console.error('Kaldırma hatası:', error);
+                const errorMessage = error?.data?.message || 'İlan kaldırılırken bir hata oluştu';
+                alert(errorMessage);
             }
         }
     };
 
     const getStatusText = () => {
+        if (effectiveStatus === PropertyStatus.SOLD) {
+            return 'Satıldı';
+        }
+        if (effectiveStatus === PropertyStatus.REMOVED) {
+            return 'Kaldırıldı';
+        }
         if (!property.active) {
             return isReady ? t('my-listings.status.inactive') : 'Pasif';
         }
@@ -44,6 +137,8 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
     };
 
     const getStatusColor = () => {
+        if (effectiveStatus === PropertyStatus.SOLD) return 'bg-orange-100 text-orange-800';
+        if (effectiveStatus === PropertyStatus.REMOVED) return 'bg-red-100 text-red-800';
         if (!property.active) return 'bg-gray-100 text-gray-800';
         if (!property.approved) return 'bg-yellow-100 text-yellow-800';
         return 'bg-green-100 text-green-800';
@@ -128,7 +223,7 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                     <Link
                         href={`/property/${property.id}`}
                         className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
@@ -143,14 +238,49 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
                         <Edit className="w-3 h-3 mr-1" />
                         {isReady ? t('my-listings.actions.edit') : 'Düzenle'}
                     </Link>
+                </div>
+
+                {/* Dropdown Menu */}
+                <div className="relative" ref={dropdownRef}>
                     <button
-                        onClick={handleDelete}
-                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
-                        title={isReady ? t('my-listings.actions.delete') : 'Sil'}
+                        onClick={() => setShowDropdown(!showDropdown)}
+                        className="inline-flex items-center px-2 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                        title="İşlemler"
                     >
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        {isReady ? t('my-listings.actions.delete') : 'Sil'}
+                        <MoreVertical className="w-3 h-3" />
                     </button>
+
+                    {showDropdown && (
+                        <div className="absolute right-0 bottom-full mb-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                            <div className="py-1">
+                                <button
+                                    onClick={handleMarkAsSold}
+                                    className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-colors"
+                                >
+                                    <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg mr-3">
+                                        <ShoppingCart className="w-4 h-4 text-orange-600" />
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                        <div className="font-medium">Satıldı olarak işaretle</div>
+                                        <div className="text-xs text-gray-500">İlan favorilerde kalır</div>
+                                    </div>
+                                </button>
+                                <div className="border-t border-gray-100"></div>
+                                <button
+                                    onClick={handleMarkAsRemoved}
+                                    className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors"
+                                >
+                                    <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mr-3">
+                                        <Trash2 className="w-4 h-4 text-red-600" />
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                        <div className="font-medium">Kaldır</div>
+                                        <div className="text-xs text-gray-500">İlan artık görünmez</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

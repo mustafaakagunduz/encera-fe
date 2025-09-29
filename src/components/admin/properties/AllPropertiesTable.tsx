@@ -2,7 +2,7 @@
 
 // src/components/admin/properties/AllPropertiesTable.tsx
 import React, { useState, useMemo } from 'react';
-import { Search, Building, CheckCircle, Clock, AlertTriangle, Eye, Users, User, Trash2 } from 'lucide-react';
+import { Search, Building, CheckCircle, Clock, AlertTriangle, Eye, Trash2 } from 'lucide-react';
 import {
     useGetAllAdminPropertiesQuery,
     useAdminDeletePropertyMutation,
@@ -21,7 +21,6 @@ export const AllPropertiesTable: React.FC = () => {
     const [deleteProperty] = useAdminDeletePropertyMutation();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'reported'>('all');
-    const [ownershipFilter, setOwnershipFilter] = useState<'all' | 'encera' | 'papp'>('all');
     const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const isLoading = approvedLoading || pendingLoading || reportedLoading;
@@ -62,19 +61,7 @@ export const AllPropertiesTable: React.FC = () => {
                 break;
         }
 
-        let matchesOwnership = true;
-        switch (ownershipFilter) {
-            case 'encera':
-                // Encera'nın kendi ilanları - admin kullanıcıları tarafından oluşturulan pappSellable ilanlar
-                matchesOwnership = property.pappSellable === true && property.owner?.role === 'ADMIN';
-                break;
-            case 'papp':
-                // Kullanıcıların pappSellable=true ilanları
-                matchesOwnership = property.pappSellable === true && property.owner?.role === 'USER';
-                break;
-        }
-
-        return matchesSearch && matchesStatus && matchesOwnership;
+        return matchesSearch && matchesStatus;
     });
 
     const handleDeleteProperty = async (propertyId: number, propertyTitle: string) => {
@@ -154,137 +141,123 @@ export const AllPropertiesTable: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Ownership Filter Buttons */}
-                <div className="flex flex-wrap gap-2">
-                    <button
-                        onClick={() => setOwnershipFilter('all')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            ownershipFilter === 'all'
-                                ? 'bg-gray-900 text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                    >
-                        <Building className="h-4 w-4" />
-                        Tüm İlanlar
-                    </button>
-
-                    <button
-                        onClick={() => setOwnershipFilter('encera')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            ownershipFilter === 'encera'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-                        }`}
-                    >
-                        <User className="h-4 w-4" />
-                        Encera'nın İlanları
-                    </button>
-
-                    <button
-                        onClick={() => setOwnershipFilter('papp')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            ownershipFilter === 'papp'
-                                ? 'bg-green-600 text-white'
-                                : 'bg-green-50 text-green-600 hover:bg-green-100'
-                        }`}
-                    >
-                        <Users className="h-4 w-4" />
-                        Papp Sellable İlanları
-                    </button>
-                </div>
             </div>
 
-            {/* Properties Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredProperties.map((property) => {
-                    const statusInfo = getStatusInfo(property);
-                    return (
-                        <div key={property.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/admin/property/${property.id}`)}>
-                            <div className="flex items-start justify-between mb-3">
-                                <div className="flex items-center">
-                                    <Building className="h-5 w-5 text-gray-400 mr-2" />
-                                    <span className={`px-2 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${statusInfo.color}`}>
-                                        {statusInfo.icon}
-                                        {statusInfo.text}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            router.push(`/admin/property/${property.id}`);
-                                        }}
-                                        className="p-1 text-gray-400 hover:text-gray-600 rounded relative z-10"
-                                        title="Detayları Görüntüle"
-                                    >
-                                        <Eye className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeleteProperty(property.id, property.title);
-                                        }}
-                                        disabled={deletingId === property.id}
-                                        className="p-1 text-red-400 hover:text-red-600 rounded relative z-10 disabled:opacity-50"
-                                        title="İlanı Sil"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <h4 className="font-medium text-gray-900 mb-2 line-clamp-2">
-                                {property.title}
-                            </h4>
-
-                            <div className="space-y-2 text-sm text-gray-600">
-                                <div className="flex items-center justify-between">
-                                    <span>{property.city}, {property.district}</span>
-                                    <span className="font-medium text-green-600">
-                                        {new Intl.NumberFormat('tr-TR', {
-                                            style: 'currency',
-                                            currency: 'TRY',
-                                            minimumFractionDigits: 0,
-                                        }).format(property.price)}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center justify-between text-xs">
-                                    <span>{property.viewCount} görüntüleme</span>
-                                    <span>{new Date(property.createdAt).toLocaleDateString('tr-TR')}</span>
-                                </div>
-
-                                <div className="text-xs space-y-1">
-                                    <div>
-                                        <div>
+            {/* Properties Table */}
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Durum
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                İlan Başlığı
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Konum
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Fiyat
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Sahip
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tarih
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                İşlemler
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                        {filteredProperties.map((property) => {
+                            const statusInfo = getStatusInfo(property);
+                            return (
+                                <tr key={property.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-4 py-4 whitespace-nowrap">
+                                        <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${statusInfo.color}`}>
+                                            {statusInfo.icon}
+                                            {statusInfo.text}
+                                        </span>
+                                        {property.pappSellable && (
+                                            <div className="text-xs text-blue-600 font-medium mt-1">
+                                                Encera
+                                            </div>
+                                        )}
+                                        {property.reportCount > 0 && (
+                                            <div className="text-xs text-red-600 mt-1">
+                                                {property.reportCount} şikayet
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-4">
+                                        <div className="text-sm font-medium text-gray-900 max-w-xs">
+                                            {property.title}
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-600">
+                                            {property.city}, {property.district}
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap">
+                                        <div className="text-sm font-medium text-green-600">
+                                            {new Intl.NumberFormat('tr-TR', {
+                                                style: 'currency',
+                                                currency: 'TRY',
+                                                minimumFractionDigits: 0,
+                                            }).format(property.price)}
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-600">
                                             {property.owner ? (
                                                 <>
-                                                    Sahibi: {property.owner.firstName} {property.owner.lastName}
+                                                    <div>{property.owner.firstName} {property.owner.lastName}</div>
                                                     {property.owner.phoneNumber && (
-                                                        <div className="text-gray-500">Tel: {property.owner.phoneNumber}</div>
+                                                        <div className="text-xs text-gray-500">{property.owner.phoneNumber}</div>
                                                     )}
                                                 </>
                                             ) : (
-                                                <div className="text-gray-500">Sahip bilgisi yok</div>
-                                            )}
-                                            {property.pappSellable && (
-                                                <div className="text-blue-600 font-medium mt-1">
-                                                    Papp Sellable
-                                                </div>
+                                                <div className="text-gray-400">Sahip bilgisi yok</div>
                                             )}
                                         </div>
-                                    </div>
-                                </div>
-
-                                {property.reportCount > 0 && (
-                                    <div className="text-xs text-red-600">
-                                        {property.reportCount} şikayet
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-600">
+                                            {new Date(property.createdAt).toLocaleDateString('tr-TR')}
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap">
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => router.push(`/admin/property/${property.id}`)}
+                                                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+                                                title="Detayları Görüntüle"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteProperty(property.id, property.title)}
+                                                disabled={deletingId === property.id}
+                                                className="p-2 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                title="İlanı Sil"
+                                            >
+                                                {deletingId === property.id ? (
+                                                    <div className="animate-spin h-4 w-4 border-2 border-red-400 border-t-transparent rounded-full"></div>
+                                                ) : (
+                                                    <Trash2 className="h-4 w-4" />
+                                                )}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
             </div>
 
             {filteredProperties.length === 0 && (

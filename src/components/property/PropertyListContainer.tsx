@@ -1,13 +1,14 @@
 // src/components/property/PropertyListContainer.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { PropertyType, PropertySearchFilters, useSearchPropertiesWithFiltersQuery } from '@/store/api/propertyApi';
 import { PropertyListRow } from './PropertyListRow';
 import { FilterSidebar } from './FilterSidebar';
 import { EmptyState } from '../ui/EmptyState';
 import { Search, AlertTriangle } from 'lucide-react';
+import { usePropertyStatusOverrides } from '@/hooks/usePropertyStatus';
 
 interface PropertyListContainerProps {
     filters: PropertySearchFilters;
@@ -55,6 +56,16 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                                                 onCloseMobileFilters
                                                                             }) => {
     const { t, isReady } = useAppTranslation();
+    const statusOverrides = usePropertyStatusOverrides();
+
+    // Satılan/kaldırılan ilanları filtrele
+    const filteredProperties = useMemo(() => {
+        return properties.filter(property => {
+            const effectiveStatus = statusOverrides[property.id] || property.status;
+            // Satılan/kaldırılan ilanları kategori sayfalarından gizle
+            return effectiveStatus !== 'SOLD' && effectiveStatus !== 'REMOVED';
+        });
+    }, [properties, statusOverrides]);
 
     if (isLoading) {
         return (
@@ -217,7 +228,7 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                     </div>
 
                     {/* Results */}
-                    {properties.length === 0 ? (
+                    {filteredProperties.length === 0 ? (
                         <EmptyState
                             icon={Search}
                             title={emptyTitle}
@@ -262,8 +273,8 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
 
                                 {/* Property Rows */}
                                 <div>
-                                    {properties.map((property, index) => (
-                                        <div key={property.id} className={index === properties.length - 1 ? '[&>a>div>div]:border-b-0' : ''}>
+                                    {filteredProperties.map((property, index) => (
+                                        <div key={property.id} className={index === filteredProperties.length - 1 ? '[&>a>div>div]:border-b-0' : ''}>
                                             <PropertyListRow
                                                 property={property}
                                                 linkHref={`${linkPrefix}/${property.id}`}

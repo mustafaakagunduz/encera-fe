@@ -1,7 +1,7 @@
 // src/components/search/SearchResultsContainer.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { SmartSearchResponse, PropertySummary } from '@/services/smartSearchService';
 import { SearchPropertyRow } from './SearchPropertyRow';
@@ -9,6 +9,7 @@ import { FilterSidebar } from '../property/FilterSidebar';
 import { EmptyState } from '../ui/EmptyState';
 import { Search, AlertTriangle, Loader2 } from 'lucide-react';
 import { PropertyType, PropertySearchFilters } from '@/store/api/propertyApi';
+import { usePropertyStatusOverrides } from '@/hooks/usePropertyStatus';
 
 interface SearchResultsContainerProps {
     searchResults: SmartSearchResponse | null;
@@ -38,6 +39,26 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
     onCloseMobileFilters
 }) => {
     const { t, isReady } = useAppTranslation();
+    const statusOverrides = usePropertyStatusOverrides();
+
+    // Satılan/kaldırılan ilanları filtrele
+    const filteredResults = useMemo(() => {
+        if (!searchResults) return null;
+
+        const filteredContent = searchResults.results.content.filter((property: PropertySummary) => {
+            const effectiveStatus = statusOverrides[property.id];
+            // Satılan/kaldırılan ilanları arama sonuçlarından gizle
+            return effectiveStatus !== 'SOLD' && effectiveStatus !== 'REMOVED';
+        });
+
+        return {
+            ...searchResults,
+            results: {
+                ...searchResults.results,
+                content: filteredContent
+            }
+        };
+    }, [searchResults, statusOverrides]);
 
     if (isLoading) {
         return (
@@ -127,7 +148,7 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
         );
     }
 
-    if (!searchResults) {
+    if (!filteredResults) {
         return (
             <div className="flex">
                 <div className="flex w-full">
@@ -180,11 +201,11 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
                 <div className="flex-1 min-w-0 lg:ml-80">
                     <div className="w-full">
                         {/* Results */}
-                        {searchResults.results.content.length === 0 ? (
+                        {filteredResults.results.content.length === 0 ? (
                             <EmptyState
                                 icon={Search}
                                 title={isReady ? 'Sonuç bulunamadı' : 'No results found'}
-                                description={`"${searchResults.originalQuery}" ${isReady ? t('search.no-results-for') : 'no listings found for search'}.`}
+                                description={`"${filteredResults.originalQuery}" ${isReady ? t('search.no-results-for') : 'no listings found for search'}.`}
                             />
                         ) : (
                             <>
@@ -221,8 +242,8 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
 
                                     {/* Property Rows */}
                                     <div>
-                                        {searchResults.results.content.map((property: PropertySummary, index) => (
-                                            <div key={property.id} className={index === searchResults.results.content.length - 1 ? '[&>a>div>div]:border-b-0' : ''}>
+                                        {filteredResults.results.content.map((property: PropertySummary, index) => (
+                                            <div key={property.id} className={index === filteredResults.results.content.length - 1 ? '[&>a>div>div]:border-b-0' : ''}>
                                                 <SearchPropertyRow
                                                     property={property}
                                                     linkHref={`/house/${property.id}`}
@@ -233,7 +254,7 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
                                 </div>
 
                                 {/* Pagination */}
-                                {searchResults.results.totalPages > 1 && (
+                                {filteredResults.results.totalPages > 1 && (
                                     <div className="mt-8 mx-4 sm:mx-6 lg:mx-8 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-lg">
                                         <div className="flex flex-1 justify-between sm:hidden">
                                             <button
@@ -245,7 +266,7 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
                                             </button>
                                             <button
                                                 onClick={() => onPageChange(currentPage + 1)}
-                                                disabled={currentPage >= searchResults.results.totalPages - 1}
+                                                disabled={currentPage >= filteredResults.results.totalPages - 1}
                                                 className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 Sonraki
@@ -257,10 +278,10 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
                                                     <span className="font-medium">{currentPage * 20 + 1}</span>
                                                     {' - '}
                                                     <span className="font-medium">
-                                                        {Math.min((currentPage + 1) * 20, searchResults.totalResults)}
+                                                        {Math.min((currentPage + 1) * 20, filteredResults.totalResults)}
                                                     </span>
                                                     {isReady ? ' arası, toplam ' : ' of, total '}
-                                                    <span className="font-medium">{searchResults.totalResults}</span>
+                                                    <span className="font-medium">{filteredResults.totalResults}</span>
                                                     {isReady ? ' sonuç' : ' results'}
                                                 </p>
                                             </div>
@@ -278,9 +299,9 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
                                                     </button>
 
                                                     {/* Page Numbers */}
-                                                    {[...Array(Math.min(5, searchResults.results.totalPages))].map((_, index) => {
-                                                        const pageIndex = Math.max(0, Math.min(currentPage - 2 + index, searchResults.results.totalPages - 5 + index));
-                                                        if (pageIndex >= searchResults.results.totalPages) return null;
+                                                    {[...Array(Math.min(5, filteredResults.results.totalPages))].map((_, index) => {
+                                                        const pageIndex = Math.max(0, Math.min(currentPage - 2 + index, filteredResults.results.totalPages - 5 + index));
+                                                        if (pageIndex >= filteredResults.results.totalPages) return null;
 
                                                         return (
                                                             <button
@@ -299,7 +320,7 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
 
                                                     <button
                                                         onClick={() => onPageChange(currentPage + 1)}
-                                                        disabled={currentPage >= searchResults.results.totalPages - 1}
+                                                        disabled={currentPage >= filteredResults.results.totalPages - 1}
                                                         className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
                                                     >
                                                         <span className="sr-only">Sonraki</span>

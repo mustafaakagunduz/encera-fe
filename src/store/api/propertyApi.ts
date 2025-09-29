@@ -22,6 +22,13 @@ export enum PropertyType {
     DAILY_RENTAL = 'DAILY_RENTAL'
 }
 
+export enum PropertyStatus {
+    ACTIVE = 'ACTIVE',
+    SOLD = 'SOLD',
+    REMOVED = 'REMOVED',
+    INACTIVE = 'INACTIVE'
+}
+
 export interface PropertyCreateRequest {
     title: string;
     listingType: ListingType;
@@ -88,6 +95,7 @@ export interface PropertyUpdateRequest {
     primaryImageUrl?: string;
     approved?: boolean; // YENİ EKLENEN - İlan editlendiğinde pending durumuna geçmesi için
     active?: boolean; // YENİ EKLENEN - Pasif ilanların editlendiğinde aktif hale gelmesi için
+    status?: PropertyStatus; // YENİ EKLENEN - İlan durumu güncelleme için
 }
 
 export interface PropertySearchFilters {
@@ -143,6 +151,7 @@ export interface PropertyResponse {
     deposit?: number;
     active: boolean;
     approved: boolean;
+    status?: PropertyStatus;
     approvedAt?: string;
     viewCount: number;
     reported: boolean;
@@ -186,6 +195,7 @@ export interface PropertySummaryResponse {
     viewCount: number;
     createdAt: string;
     primaryImageUrl?: string;
+    status?: PropertyStatus;
 }
 
 export interface CreatePropertyResponse {
@@ -383,10 +393,122 @@ export const propertyApi = createApi({
             ],
         }),
 
-        // Delete property
+        // Mark property as sold (preserving all existing data, only updating status)
+        markPropertyAsSold: builder.mutation<PropertyResponse, { propertyId: number; propertyData: PropertyResponse }>({
+            query: ({ propertyId, propertyData }) => ({
+                url: `/user/${propertyId}`,
+                method: 'PUT',
+                body: {
+                    // Preserve all existing data
+                    title: propertyData.title,
+                    listingType: propertyData.listingType,
+                    propertyType: propertyData.propertyType,
+                    city: propertyData.city,
+                    district: propertyData.district,
+                    neighborhood: propertyData.neighborhood,
+                    street: propertyData.street,
+                    price: propertyData.price,
+                    negotiable: propertyData.negotiable,
+                    grossArea: propertyData.grossArea,
+                    netArea: propertyData.netArea,
+                    elevator: propertyData.elevator,
+                    parking: propertyData.parking,
+                    balcony: propertyData.balcony,
+                    security: propertyData.security,
+                    description: propertyData.description,
+                    furnished: propertyData.furnished,
+                    pappSellable: propertyData.pappSellable,
+                    delegatedToEncera: propertyData.delegatedToEncera,
+                    roomConfiguration: propertyData.roomConfiguration,
+                    bathroomCount: propertyData.bathroomCount,
+                    monthlyFee: propertyData.monthlyFee,
+                    deposit: propertyData.deposit,
+                    buildingAge: propertyData.buildingAge,
+                    totalFloors: propertyData.totalFloors,
+                    currentFloor: propertyData.currentFloor,
+                    heatingTypes: propertyData.heatingTypes,
+                    facades: propertyData.facades,
+                    imageUrls: propertyData.imageUrls,
+                    primaryImageUrl: propertyData.primaryImageUrl,
+                    // Only update status and active
+                    status: PropertyStatus.SOLD,
+                    active: false
+                }
+            }),
+            invalidatesTags: (result, error, { propertyId }) => [
+                'UserProperty',
+                'PropertyStats',
+                { type: 'UserProperty', id: 'LIST' },
+                { type: 'Property', id: propertyId }
+            ],
+        }),
+
+        // Mark property as removed (preserving all existing data, only updating status)
+        markPropertyAsRemoved: builder.mutation<PropertyResponse, { propertyId: number; propertyData: PropertyResponse }>({
+            query: ({ propertyId, propertyData }) => ({
+                url: `/user/${propertyId}`,
+                method: 'PUT',
+                body: {
+                    // Preserve all existing data
+                    title: propertyData.title,
+                    listingType: propertyData.listingType,
+                    propertyType: propertyData.propertyType,
+                    city: propertyData.city,
+                    district: propertyData.district,
+                    neighborhood: propertyData.neighborhood,
+                    street: propertyData.street,
+                    price: propertyData.price,
+                    negotiable: propertyData.negotiable,
+                    grossArea: propertyData.grossArea,
+                    netArea: propertyData.netArea,
+                    elevator: propertyData.elevator,
+                    parking: propertyData.parking,
+                    balcony: propertyData.balcony,
+                    security: propertyData.security,
+                    description: propertyData.description,
+                    furnished: propertyData.furnished,
+                    pappSellable: propertyData.pappSellable,
+                    delegatedToEncera: propertyData.delegatedToEncera,
+                    roomConfiguration: propertyData.roomConfiguration,
+                    bathroomCount: propertyData.bathroomCount,
+                    monthlyFee: propertyData.monthlyFee,
+                    deposit: propertyData.deposit,
+                    buildingAge: propertyData.buildingAge,
+                    totalFloors: propertyData.totalFloors,
+                    currentFloor: propertyData.currentFloor,
+                    heatingTypes: propertyData.heatingTypes,
+                    facades: propertyData.facades,
+                    imageUrls: propertyData.imageUrls,
+                    primaryImageUrl: propertyData.primaryImageUrl,
+                    // Only update status and active
+                    status: PropertyStatus.REMOVED,
+                    active: false
+                }
+            }),
+            invalidatesTags: (result, error, { propertyId }) => [
+                'UserProperty',
+                'PropertyStats',
+                { type: 'UserProperty', id: 'LIST' },
+                { type: 'Property', id: propertyId }
+            ],
+        }),
+
+        // Clean up additional images (keep only primary image for sold/removed properties)
+        cleanupPropertyImages: builder.mutation<void, { propertyId: number; keepOnlyPrimary: boolean }>({
+            query: ({ propertyId, keepOnlyPrimary }) => ({
+                url: `/user/${propertyId}/cleanup-images`,
+                method: 'POST',
+                body: { keepOnlyPrimary }
+            }),
+            invalidatesTags: (result, error, { propertyId }) => [
+                { type: 'Property', id: propertyId }
+            ],
+        }),
+
+        // Hard delete property (only for properties not in favorites)
         deleteProperty: builder.mutation<void, number>({
             query: (id) => ({
-                url: `/properties/user/${id}`,
+                url: `/user/${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: (result, error, id) => [
@@ -394,6 +516,38 @@ export const propertyApi = createApi({
                 'PropertyStats',
                 { type: 'UserProperty', id: 'LIST' },
                 { type: 'Property', id }
+            ],
+        }),
+
+        // Mark property as sold
+        markAsSold: builder.mutation<PropertyResponse, { propertyId: number; propertyData?: any }>({
+            query: ({ propertyId }) => ({
+                url: `/user/${propertyId}/mark-sold`,
+                method: 'POST',
+            }),
+            invalidatesTags: (result, error, { propertyId }) => [
+                'UserProperty',
+                'PropertyStats',
+                'Property',
+                { type: 'UserProperty', id: 'LIST' },
+                { type: 'Property', id: propertyId },
+                { type: 'Favorite', id: 'LIST' }
+            ],
+        }),
+
+        // Mark property as removed
+        markAsRemoved: builder.mutation<PropertyResponse, { propertyId: number; propertyData?: any }>({
+            query: ({ propertyId }) => ({
+                url: `/user/${propertyId}/mark-removed`,
+                method: 'POST',
+            }),
+            invalidatesTags: (result, error, { propertyId }) => [
+                'UserProperty',
+                'PropertyStats',
+                'Property',
+                { type: 'UserProperty', id: 'LIST' },
+                { type: 'Property', id: propertyId },
+                { type: 'Favorite', id: 'LIST' }
             ],
         }),
 
@@ -472,7 +626,12 @@ export const {
     useSearchPropertiesWithFiltersQuery,
     useGetUserStatsQuery,
     useUpdatePropertyMutation,
+    useMarkPropertyAsSoldMutation,
+    useMarkPropertyAsRemovedMutation,
+    useCleanupPropertyImagesMutation,
     useDeletePropertyMutation,
+    useMarkAsSoldMutation,
+    useMarkAsRemovedMutation,
     useTogglePropertyStatusMutation,
     useRepublishPropertyMutation,
     useReportPropertyMutation,

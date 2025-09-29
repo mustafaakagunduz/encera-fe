@@ -3,11 +3,12 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useGetUserPropertiesQuery, useGetDelegatedPropertiesQuery } from '@/store/api/propertyApi';
+import { useGetUserPropertiesQuery, useGetDelegatedPropertiesQuery, PropertyStatus } from '@/store/api/propertyApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAuth } from '@/hooks/useAuth';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import { usePropertyStatusOverrides } from '@/hooks/usePropertyStatus';
 import { MyListingsTable } from './MyListingsTable';
 import { MyListingsStats } from './MyListingsStats';
 import { MyListingsEmpty } from './MyListingsEmpty';
@@ -23,6 +24,7 @@ export const MyListings: React.FC = () => {
     const { isHydrated } = useSelector((state: RootState) => state.auth);
     const router = useRouter();
     const searchParams = useSearchParams();
+    const statusOverrides = usePropertyStatusOverrides();
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
@@ -104,6 +106,12 @@ export const MyListings: React.FC = () => {
     // Filtreleme - useMemo ile optimize et
     const filteredProperties = useMemo(() => {
         return properties.filter(property => {
+            // Satılan/kaldırılan ilanları my-listings'ten gizle
+            const effectiveStatus = statusOverrides[property.id] || property.status;
+            if (effectiveStatus === PropertyStatus.SOLD || effectiveStatus === PropertyStatus.REMOVED) {
+                return false;
+            }
+
             const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 property.district.toLowerCase().includes(searchTerm.toLowerCase());
@@ -115,7 +123,7 @@ export const MyListings: React.FC = () => {
 
             return matchesSearch && matchesStatus;
         });
-    }, [properties, searchTerm, statusFilter]);
+    }, [properties, searchTerm, statusFilter, statusOverrides]);
 
     // Loading state - authentication hazır olmadan veya data yüklenirken
     if (!isHydrated || !isAuthenticated || currentLoading) {

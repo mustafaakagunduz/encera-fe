@@ -6,7 +6,8 @@ import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useGetUserFavoritesQuery, useRemoveFavoriteMutation } from '@/store/api/favoriteApi';
-import { PropertyResponse, ListingType, PropertyType } from '@/store/api/propertyApi';
+import { PropertyResponse, ListingType, PropertyType, PropertyStatus } from '@/store/api/propertyApi';
+import { usePropertyStatus } from '@/hooks/usePropertyStatus';
 import {
     Heart,
     MapPin,
@@ -20,36 +21,18 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-export const FavoritesPage: React.FC = () => {
+// Favorite Property Card component
+const FavoritePropertyCard: React.FC<{
+    property: PropertyResponse;
+    onRemoveFavorite: (propertyId: number) => void;
+}> = ({ property, onRemoveFavorite }) => {
     const { t, isReady } = useAppTranslation();
-    const { user } = useAuth();
-    const router = useRouter();
 
-    const [page, setPage] = React.useState(0);
-    const { data: favoritesData, isLoading, error, refetch } = useGetUserFavoritesQuery(
-        { page, size: 12 },
-        { skip: !user }
-    );
-    const [removeFavorite] = useRemoveFavoriteMutation();
+    // Check if property is sold/inactive based on active field
+    const isPropertySoldOrRemoved = !property.active;
 
-    // Redirect if not logged in
-    React.useEffect(() => {
-        if (!user) {
-            router.push('/authentication');
-        }
-    }, [user, router]);
-
-    const handleRemoveFavorite = async (propertyId: number) => {
-        try {
-            await removeFavorite(propertyId).unwrap();
-            // Cache'i manuel olarak yenile - RTK Query'nin invalidation'ı yeterli olmayabilir
-            refetch();
-        } catch (error) {
-            console.error('Favorilerden kaldırma hatası:', error);
-            // Hata durumunda da cache'i yenile
-            refetch();
-        }
-    };
+    // Debug logging
+    console.log(`Property ${property.id}: active=${property.active}, isSoldOrRemoved=${isPropertySoldOrRemoved}`);
 
     const getListingTypeText = (type: ListingType) => {
         switch (type) {
@@ -91,6 +74,151 @@ export const FavoritesPage: React.FC = () => {
             month: '2-digit',
             year: 'numeric'
         });
+    };
+
+    return (
+        <div className={`bg-white rounded-lg shadow-sm border overflow-hidden transition-shadow ${
+            isPropertySoldOrRemoved ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-md'
+        }`}>
+            {/* Property Image */}
+            <div className="aspect-video bg-gray-100 relative overflow-hidden">
+                {property.primaryImageUrl || (property.imageUrls && property.imageUrls.length > 0) ? (
+                    <img
+                        src={property.primaryImageUrl || property.imageUrls?.[0]}
+                        alt={property.title}
+                        className={`w-full h-full object-cover ${isPropertySoldOrRemoved ? 'opacity-40' : ''}`}
+                        onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement;
+                            if (fallback) {
+                                fallback.style.display = 'flex';
+                            }
+                        }}
+                    />
+                ) : null}
+                <div
+                    className="fallback-icon absolute inset-0 flex items-center justify-center"
+                    style={{
+                        display: (property.primaryImageUrl || (property.imageUrls && property.imageUrls.length > 0)) ? 'none' : 'flex'
+                    }}
+                >
+                    <Building className="w-12 h-12 text-gray-300" />
+                </div>
+
+                {/* Remove from favorites button */}
+                <button
+                    onClick={() => onRemoveFavorite(property.id)}
+                    className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+                    title="Favorilerden kaldır"
+                >
+                    <X className="w-4 h-4 text-gray-600" />
+                </button>
+
+                {/* Status Overlay */}
+                {isPropertySoldOrRemoved && (
+                    <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-10">
+                        <div className="px-6 py-3 rounded-lg text-center shadow-lg bg-orange-500 text-white">
+                            <div className="text-lg font-bold tracking-wide">
+                                SATILDI
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Featured badge */}
+                {property.featured && (
+                    <div className="absolute top-2 left-2">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            ⭐ VIP
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            {/* Property Info */}
+            <div className="p-4">
+                {isPropertySoldOrRemoved ? (
+                    <div className="block cursor-not-allowed">
+                        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">
+                            {property.title}
+                        </h3>
+                    </div>
+                ) : (
+                    <Link href={`/property/${property.id}`} className="block">
+                        <h3 className="font-medium text-gray-900 hover:text-blue-600 transition-colors mb-2 line-clamp-2">
+                            {property.title}
+                        </h3>
+                    </Link>
+                )}
+
+                {/* Location */}
+                <div className="flex items-center text-gray-600 text-sm mb-3">
+                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                    <span className="truncate">
+                        {property.neighborhood}, {property.district}
+                    </span>
+                </div>
+
+                {/* Price */}
+                <div className="text-lg font-bold text-gray-900 mb-3">
+                    {formatPrice(property.price)}
+                </div>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {getListingTypeText(property.listingType)}
+                    </span>
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        {getPropertyTypeText(property.propertyType)}
+                    </span>
+                </div>
+
+                {/* Stats */}
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div className="flex items-center">
+                        <Eye className="w-4 h-4 mr-1" />
+                        <span>{property.viewCount}</span>
+                    </div>
+                    <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        <span>{formatDate(property.createdAt)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const FavoritesPage: React.FC = () => {
+    const { t, isReady } = useAppTranslation();
+    const { user } = useAuth();
+    const router = useRouter();
+
+    const [page, setPage] = React.useState(0);
+    const { data: favoritesData, isLoading, error, refetch } = useGetUserFavoritesQuery(
+        { page, size: 12 },
+        { skip: !user }
+    );
+    const [removeFavorite] = useRemoveFavoriteMutation();
+
+    // Redirect if not logged in
+    React.useEffect(() => {
+        if (!user) {
+            router.push('/authentication');
+        }
+    }, [user, router]);
+
+    const handleRemoveFavorite = async (propertyId: number) => {
+        try {
+            await removeFavorite(propertyId).unwrap();
+            // Cache'i manuel olarak yenile - RTK Query'nin invalidation'ı yeterli olmayabilir
+            refetch();
+        } catch (error) {
+            console.error('Favorilerden kaldırma hatası:', error);
+            // Hata durumunda da cache'i yenile
+            refetch();
+        }
     };
 
     if (!user) {
@@ -174,100 +302,9 @@ export const FavoritesPage: React.FC = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {favorites.map((property) => (
-                            <div
-                                key={property.id}
-                                className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
-                            >
-                                {/* Property Image */}
-                                <div className="aspect-video bg-gray-100 relative overflow-hidden">
-                                    {property.primaryImageUrl || (property.imageUrls && property.imageUrls.length > 0) ? (
-                                        <img
-                                            src={property.primaryImageUrl || property.imageUrls?.[0]}
-                                            alt={property.title}
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => {
-                                                e.currentTarget.style.display = 'none';
-                                                const fallback = e.currentTarget.parentElement?.querySelector('.fallback-icon') as HTMLElement;
-                                                if (fallback) {
-                                                    fallback.style.display = 'flex';
-                                                }
-                                            }}
-                                        />
-                                    ) : null}
-                                    <div
-                                        className="fallback-icon absolute inset-0 flex items-center justify-center"
-                                        style={{
-                                            display: (property.primaryImageUrl || (property.imageUrls && property.imageUrls.length > 0)) ? 'none' : 'flex'
-                                        }}
-                                    >
-                                        <Building className="w-12 h-12 text-gray-300" />
-                                    </div>
-
-                                    {/* Remove from favorites button */}
-                                    <button
-                                        onClick={() => handleRemoveFavorite(property.id)}
-                                        className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
-                                        title="Favorilerden kaldır"
-                                    >
-                                        <X className="w-4 h-4 text-gray-600" />
-                                    </button>
-
-                                    {/* Featured badge */}
-                                    {property.featured && (
-                                        <div className="absolute top-2 left-2">
-                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                ⭐ VIP
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Property Info */}
-                                <div className="p-4">
-                                    <Link href={`/house/${property.id}`} className="block">
-                                        <h3 className="font-medium text-gray-900 hover:text-blue-600 transition-colors mb-2 line-clamp-2">
-                                            {property.title}
-                                        </h3>
-
-                                        {/* Location */}
-                                        <div className="flex items-center text-gray-600 text-sm mb-3">
-                                            <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-                                            <span className="truncate">
-                                                {property.neighborhood}, {property.district}
-                                            </span>
-                                        </div>
-
-                                        {/* Price */}
-                                        <div className="text-lg font-bold text-gray-900 mb-3">
-                                            {formatPrice(property.price)}
-                                        </div>
-
-                                        {/* Tags */}
-                                        <div className="flex flex-wrap gap-1 mb-3">
-                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                {getListingTypeText(property.listingType)}
-                                            </span>
-                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                {getPropertyTypeText(property.propertyType)}
-                                            </span>
-                                        </div>
-
-                                        {/* Stats */}
-                                        <div className="flex items-center justify-between text-sm text-gray-500">
-                                            <div className="flex items-center">
-                                                <Eye className="w-4 h-4 mr-1" />
-                                                <span>{property.viewCount}</span>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <Calendar className="w-4 h-4 mr-1" />
-                                                <span>{formatDate(property.createdAt)}</span>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
+                        {favorites.map((property) => {
+                            return <FavoritePropertyCard key={property.id} property={property} onRemoveFavorite={handleRemoveFavorite} />;
+                        })}
                     </div>
                 )}
 

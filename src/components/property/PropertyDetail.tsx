@@ -2,12 +2,13 @@
 'use client';
 
 import React from 'react';
-import { useGetPropertyByIdQuery, useDeletePropertyMutation, PropertyResponse, ListingType, PropertyType } from '@/store/api/propertyApi';
+import { useGetPropertyByIdQuery, useDeletePropertyMutation, PropertyResponse, ListingType, PropertyType, PropertyStatus } from '@/store/api/propertyApi';
 import { useToggleFavoriteMutation, useGetFavoriteStatusQuery } from '@/store/api/favoriteApi';
 import { useAddCommentMutation, useGetCommentsByPropertyQuery, useGetPropertyRatingQuery, useDeleteCommentMutation } from '@/store/api/commentApi';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { usePropertyStatus } from '@/hooks/usePropertyStatus';
 import {
     ArrowLeft,
     Eye,
@@ -54,6 +55,9 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     }, [user]);
 
     const { data: property, isLoading, error } = useGetPropertyByIdQuery(propertyId);
+
+    // Get effective status (original or overridden)
+    const effectiveStatus = usePropertyStatus(propertyId, property?.status);
     const [deleteProperty] = useDeletePropertyMutation();
 
     // Debug - property objesi ve street field'ını kontrol et
@@ -157,6 +161,12 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     };
 
     const getStatusText = (property: PropertyResponse) => {
+        if (effectiveStatus === PropertyStatus.SOLD) {
+            return 'Satıldı';
+        }
+        if (effectiveStatus === PropertyStatus.REMOVED) {
+            return 'Kaldırıldı';
+        }
         if (!property.active) {
             return isReady ? t('my-listings.status.inactive') : 'Pasif';
         }
@@ -167,6 +177,8 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
     };
 
     const getStatusColor = (property: PropertyResponse) => {
+        if (effectiveStatus === PropertyStatus.SOLD) return 'bg-orange-100 text-orange-800';
+        if (effectiveStatus === PropertyStatus.REMOVED) return 'bg-red-100 text-red-800';
         if (!property.active) return 'bg-gray-100 text-gray-800';
         if (!property.approved) return 'bg-yellow-100 text-yellow-800';
         return 'bg-green-100 text-green-800';

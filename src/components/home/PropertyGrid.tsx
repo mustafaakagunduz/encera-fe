@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { MapPin, Bed, Square, Heart } from 'lucide-react';
 import { useToggleFavoriteMutation, useGetFavoriteStatusQuery } from '@/store/api/favoriteApi';
 import { Toast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
+import { usePropertyStatus, usePropertyStatusOverrides } from '@/hooks/usePropertyStatus';
 
 interface Property {
     id: number;
@@ -28,6 +29,7 @@ interface Property {
     viewCount: number;
     createdAt: string;
     featured: boolean;
+    status?: string; // 'SOLD', 'REMOVED', 'ACTIVE', etc.
 }
 
 interface PropertyGridProps {
@@ -42,6 +44,9 @@ const PropertyCard: React.FC<{
     onShowToast: (message: string, type: 'success' | 'error') => void;
 }> = ({ property, onShowToast }) => {
     const { t } = useAppTranslation();
+
+    // Get the effective status (original or overridden)
+    const effectiveStatus = usePropertyStatus(property.id, property.status);
 
     // Favorite functionality
     const { data: favoriteStatus } = useGetFavoriteStatusQuery(property.id, {
@@ -68,14 +73,26 @@ const PropertyCard: React.FC<{
         }
     };
 
+    const isPropertySoldOrRemoved = effectiveStatus === 'SOLD' || effectiveStatus === 'REMOVED';
+
+    const handlePropertyClick = () => {
+        if (!isPropertySoldOrRemoved) {
+            window.location.href = `/house/${property.id}`;
+        }
+    };
+
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('tr-TR').format(price);
     };
 
     return (
         <div
-            className="rounded-xl shadow-sm overflow-hidden group hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer bg-white"
-            onClick={() => window.location.href = `/house/${property.id}`}
+            className={`rounded-xl shadow-sm overflow-hidden group transition-all duration-300 bg-white ${
+                isPropertySoldOrRemoved
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:shadow-lg transform hover:-translate-y-1 cursor-pointer'
+            }`}
+            onClick={handlePropertyClick}
         >
             {/* Image */}
             <div className="relative">
@@ -116,6 +133,17 @@ const PropertyCard: React.FC<{
                             }`}
                         />
                     </button>
+
+                    {/* Status Badge */}
+                    {isPropertySoldOrRemoved && (
+                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <div className="bg-white px-4 py-2 rounded-lg text-center">
+                                <div className={`text-sm font-bold ${effectiveStatus === 'SOLD' ? 'text-orange-600' : 'text-red-600'}`}>
+                                    {effectiveStatus === 'SOLD' ? 'SATILDI' : 'KALDIRILDI'}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Property Type Badge - Moved to top left */}
                     <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded-md text-xs font-medium">
@@ -169,6 +197,16 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
     hasMore = false
 }) => {
     const { t } = useAppTranslation();
+    const statusOverrides = usePropertyStatusOverrides();
+
+    // Satılan/kaldırılan ilanları ana sayfadan filtrele
+    const filteredProperties = useMemo(() => {
+        return properties.filter(property => {
+            const effectiveStatus = statusOverrides[property.id] || property.status;
+            // Ana sayfa/liste sayfalarında satılan/kaldırılan ilanları gösterme
+            return effectiveStatus !== 'SOLD' && effectiveStatus !== 'REMOVED';
+        });
+    }, [properties, statusOverrides]);
 
     // Toast state
     const [toast, setToast] = useState<{
@@ -189,7 +227,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
         setToast(prev => ({ ...prev, show: false }));
     };
 
-    if (loading && properties.length === 0) {
+    if (loading && filteredProperties.length === 0) {
         return (
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:!grid-cols-6 min-[1900px]:grid-cols-6 gap-6">
                 {Array.from({ length: 12 }).map((_, index) => (
@@ -207,7 +245,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
         );
     }
 
-    if (properties.length === 0) {
+    if (filteredProperties.length === 0) {
         return (
             <div className="text-center py-16">
                 <div className="max-w-md mx-auto">
@@ -227,7 +265,7 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
         <div>
             {/* Property Grid */}
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:!grid-cols-6 min-[1900px]:grid-cols-6 gap-6 mb-8">
-                {properties.map((property) => (
+                {filteredProperties.map((property) => (
                     <PropertyCard key={property.id} property={property} onShowToast={showToast} />
                 ))}
             </div>
