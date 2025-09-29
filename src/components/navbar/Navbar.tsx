@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
     // Okunmamış mesaj sayısını çek
     const { data: unreadData } = useGetUnreadCountQuery(undefined, {
         skip: !isAuthenticated,
-        pollingInterval: 30000, // 30 saniyede bir yenile
+        pollingInterval: 120000, // 120 saniyede bir yenile
     });
 
     // Scroll detection - sadece ana sayfa haricinde

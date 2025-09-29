@@ -43,7 +43,7 @@ export function NotificationBell() {
 
     // RTK Query hooks
     const { data: countData } = useGetUnreadNotificationCountQuery(undefined, {
-        pollingInterval: 30000, // 30 saniyede bir güncelle
+        pollingInterval: 120000, // 120 saniyede bir güncelle
         skip: !user
     });
     const { data: notifications = [] } = useGetUnreadNotificationsQuery(undefined, {

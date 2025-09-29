@@ -48,10 +48,15 @@ export const Messages: React.FC = () => {
     const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
     // API hooks
-    const { data: conversations = [], isLoading: conversationsLoading, refetch: refetchConversations } = useGetUserConversationsQuery();
+    const { data: conversations = [], isLoading: conversationsLoading, refetch: refetchConversations } = useGetUserConversationsQuery(undefined, {
+        pollingInterval: 75000, // 75 saniyede bir güncelle
+    });
     const { data: messages = [], isLoading: messagesLoading, refetch: refetchMessages } = useGetConversationQuery(
         selectedConversation!,
-        { skip: !selectedConversation }
+        {
+            skip: !selectedConversation,
+            pollingInterval: 75000, // 75 saniyede bir güncelle
+        }
     );
     const { data: selectedUser } = useGetUserByIdQuery(
         selectedConversation!,
@@ -203,29 +208,28 @@ export const Messages: React.FC = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
             {/* Header */}
             <div className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center">
-                            <button
-                                onClick={() => router.back()}
-                                className="mr-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                            >
-                                <ArrowLeft className="w-5 h-5" />
-                            </button>
-                            <MessageSquare className="w-6 h-6 text-blue-600 mr-2" />
-                            <h1 className="text-xl font-semibold text-gray-900">
-                                {isReady ? 'Mesajlar' : 'Messages'}
-                            </h1>
-                        </div>
+                <div className="px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center h-16">
+                        <button
+                            onClick={() => router.back()}
+                            className="mr-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
+                        <MessageSquare className="w-6 h-6 text-blue-600 mr-2" />
+                        <h1 className="text-xl font-semibold text-gray-900">
+                            {isReady ? 'Mesajlar' : 'Messages'}
+                        </h1>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="bg-white rounded-lg shadow-sm border h-[600px] flex">
+            {/* Messages Container - Full Height */}
+            <div className="flex-1 flex overflow-hidden">
+                <div className="bg-white w-full flex">
                     {/* Conversations List */}
                     <div className="w-1/3 border-r border-gray-200 flex flex-col">
                         <div className="p-4 border-b border-gray-200">
