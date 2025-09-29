@@ -171,7 +171,8 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
         : useGetPropertiesByPropertyTypeQuery({
             propertyType,
             page: currentPage,
-            size: pageSize
+            size: pageSize,
+            sort: sortBy
         });
 
     // URL parametrelerinin değişmesini dinle

@@ -315,10 +315,22 @@ export const propertyApi = createApi({
         getPropertiesByPropertyType: builder.query<PaginatedResponse<PropertySummaryResponse>, {
             propertyType: PropertyType;
             page?: number;
-            size?: number
+            size?: number;
+            sort?: string;
         }>({
-            query: ({ propertyType, page = 0, size = 20 }) =>
-                `/public/property-type/${propertyType}?page=${page}&size=${size}`,
+            query: ({ propertyType, page = 0, size = 20, sort = 'createdAt-desc' }) => {
+                const params = new URLSearchParams();
+                params.append('page', page.toString());
+                params.append('size', size.toString());
+
+                // Add sorting parameter - convert frontend format to backend format
+                if (sort) {
+                    const [field, direction] = sort.split('-');
+                    params.append('sort', `${field},${direction}`);
+                }
+
+                return `/public/property-type/${propertyType}?${params.toString()}`;
+            },
             providesTags: ['Property'],
         }),
 
