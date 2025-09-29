@@ -8,8 +8,7 @@ import { SearchPropertyRow } from './SearchPropertyRow';
 import { FilterSidebar } from '../property/FilterSidebar';
 import { EmptyState } from '../ui/EmptyState';
 import { Search, AlertTriangle, Loader2 } from 'lucide-react';
-import { PropertyType, PropertySearchFilters } from '@/store/api/propertyApi';
-import { usePropertyStatusOverrides } from '@/hooks/usePropertyStatus';
+import { PropertyType, PropertySearchFilters, PropertyStatus } from '@/store/api/propertyApi';
 
 interface SearchResultsContainerProps {
     searchResults: SmartSearchResponse | null;
@@ -39,26 +38,9 @@ export const SearchResultsContainer: React.FC<SearchResultsContainerProps> = ({
     onCloseMobileFilters
 }) => {
     const { t, isReady } = useAppTranslation();
-    const statusOverrides = usePropertyStatusOverrides();
 
-    // Satılan/kaldırılan ilanları filtrele
-    const filteredResults = useMemo(() => {
-        if (!searchResults) return null;
-
-        const filteredContent = searchResults.results.content.filter((property: PropertySummary) => {
-            const effectiveStatus = statusOverrides[property.id];
-            // Satılan/kaldırılan ilanları arama sonuçlarından gizle
-            return effectiveStatus !== 'SOLD' && effectiveStatus !== 'REMOVED';
-        });
-
-        return {
-            ...searchResults,
-            results: {
-                ...searchResults.results,
-                content: filteredContent
-            }
-        };
-    }, [searchResults, statusOverrides]);
+    // Search results - no filtering needed for now since status is not available in PropertySummary
+    const filteredResults = searchResults;
 
     if (isLoading) {
         return (

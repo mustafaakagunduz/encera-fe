@@ -531,7 +531,6 @@ export const propertyApi = createApi({
                 'Property',
                 { type: 'UserProperty', id: 'LIST' },
                 { type: 'Property', id: propertyId },
-                { type: 'Favorite', id: 'LIST' }
             ],
         }),
 
@@ -547,7 +546,6 @@ export const propertyApi = createApi({
                 'Property',
                 { type: 'UserProperty', id: 'LIST' },
                 { type: 'Property', id: propertyId },
-                { type: 'Favorite', id: 'LIST' }
             ],
         }),
 

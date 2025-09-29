@@ -3,12 +3,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
-import { PropertyType, PropertySearchFilters, useSearchPropertiesWithFiltersQuery } from '@/store/api/propertyApi';
+import { PropertyType, PropertySearchFilters, PropertyStatus, useSearchPropertiesWithFiltersQuery } from '@/store/api/propertyApi';
 import { PropertyListRow } from './PropertyListRow';
 import { FilterSidebar } from './FilterSidebar';
 import { EmptyState } from '../ui/EmptyState';
 import { Search, AlertTriangle } from 'lucide-react';
-import { usePropertyStatusOverrides } from '@/hooks/usePropertyStatus';
 
 interface PropertyListContainerProps {
     filters: PropertySearchFilters;
@@ -56,16 +55,15 @@ export const PropertyListContainer: React.FC<PropertyListContainerProps> = ({
                                                                                 onCloseMobileFilters
                                                                             }) => {
     const { t, isReady } = useAppTranslation();
-    const statusOverrides = usePropertyStatusOverrides();
 
     // Satılan/kaldırılan ilanları filtrele
     const filteredProperties = useMemo(() => {
         return properties.filter(property => {
-            const effectiveStatus = statusOverrides[property.id] || property.status;
+            const effectiveStatus = property.status;
             // Satılan/kaldırılan ilanları kategori sayfalarından gizle
-            return effectiveStatus !== 'SOLD' && effectiveStatus !== 'REMOVED';
+            return effectiveStatus !== PropertyStatus.SOLD && effectiveStatus !== PropertyStatus.REMOVED;
         });
-    }, [properties, statusOverrides]);
+    }, [properties]);
 
     if (isLoading) {
         return (

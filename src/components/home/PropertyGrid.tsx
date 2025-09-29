@@ -6,7 +6,8 @@ import { MapPin, Bed, Square, Heart } from 'lucide-react';
 import { useToggleFavoriteMutation, useGetFavoriteStatusQuery } from '@/store/api/favoriteApi';
 import { Toast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
-import { usePropertyStatus, usePropertyStatusOverrides } from '@/hooks/usePropertyStatus';
+import { usePropertyStatus } from '@/hooks/usePropertyStatus';
+import { PropertyStatus } from '@/store/api/propertyApi';
 
 interface Property {
     id: number;
@@ -29,7 +30,7 @@ interface Property {
     viewCount: number;
     createdAt: string;
     featured: boolean;
-    status?: string; // 'SOLD', 'REMOVED', 'ACTIVE', etc.
+    status?: PropertyStatus; // 'SOLD', 'REMOVED', 'ACTIVE', etc.
 }
 
 interface PropertyGridProps {
@@ -73,7 +74,7 @@ const PropertyCard: React.FC<{
         }
     };
 
-    const isPropertySoldOrRemoved = effectiveStatus === 'SOLD' || effectiveStatus === 'REMOVED';
+    const isPropertySoldOrRemoved = effectiveStatus === PropertyStatus.SOLD || effectiveStatus === PropertyStatus.REMOVED;
 
     const handlePropertyClick = () => {
         if (!isPropertySoldOrRemoved) {
@@ -138,8 +139,8 @@ const PropertyCard: React.FC<{
                     {isPropertySoldOrRemoved && (
                         <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                             <div className="bg-white px-4 py-2 rounded-lg text-center">
-                                <div className={`text-sm font-bold ${effectiveStatus === 'SOLD' ? 'text-orange-600' : 'text-red-600'}`}>
-                                    {effectiveStatus === 'SOLD' ? 'SATILDI' : 'KALDIRILDI'}
+                                <div className={`text-sm font-bold ${effectiveStatus === PropertyStatus.SOLD ? 'text-orange-600' : 'text-red-600'}`}>
+                                    {effectiveStatus === PropertyStatus.SOLD ? 'SATILDI' : 'KALDIRILDI'}
                                 </div>
                             </div>
                         </div>
@@ -197,16 +198,15 @@ const PropertyGrid: React.FC<PropertyGridProps> = ({
     hasMore = false
 }) => {
     const { t } = useAppTranslation();
-    const statusOverrides = usePropertyStatusOverrides();
 
     // Satılan/kaldırılan ilanları ana sayfadan filtrele
     const filteredProperties = useMemo(() => {
         return properties.filter(property => {
-            const effectiveStatus = statusOverrides[property.id] || property.status;
+            const effectiveStatus = property.status;
             // Ana sayfa/liste sayfalarında satılan/kaldırılan ilanları gösterme
-            return effectiveStatus !== 'SOLD' && effectiveStatus !== 'REMOVED';
+            return effectiveStatus !== PropertyStatus.SOLD && effectiveStatus !== PropertyStatus.REMOVED;
         });
-    }, [properties, statusOverrides]);
+    }, [properties]);
 
     // Toast state
     const [toast, setToast] = useState<{
