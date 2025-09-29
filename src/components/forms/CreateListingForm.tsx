@@ -321,8 +321,8 @@ export const CreateListingForm: React.FC = () => {
             district: location.district,
             neighborhood: location.neighborhood,
             street: location.street || prev.street,
-            // Ankara dışında bir il seçilirse pappSellable'ı sıfırla
-            pappSellable: location.city === 'Ankara' ? prev.pappSellable : false
+            // Ankara, Mersin ve Diyarbakır dışında bir il seçilirse pappSellable'ı sıfırla
+            pappSellable: (location.city === 'Ankara' || location.city === 'Mersin' || location.city === 'Diyarbakır') ? prev.pappSellable : false
         }));
 
         // Clear location errors
@@ -1191,8 +1191,8 @@ export const CreateListingForm: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Ençera Premium - Sadece Ankara seçildiğinde görünür */}
-                    {formData.city === 'Ankara' && (
+                    {/* Ençera Premium - Ankara, Mersin ve Diyarbakır seçildiğinde görünür */}
+                    {(formData.city === 'Ankara' || formData.city === 'Mersin' || formData.city === 'Diyarbakır') && (
                         <div>
                             <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
                                 <Crown className="w-6 h-6 mr-3 text-yellow-600" />
