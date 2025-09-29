@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/store/api/authApi';
-import { setPendingVerificationEmail } from '@/store/slices/authSlice';
+import { setPendingVerificationEmail, setCredentials } from '@/store/slices/authSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle, Phone } from 'lucide-react';
 import {useAppTranslation} from "@/hooks/useAppTranslation";
@@ -141,10 +141,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
 
         if (!validateForm()) return;
 
-        if (!phoneVerified) {
-            setErrors(prev => ({ ...prev, phoneNumber: 'Lütfen telefon numaranızı doğrulayın' }));
-            return;
-        }
+        // Telefon doğrulaması pasif - sadece numara kontrolü yap
+        // if (!phoneVerified) {
+        //     setErrors(prev => ({ ...prev, phoneNumber: 'Lütfen telefon numaranızı doğrulayın' }));
+        //     return;
+        // }
 
         setIsLoading(true);
 
@@ -173,6 +174,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             setIsLoading(false);
         }
     };
+
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -204,6 +207,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             </div>
         );
     }
+
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -293,36 +297,21 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             <div>
                 <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
                     Telefon Numarası
-                    {phoneVerified && <CheckCircle className="inline-block w-4 h-4 text-green-600 ml-2" />}
                 </label>
-                <div className="flex gap-2">
-                    <div className="relative flex-1">
-                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <input
-                            id="phoneNumber"
-                            name="phoneNumber"
-                            type="tel"
-                            autoComplete="tel"
-                            value={formData.phoneNumber}
-                            onChange={handleInputChange}
-                            disabled={phoneVerified}
-                            className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.phoneNumber ? 'border-red-300' :
-                                phoneVerified ? 'border-green-300 bg-green-50' : 'border-gray-300'
-                            }`}
-                            placeholder="+90 555 123 4567"
-                        />
-                    </div>
-                    {!phoneVerified && (
-                        <button
-                            type="button"
-                            onClick={handlePhoneVerification}
-                            disabled={phoneVerificationLoading || !formData.phoneNumber}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm whitespace-nowrap"
-                        >
-                            {phoneVerificationLoading ? 'Gönderiliyor...' : 'Doğrula'}
-                        </button>
-                    )}
+                <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        type="tel"
+                        autoComplete="tel"
+                        value={formData.phoneNumber}
+                        onChange={handleInputChange}
+                        className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            errors.phoneNumber ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="+90 555 123 4567"
+                    />
                 </div>
                 {errors.phoneNumber && (
                     <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
@@ -405,6 +394,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
                 }
             </Button>
 
+
             {/* Login Link */}
             <div className="text-center">
                 <span className="text-sm text-gray-600">
@@ -419,71 +409,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
                 </span>
             </div>
 
-            {/* Phone Verification Modal */}
-            {showPhoneVerification && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                        <div className="text-center mb-6">
-                            <Phone className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                Telefon Doğrulama
-                            </h3>
-                            <p className="text-gray-600">
-                                {formData.phoneNumber} numarasına gönderilen 6 haneli kodu girin
-                            </p>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <input
-                                    type="text"
-                                    value={verificationCode}
-                                    onChange={(e) => setVerificationCode(e.target.value)}
-                                    placeholder="123456"
-                                    maxLength={6}
-                                    className={`w-full px-4 py-3 text-center text-lg tracking-widest border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                        errors.verificationCode ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                />
-                                {errors.verificationCode && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.verificationCode}</p>
-                                )}
-                            </div>
-
-                            <div className="flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowPhoneVerification(false);
-                                        setVerificationCode('');
-                                        setErrors(prev => ({ ...prev, verificationCode: '' }));
-                                    }}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-                                >
-                                    İptal
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleVerifyPhoneCode}
-                                    disabled={phoneVerificationLoading || verificationCode.length !== 6}
-                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                                >
-                                    {phoneVerificationLoading ? 'Doğrulanıyor...' : 'Doğrula'}
-                                </button>
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={handlePhoneVerification}
-                                disabled={phoneVerificationLoading}
-                                className="w-full text-blue-600 hover:text-blue-500 text-sm"
-                            >
-                                {phoneVerificationLoading ? 'Gönderiliyor...' : 'Kodu Tekrar Gönder'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </form>
     );
 };

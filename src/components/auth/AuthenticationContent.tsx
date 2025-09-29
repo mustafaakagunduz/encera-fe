@@ -12,7 +12,7 @@ import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
 import { useAppSelector } from '@/store/hooks';
 import { useAppTranslation } from "@/hooks/useAppTranslation";
 
-type AuthMode = 'login' | 'register' | 'verify' | 'forgot-password' | 'reset-password';
+type AuthMode = 'login' | 'register' | 'verify' | 'forgot-password' | 'reset-password' | 'oauth-complete';
 
 const AuthenticationContent: React.FC = () => {
     const { t, isReady } = useAppTranslation();
@@ -38,11 +38,12 @@ const AuthenticationContent: React.FC = () => {
         // Check URL parameters
         const modeParam = searchParams.get('mode') as AuthMode;
         const tokenParam = searchParams.get('token');
+        const socialParam = searchParams.get('social');
 
         if (modeParam === 'reset-password' && tokenParam) {
             setMode('reset-password');
             setResetToken(tokenParam);
-        } else if (modeParam && ['login', 'register', 'forgot-password'].includes(modeParam)) {
+        } else if (modeParam && ['login', 'register', 'forgot-password', 'oauth-complete'].includes(modeParam)) {
             setMode(modeParam);
         } else if (pendingVerificationEmail && modeParam === 'verify') {
             setMode('verify');
