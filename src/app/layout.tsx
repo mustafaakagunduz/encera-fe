@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     title: "ENCERA - Emlak İlanları",
-    description: "Emlak sektöründe dijital dönüşüm için PAPP",
+    description: "Emlak sektöründe dijital dönüşüm için ENÇERA",
 };
 //deneme
 export default function RootLayout({
