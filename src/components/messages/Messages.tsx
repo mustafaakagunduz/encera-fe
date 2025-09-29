@@ -95,16 +95,16 @@ export const Messages: React.FC = () => {
                 <div className="text-center">
                     <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                        {isReady ? 'Mesajlara Erişim' : 'Access Messages'}
+                        {isReady ? t('messages.access-title') : 'Access Messages'}
                     </h2>
                     <p className="text-gray-600 mb-4">
-                        {isReady ? 'Mesajları görüntülemek için giriş yapmanız gerekiyor.' : 'You need to login to view messages.'}
+                        {isReady ? t('messages.access-description') : 'You need to login to view messages.'}
                     </p>
                     <Link
                         href="/auth/login"
                         className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                     >
-                        {isReady ? 'Giriş Yap' : 'Login'}
+                        {isReady ? t('messages.login') : 'Login'}
                     </Link>
                 </div>
             </div>
@@ -179,7 +179,7 @@ export const Messages: React.FC = () => {
     };
 
     const handleDeleteMessage = async (messageId: number) => {
-        if (window.confirm(isReady ? 'Bu mesajı silmek istediğinizden emin misiniz?' : 'Are you sure you want to delete this message?')) {
+        if (window.confirm(isReady ? t('messages.delete-message-confirm') : 'Are you sure you want to delete this message?')) {
             try {
                 await deleteMessage(messageId).unwrap();
                 refetchMessages();
@@ -190,7 +190,7 @@ export const Messages: React.FC = () => {
     };
 
     const handleDeleteConversation = async (otherUserId: number) => {
-        if (window.confirm(isReady ? 'Bu konuşmayı silmek istediğinizden emin misiniz?' : 'Are you sure you want to delete this conversation?')) {
+        if (window.confirm(isReady ? t('messages.delete-conversation-confirm') : 'Are you sure you want to delete this conversation?')) {
             try {
                 await deleteConversation(otherUserId).unwrap();
                 refetchConversations();
@@ -221,7 +221,7 @@ export const Messages: React.FC = () => {
                         </button>
                         <MessageSquare className="w-6 h-6 text-blue-600 mr-2" />
                         <h1 className="text-xl font-semibold text-gray-900">
-                            {isReady ? 'Mesajlar' : 'Messages'}
+                            {isReady ? t('messages.title') : 'Messages'}
                         </h1>
                     </div>
                 </div>
@@ -234,13 +234,13 @@ export const Messages: React.FC = () => {
                     <div className="w-1/3 border-r border-gray-200 flex flex-col">
                         <div className="p-4 border-b border-gray-200">
                             <h2 className="font-semibold text-gray-900 mb-3">
-                                {isReady ? 'Konuşmalar' : 'Conversations'}
+                                {isReady ? t('messages.conversations') : 'Conversations'}
                             </h2>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <input
                                     type="text"
-                                    placeholder={isReady ? 'Konuşma ara...' : 'Search conversations...'}
+                                    placeholder={isReady ? t('messages.search-conversations') : 'Search conversations...'}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
@@ -257,7 +257,7 @@ export const Messages: React.FC = () => {
                                 <div className="text-center py-8 text-gray-500">
                                     <MessageSquare className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                                     <p className="text-sm">
-                                        {isReady ? 'Henüz mesajınız yok' : 'No messages yet'}
+                                        {isReady ? t('messages.no-messages-yet') : 'No messages yet'}
                                     </p>
                                 </div>
                             ) : (
@@ -285,14 +285,14 @@ export const Messages: React.FC = () => {
                                                         </p>
                                                     </div>
                                                     <p className="text-sm text-gray-600 truncate mt-1">
-                                                        {isReady ? 'Yeni konuşma başlat' : 'Start new conversation'}
+                                                        {isReady ? t('messages.start-new-conversation') : 'Start new conversation'}
                                                     </p>
                                                     {(propertyData || propertyId) && (
                                                         <div className="mt-2">
                                                             <div className="flex items-center">
                                                                 <Home className="w-3 h-3 text-gray-400 mr-1" />
                                                                 <span className="text-xs text-gray-500 truncate">
-                                                                    {propertyData?.title || (isReady ? `İlan #${propertyId}` : `Property #${propertyId}`)}
+                                                                    {propertyData?.title || (isReady ? `${t('messages.property')} #${propertyId}` : `Property #${propertyId}`)}
                                                                 </span>
                                                             </div>
                                                             {propertyData && (
@@ -311,7 +311,7 @@ export const Messages: React.FC = () => {
                                         <div className="text-center py-8 text-gray-500">
                                             <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                                             <p className="text-sm">
-                                                {isReady ? 'Arama sonucu bulunamadı' : 'No results found'}
+                                                {isReady ? t('messages.no-results-found') : 'No results found'}
                                             </p>
                                         </div>
                                     ) : (
@@ -353,7 +353,7 @@ export const Messages: React.FC = () => {
                                                                     handleDeleteConversation(conversation.otherUserId);
                                                                 }}
                                                                 className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                                                title={isReady ? 'Konuşmayı sil' : 'Delete conversation'}
+                                                                title={isReady ? t('messages.delete-conversation') : 'Delete conversation'}
                                                             >
                                                                 <Trash2 className="w-3 h-3" />
                                                             </button>
@@ -406,7 +406,7 @@ export const Messages: React.FC = () => {
                                                 <div className="text-sm text-gray-500">
                                                     {conversations.find(c => c.otherUserId === selectedConversation)?.propertyTitle ||
                                                      propertyData?.title ||
-                                                     (propertyId ? `İlan ID: ${propertyId}` : '')}
+                                                     (propertyId ? `${isReady ? t('messages.property') : 'Property'} ID: ${propertyId}` : '')}
                                                     {propertyData && (
                                                         <div className="text-xs text-blue-600 mt-1">
                                                             🏠 {propertyData.price?.toLocaleString('tr-TR')} ₺ • {propertyData.district}, {propertyData.city}
@@ -428,7 +428,7 @@ export const Messages: React.FC = () => {
                                         <div className="text-center py-8 text-gray-500">
                                             <MessageSquare className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                                             <p className="text-sm">
-                                                {isReady ? 'Henüz mesaj yok' : 'No messages yet'}
+                                                {isReady ? t('messages.no-messages-in-conversation') : 'No messages yet'}
                                             </p>
                                         </div>
                                     ) : (
@@ -472,7 +472,7 @@ export const Messages: React.FC = () => {
                                                     <button
                                                         onClick={() => handleDeleteMessage(message.id)}
                                                         className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all"
-                                                        title={isReady ? 'Mesajı sil' : 'Delete message'}
+                                                        title={isReady ? t('messages.delete-message') : 'Delete message'}
                                                     >
                                                         <Trash2 className="w-3 h-3" />
                                                     </button>
@@ -490,7 +490,7 @@ export const Messages: React.FC = () => {
                                             type="text"
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
-                                            placeholder={isReady ? 'Mesajınızı yazın...' : 'Type your message...'}
+                                            placeholder={isReady ? t('messages.type-message') : 'Type your message...'}
                                             className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             disabled={sendingMessage}
                                         />
@@ -509,11 +509,11 @@ export const Messages: React.FC = () => {
                                 <div className="text-center">
                                     <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                                     <p className="text-lg font-medium text-gray-400">
-                                        {isReady ? 'Bir konuşma seçin' : 'Select a conversation'}
+                                        {isReady ? t('messages.select-conversation') : 'Select a conversation'}
                                     </p>
                                     <p className="text-sm text-gray-400 mt-1">
                                         {isReady
-                                            ? 'Soldaki listeden bir konuşma seçin veya yeni bir mesaj başlatın'
+                                            ? t('messages.select-conversation-desc')
                                             : 'Choose a conversation from the list or start a new message'
                                         }
                                     </p>

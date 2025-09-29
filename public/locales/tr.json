@@ -824,5 +824,26 @@
     "featured": "VIP",
     "encera-sellable": "ENCERA",
     "viewing": "görüntülenme"
+  },
+
+  "messages": {
+    "title": "Mesajlar",
+    "access-title": "Mesajlara Erişim",
+    "access-description": "Mesajları görüntülemek için giriş yapmanız gerekiyor.",
+    "login": "Giriş Yap",
+    "conversations": "Konuşmalar",
+    "search-conversations": "Konuşma ara...",
+    "no-messages-yet": "Henüz mesajınız yok",
+    "start-new-conversation": "Yeni konuşma başlat",
+    "property": "İlan",
+    "no-results-found": "Arama sonucu bulunamadı",
+    "select-conversation": "Bir konuşma seçin",
+    "select-conversation-desc": "Soldaki listeden bir konuşma seçin veya yeni bir mesaj başlatın",
+    "no-messages-in-conversation": "Henüz mesaj yok",
+    "type-message": "Mesajınızı yazın...",
+    "delete-message-confirm": "Bu mesajı silmek istediğinizden emin misiniz?",
+    "delete-conversation-confirm": "Bu konuşmayı silmek istediğinizden emin misiniz?",
+    "delete-message": "Mesajı sil",
+    "delete-conversation": "Konuşmayı sil"
   }
 }
