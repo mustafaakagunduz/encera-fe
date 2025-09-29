@@ -114,9 +114,8 @@ const Navbar: React.FC = () => {
     const handleLogout = () => {
         dispatch(logout());
         setIsUserMenuOpen(false);
-        router.push('/');
-        // Sayfayı yenile
-        window.location.reload();
+        // Complete page reload to ensure all auth state is cleared
+        window.location.href = '/';
     };
 
     const handleCreateListing = () => {
@@ -149,6 +148,7 @@ const Navbar: React.FC = () => {
         console.log('🔍 Navbar search triggered:', searchQuery.trim());
         const encodedQuery = encodeURIComponent(searchQuery.trim());
         router.push(`/search?q=${encodedQuery}`);
+        router.refresh(); // Force refresh for updated search results
 
         // Arama sonuçları sayfasına geçerken arama çubuğunu temizle ve focus'u kaldır
         setSearchQuery('');

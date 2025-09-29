@@ -65,7 +65,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onModeChange }) => {
                     token: result.token,
                     refreshToken: result.refreshToken,
                 }));
-                router.push('/');
+                // Force a complete page reload to ensure all components update with new auth state
+                window.location.href = '/';
             }
         } catch (error: any) {
             console.error('Login error:', error);

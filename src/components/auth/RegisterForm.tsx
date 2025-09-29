@@ -158,10 +158,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
             }).unwrap();
 
             setIsSuccess(true);
-            dispatch(setPendingVerificationEmail(formData.email));
 
+            // Artık email doğrulama yok, direkt ana sayfaya yönlendir
             setTimeout(() => {
-                onSuccess();
+                window.location.href = '/';
+                window.location.reload(); // Force complete page reload to update all components
             }, 2000);
 
         } catch (error: any) {
@@ -197,7 +198,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onModeChange }) 
                         {isReady ? t('auth.email-verification.success-title') : 'Kayıt Başarılı!'}
                     </h3>
                     <p className="text-sm text-gray-600">
-                        {isReady ? t('auth.email-verification.success-description') : 'Email adresinize doğrulama kodu gönderildi. Email doğrulama sayfasına yönlendiriliyorsunuz...'}
+                        Kayıt işleminiz başarıyla tamamlandı. Ana sayfaya yönlendiriliyorsunuz...
                     </p>
                 </div>
             </div>

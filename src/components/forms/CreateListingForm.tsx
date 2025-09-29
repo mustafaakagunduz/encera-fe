@@ -537,6 +537,7 @@ export const CreateListingForm: React.FC = () => {
                 // Redirect to my listings after successful update
                 setTimeout(() => {
                     router.push('/my-listings');
+                    router.refresh(); // Force page refresh to show updated listing
                 }, 1500);
             } catch (error) {
                 showToast(
@@ -551,8 +552,9 @@ export const CreateListingForm: React.FC = () => {
             // Redux'a sadece serialize edilebilir veriyi kaydet
             dispatch(setListingPreviewData(submitData));
 
-            // Preview sayfasına yönlendir
+            // Preview sayfasına yönlendir - cache'i temizleyerek güncel verileri göster
             router.push('/listing-preview');
+            router.refresh();
         }
     };
 
