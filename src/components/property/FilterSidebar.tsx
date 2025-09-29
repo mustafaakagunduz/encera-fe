@@ -270,7 +270,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                             <label className="flex items-center">
                                 <input
                                     type="radio"
-                                    name="listingType"
+                                    name={`listingType-${isMobile ? 'mobile' : 'desktop'}`}
                                     checked={!localFilters.listingType}
                                     onChange={() => handleFilterChange('listingType', undefined)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
@@ -280,7 +280,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                             <label className="flex items-center">
                                 <input
                                     type="radio"
-                                    name="listingType"
+                                    name={`listingType-${isMobile ? 'mobile' : 'desktop'}`}
                                     checked={localFilters.listingType === ListingType.SALE}
                                     onChange={() => handleFilterChange('listingType', ListingType.SALE)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
@@ -290,7 +290,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                             <label className="flex items-center">
                                 <input
                                     type="radio"
-                                    name="listingType"
+                                    name={`listingType-${isMobile ? 'mobile' : 'desktop'}`}
                                     checked={localFilters.listingType === ListingType.RENT}
                                     onChange={() => handleFilterChange('listingType', ListingType.RENT)}
                                     className="mr-3 text-blue-600 focus:ring-blue-500"
