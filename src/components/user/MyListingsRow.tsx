@@ -27,7 +27,9 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
     const [markAsRemoved] = useMarkPropertyAsRemovedMutation();
     const [cleanupImages] = useCleanupPropertyImagesMutation();
     const [showDropdown, setShowDropdown] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState<{ top: number; right: number } | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
     const router = useRouter();
 
     // Get the effective status (original or overridden)
@@ -248,8 +250,16 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
                     {/* Dropdown Menu */}
                     <div className="relative" ref={dropdownRef}>
                         <button
+                            ref={buttonRef}
                             onClick={(e) => {
                                 e.stopPropagation();
+                                if (!showDropdown && buttonRef.current) {
+                                    const rect = buttonRef.current.getBoundingClientRect();
+                                    setDropdownPosition({
+                                        top: rect.bottom + window.scrollY + 8,
+                                        right: window.innerWidth - rect.right
+                                    });
+                                }
                                 setShowDropdown(!showDropdown);
                             }}
                             className="text-gray-400 hover:text-gray-700 transition-colors p-2 rounded-md hover:bg-gray-100"
@@ -258,8 +268,15 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
                             <MoreVertical className="w-4 h-4" />
                         </button>
 
-                        {showDropdown && (
-                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                        {showDropdown && dropdownPosition && (
+                            <div
+                                className="fixed w-56 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
+                                style={{
+                                    top: `${dropdownPosition.top}px`,
+                                    right: `${dropdownPosition.right}px`,
+                                    zIndex: 9999
+                                }}
+                            >
                                 <div className="py-1">
                                     <button
                                         onClick={(e) => {

@@ -30,7 +30,9 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
     const [markAsRemoved] = useMarkPropertyAsRemovedMutation();
     const [cleanupImages] = useCleanupPropertyImagesMutation();
     const [showDropdown, setShowDropdown] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState<{ top: number; right: number } | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
 
     // Get the effective status (original or overridden)
     const effectiveStatus = usePropertyStatus(property.id, property.status);
@@ -243,15 +245,32 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
                 {/* Dropdown Menu */}
                 <div className="relative" ref={dropdownRef}>
                     <button
-                        onClick={() => setShowDropdown(!showDropdown)}
+                        ref={buttonRef}
+                        onClick={() => {
+                            if (!showDropdown && buttonRef.current) {
+                                const rect = buttonRef.current.getBoundingClientRect();
+                                setDropdownPosition({
+                                    top: rect.top + window.scrollY - 8,
+                                    right: window.innerWidth - rect.right
+                                });
+                            }
+                            setShowDropdown(!showDropdown);
+                        }}
                         className="inline-flex items-center px-2 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
                         title="İşlemler"
                     >
                         <MoreVertical className="w-3 h-3" />
                     </button>
 
-                    {showDropdown && (
-                        <div className="absolute right-0 bottom-full mb-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                    {showDropdown && dropdownPosition && (
+                        <div
+                            className="fixed w-56 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
+                            style={{
+                                bottom: `${window.innerHeight - dropdownPosition.top}px`,
+                                right: `${dropdownPosition.right}px`,
+                                zIndex: 9999
+                            }}
+                        >
                             <div className="py-1">
                                 <button
                                     onClick={handleMarkAsSold}
