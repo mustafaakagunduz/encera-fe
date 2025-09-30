@@ -232,14 +232,15 @@ export const CreateListingForm: React.FC = () => {
             const target = event.target as HTMLElement;
             if (!target.closest('[data-dropdown-container]')) {
                 setHeatingDropdownOpen(false);
+                setFacadeDropdownOpen(false);
             }
         };
 
-        if (heatingDropdownOpen) {
+        if (heatingDropdownOpen || facadeDropdownOpen) {
             document.addEventListener('click', handleClickOutside);
             return () => document.removeEventListener('click', handleClickOutside);
         }
-    }, [heatingDropdownOpen]);
+    }, [heatingDropdownOpen, facadeDropdownOpen]);
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setToast({ show: true, message, type });
