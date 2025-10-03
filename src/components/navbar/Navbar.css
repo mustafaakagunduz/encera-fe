@@ -19,7 +19,7 @@
     color: white;
     left: 0;
     right: 0;
-    z-index: 50;
+    z-index: 9998;
     border-bottom: none !important;
     border: none !important;
     transform: translateY(0);
@@ -327,7 +327,7 @@
     border-radius: 6px;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     padding: 4px 0;
-    z-index: 50;
+    z-index: 10001;
 }
 
 .navbar-dropdown.user-dropdown {
@@ -414,6 +414,8 @@
 /* Mobile/Desktop visibility controls */
 .mobile-only {
     display: block;
+    position: relative;
+    z-index: 10000;
 }
 
 .desktop-only {
@@ -438,32 +440,104 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    z-index: 9999;
     backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.mobile-menu-overlay.closing {
+    animation: fadeOut 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
 }
 
 .mobile-menu-content {
-    position: absolute;
-    top: 80px; /* navbar height - diğer sayfalarda daha yüksek */
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: fixed;
+    top: 0; /* Ekranın en üstünden başla */
+    right: 0; /* Sağdan konumlandır */
+    width: 85%; /* Mobilde ekranın %85'i kadar genişlik */
+    max-width: 400px; /* Maksimum genişlik */
+    max-height: 100vh; /* Ekran yüksekliğini geçmesin */
     background-color: rgba(30, 58, 138, 0.95); /* blue-900 with transparency */
     backdrop-filter: blur(10px);
     padding: 20px;
     overflow-y: auto;
+    z-index: inherit; /* Parent'tan z-index al */
+    height: auto; /* İçeriğe göre otomatik yükseklik */
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3); /* Sol tarafa gölge */
+    animation: slideInFromRight 0.3s ease-out;
 }
 
-/* Ana sayfada mobil menü için orijinal yükseklik */
-.navbar-fixed .mobile-menu-content {
-    top: 64px !important; /* Ana sayfada orijinal yükseklik */
+.mobile-menu-content.closing {
+    animation: slideOutToRight 0.3s ease-out;
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutToRight {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+/* Mobile Menu Close Button */
+.mobile-menu-close-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.mobile-menu-close-button {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-menu-close-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(3px);
+}
+
+.mobile-menu-close-button:active {
+    transform: translateX(5px);
 }
 
 /* Mobile Menu Sections */
 .mobile-menu-section {
-    margin-bottom: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .mobile-menu-section-header {
@@ -471,7 +545,7 @@
     align-items: center;
     gap: 12px;
     width: 100%;
-    padding: 12px 0;
+    padding: 10px 0;
     background: transparent;
     border: none;
     color: white;
@@ -487,14 +561,14 @@
 
 .mobile-menu-section-content {
     padding-left: 29px; /* Align with icon */
-    margin-top: 8px;
+    margin-top: 4px;
 }
 
 /* Mobile Menu Items */
 .mobile-menu-item {
     display: block;
     width: 100%;
-    padding: 12px 0;
+    padding: 10px 0;
     color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
     border: none;
@@ -518,16 +592,14 @@
 .mobile-menu-item.admin-item {
     background-color: rgba(59, 130, 246, 0.2);
     border-radius: 6px;
-    padding: 12px 16px;
-    margin: 8px 0;
+    padding: 10px 16px;
+    margin: 4px 0;
     font-weight: 600;
 }
 
 .mobile-menu-item.logout-item {
     color: #f87171; /* red-400 */
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 8px;
-    padding-top: 16px;
+    margin-top: 4px;
 }
 
 /* Mobile Menu Links */
@@ -536,11 +608,10 @@
     align-items: center;
     gap: 12px;
     width: 100%;
-    padding: 16px 0;
+    padding: 10px 0;
     color: white;
     text-decoration: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     transition: all 0.2s ease;
 }
 
@@ -554,14 +625,14 @@
     width: 100%;
     background-color: #dc2626; /* red-600 */
     color: white;
-    padding: 16px;
+    padding: 12px;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-top: 20px;
+    margin-top: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 

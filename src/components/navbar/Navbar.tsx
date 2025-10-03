@@ -2,13 +2,14 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
-import { ChevronDown, User, Globe, MessageSquare, ArrowRight, Menu, X, ChevronUp } from 'lucide-react';
+import { ChevronDown, User, Globe, MessageSquare, ArrowRight, Menu, X, ChevronUp, Bell, Home } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NotificationBell } from '@/components/ui/notification-bell';
 import { useGetUnreadCountQuery } from '@/store/api/messageApi';
@@ -24,12 +25,14 @@ const Navbar: React.FC = () => {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMobileMenuClosing, setIsMobileMenuClosing] = useState(false);
     const [mobileExpandedSection, setMobileExpandedSection] = useState<string | null>(null);
     const [isNavbarVisible, setIsNavbarVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [showScrollToTop, setShowScrollToTop] = useState(false);
     const [isHiding, setIsHiding] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isMounted, setIsMounted] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const languageMenuRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +41,11 @@ const Navbar: React.FC = () => {
         skip: !isAuthenticated,
         pollingInterval: 120000, // 120 saniyede bir yenile
     });
+
+    // Component mount kontrolü
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // Scroll detection - sadece ana sayfa haricinde
     useEffect(() => {
@@ -131,8 +139,13 @@ const Navbar: React.FC = () => {
     };
 
     const closeMobileMenu = () => {
-        setIsMobileMenuOpen(false);
-        setMobileExpandedSection(null);
+        if (isMobileMenuClosing) return; // Zaten kapanıyorsa tekrar çağırma
+        setIsMobileMenuClosing(true);
+        setTimeout(() => {
+            setIsMobileMenuOpen(false);
+            setIsMobileMenuClosing(false);
+            setMobileExpandedSection(null);
+        }, 300); // Animasyon süresi
     };
 
     const scrollToTop = () => {
@@ -416,83 +429,22 @@ const Navbar: React.FC = () => {
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
-            {isMobileMenuOpen && (
-                <div className="mobile-menu-overlay">
-                    <div className="mobile-menu-content">
-                        {/* Language Section */}
-                        <div className="mobile-menu-section">
+            {/* Mobile Menu Overlay - Portal ile body'ye render et */}
+            {isMounted && isMobileMenuOpen && createPortal(
+                <div className={`mobile-menu-overlay ${isMobileMenuClosing ? 'closing' : ''}`} onClick={closeMobileMenu}>
+                    <div className={`mobile-menu-content ${pathname === '/' ? 'mobile-menu-home' : ''} ${isMobileMenuClosing ? 'closing' : ''}`} onClick={(e) => e.stopPropagation()}>
+                        {/* Kapatma butonu - Sağ üst köşe */}
+                        <div className="mobile-menu-close-container">
                             <button
-                                onClick={() => toggleMobileSection('language')}
-                                className="mobile-menu-section-header"
+                                onClick={closeMobileMenu}
+                                className="mobile-menu-close-button"
+                                aria-label="Close menu"
                             >
-                                <Globe className="w-5 h-5" />
-                                <span>{isReady ? 'Dil' : 'Language'}</span>
-                                <ChevronDown className={`w-4 h-4 transition-transform ${mobileExpandedSection === 'language' ? 'rotate-180' : ''}`} />
+                                <ArrowRight className="w-6 h-6" />
                             </button>
-                            {mobileExpandedSection === 'language' && (
-                                <div className="mobile-menu-section-content">
-                                    <button
-                                        onClick={() => {
-                                            handleLanguageChange('tr');
-                                            closeMobileMenu();
-                                        }}
-                                        className={`mobile-menu-item ${language === 'tr' ? 'active' : ''}`}
-                                    >
-                                        🇹🇷 Türkçe
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            handleLanguageChange('en');
-                                            closeMobileMenu();
-                                        }}
-                                        className={`mobile-menu-item ${language === 'en' ? 'active' : ''}`}
-                                    >
-                                        🇺🇸 English
-                                    </button>
-                                </div>
-                            )}
                         </div>
 
-                        {/* Messages Link */}
-                        {isHydrated && isAuthenticated && (
-                            <Link
-                                href="/messages"
-                                className="mobile-menu-link"
-                                onClick={closeMobileMenu}
-                            >
-                                <MessageSquare className="w-5 h-5" />
-                                <span>{isReady ? 'Mesajlar' : 'Messages'}</span>
-                                {unreadData && unreadData.unreadCount > 0 && (
-                                    <div className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-medium ml-auto">
-                                        {unreadData.unreadCount > 9 ? '9+' : unreadData.unreadCount}
-                                    </div>
-                                )}
-                            </Link>
-                        )}
-
-                        {/* Notifications Section */}
-                        {isHydrated && isAuthenticated && (
-                            <div className="mobile-menu-section">
-                                <button
-                                    onClick={() => toggleMobileSection('notifications')}
-                                    className="mobile-menu-section-header"
-                                >
-                                    <span className="w-5 h-5 flex items-center">🔔</span>
-                                    <span>{isReady ? 'Bildirimler' : 'Notifications'}</span>
-                                    <ChevronDown className={`w-4 h-4 transition-transform ${mobileExpandedSection === 'notifications' ? 'rotate-180' : ''}`} />
-                                </button>
-                                {mobileExpandedSection === 'notifications' && (
-                                    <div className="mobile-menu-section-content">
-                                        <div className="mobile-menu-item">
-                                            {isReady ? 'Henüz bildirim yok' : 'No notifications yet'}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Profile Section */}
+                        {/* 1. Profile Section */}
                         {isHydrated && isAuthenticated && user && (
                             <div className="mobile-menu-section">
                                 <button
@@ -535,6 +487,78 @@ const Navbar: React.FC = () => {
                             </div>
                         )}
 
+                        {/* 3. Notifications Section */}
+                        {isHydrated && isAuthenticated && (
+                            <div className="mobile-menu-section">
+                                <button
+                                    onClick={() => toggleMobileSection('notifications')}
+                                    className="mobile-menu-section-header"
+                                >
+                                    <Bell className="w-5 h-5" />
+                                    <span>{isReady ? 'Bildirimler' : 'Notifications'}</span>
+                                    <ChevronDown className={`w-4 h-4 transition-transform ${mobileExpandedSection === 'notifications' ? 'rotate-180' : ''}`} />
+                                </button>
+                                {mobileExpandedSection === 'notifications' && (
+                                    <div className="mobile-menu-section-content">
+                                        <div className="mobile-menu-item">
+                                            {isReady ? 'Henüz bildirim yok' : 'No notifications yet'}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 4. Messages Link */}
+                        {isHydrated && isAuthenticated && (
+                            <Link
+                                href="/messages"
+                                className="mobile-menu-link"
+                                onClick={closeMobileMenu}
+                            >
+                                <MessageSquare className="w-5 h-5" />
+                                <span>{isReady ? 'Mesajlar' : 'Messages'}</span>
+                                {unreadData && unreadData.unreadCount > 0 && (
+                                    <div className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-medium ml-auto">
+                                        {unreadData.unreadCount > 9 ? '9+' : unreadData.unreadCount}
+                                    </div>
+                                )}
+                            </Link>
+                        )}
+
+                        {/* 5. Language Section */}
+                        <div className="mobile-menu-section">
+                            <button
+                                onClick={() => toggleMobileSection('language')}
+                                className="mobile-menu-section-header"
+                            >
+                                <Globe className="w-5 h-5" />
+                                <span>{isReady ? 'Dil' : 'Language'}</span>
+                                <ChevronDown className={`w-4 h-4 transition-transform ${mobileExpandedSection === 'language' ? 'rotate-180' : ''}`} />
+                            </button>
+                            {mobileExpandedSection === 'language' && (
+                                <div className="mobile-menu-section-content">
+                                    <button
+                                        onClick={() => {
+                                            handleLanguageChange('tr');
+                                            closeMobileMenu();
+                                        }}
+                                        className={`mobile-menu-item ${language === 'tr' ? 'active' : ''}`}
+                                    >
+                                        🇹🇷 Türkçe
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            handleLanguageChange('en');
+                                            closeMobileMenu();
+                                        }}
+                                        className={`mobile-menu-item ${language === 'en' ? 'active' : ''}`}
+                                    >
+                                        🇺🇸 English
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
                         {/* Create Listing Button */}
                         <button
                             onClick={() => {
@@ -558,7 +582,8 @@ const Navbar: React.FC = () => {
                             </Link>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* Property Type Navigation Section - Sadece ana sayfada göster */}
