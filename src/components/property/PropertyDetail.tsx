@@ -368,13 +368,101 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                 {/* Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
 
-                    {/* Left Column - Image Gallery */}
-                    <div className="lg:col-span-2">
+                    {/* Left Column - Image Gallery & Contact (Desktop) */}
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* Image Gallery */}
                         <PropertyImageGallery
                             images={property.imageUrls || []}
                             primaryImageUrl={property.primaryImageUrl}
                             title={property.title}
                         />
+
+                        {/* Contact Info - Desktop only (below carousel) */}
+                        <div className="hidden lg:block">
+                            <div className="bg-white border border-gray-200 rounded-lg p-6">
+                                <h3 className="font-semibold text-gray-900 mb-6 text-lg">
+                                    {isOwner ? (isReady ? t('property-detail.listing-info') : 'İlan Sahibinin İletişim Bilgileri') : (isReady ? t('property-detail.contact-info') : 'İlan Sahibinin İletişim Bilgileri')}
+                                </h3>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Contact Details */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center">
+                                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                                                <UserIcon className="w-5 h-5 text-gray-600" />
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="font-medium text-gray-900">
+                                                        {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
+                                                    </div>
+                                                    {isEncera && (
+                                                        <CheckCircle className="w-4 h-4 text-blue-500" />
+                                                    )}
+                                                    {isOwner && (
+                                                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                                                            {isReady ? t('property-detail.you') : 'Siz'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="text-sm text-gray-500">{isReady ? t('property-detail.listing-owner') : 'İlan Sahibi'}</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center">
+                                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                                                <Phone className="w-5 h-5 text-gray-600" />
+                                            </div>
+                                            <div>
+                                                <div className="font-medium text-gray-900">
+                                                    {isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber || (isReady ? t('property-detail.phone-not-found') : 'Telefon bulunamadı')}
+                                                </div>
+                                                <div className="text-sm text-gray-500">{isReady ? t('property-detail.phone-number') : 'Telefon Numarası'}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="space-y-3">
+                                        {!isOwner ? (
+                                            <>
+                                                <a
+                                                    href={`tel:${isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber}`}
+                                                    className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
+                                                >
+                                                    <Phone className="w-4 h-4 mr-2" />
+                                                    {isReady ? t('property-detail.call-now') : 'Hemen Ara'}
+                                                </a>
+
+                                                <Link
+                                                    href={`/messages?userId=${isEncera ? ENCERA_CONFIG.USER_ID : property.owner.id}&propertyId=${propertyId}`}
+                                                    className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
+                                                >
+                                                    <MessageSquare className="w-4 h-4 mr-2" />
+                                                    {isReady ? t('property-detail.send-message') : 'Mesaj Gönder'}
+                                                </Link>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Link
+                                                    href="/my-listings"
+                                                    className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors rounded-lg border border-blue-200"
+                                                >
+                                                    <Eye className="w-4 h-4 mr-2" />
+                                                    {isReady ? t('property-detail.all-my-listings') : 'Tüm İlanlarım'}
+                                                </Link>
+
+                                                <div className="bg-gray-50 rounded-lg p-4">
+                                                    <div className="text-sm text-gray-600">
+                                                        {isReady ? t('property-detail.owner-note') : 'Bu sizin ilanınız. Düzenlemek veya silmek için yukarıdaki butonları kullanabilirsiniz.'}
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right Column - Property Info */}
@@ -389,19 +477,16 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 </div>
                             )}
 
-                            {/* Price Section */}
-                            <div className="mb-8">
-                                <div className="text-4xl font-bold text-gray-900 mb-2">
-                                    {formatPrice(property.price)}
-                                </div>
-                            </div>
-
-                            {/* Title and Tags */}
+                            {/* Title */}
                             <div className="mb-6">
-                                <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
                                     {property.title}
                                 </h1>
-                                <div className="flex flex-wrap gap-2">
+                            </div>
+
+                            {/* Tags and Price */}
+                            <div className="mb-8">
+                                <div className="flex flex-wrap gap-2 mb-4">
                                     <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded">
                                         {getListingTypeText(property.listingType)}
                                     </span>
@@ -413,6 +498,9 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                             ⭐ VIP
                                         </span>
                                     )}
+                                </div>
+                                <div className="text-2xl md:text-3xl font-bold text-gray-900">
+                                    {formatPrice(property.price)}
                                 </div>
                             </div>
 
@@ -520,95 +608,86 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
                 </div>
 
-                {/* Contact Info - Full width below */}
-                <div className="mt-8 pt-8 border-t border-gray-100">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Contact Details */}
-                        <div>
-                            <h3 className="font-semibold text-gray-900 mb-6 text-lg">
-                                {isOwner ? (isReady ? t('property-detail.listing-info') : 'İlan Bilgileri') : (isReady ? t('property-detail.contact-info') : 'İletişim Bilgileri')}
-                            </h3>
+                {/* Contact Info - Mobile only (same position as before) */}
+                <div className="lg:hidden mt-8 pt-8 border-t border-gray-100">
+                    <div className="bg-white border border-gray-200 rounded-lg p-6">
+                        <h3 className="font-semibold text-gray-900 mb-6 text-lg">
+                            {isOwner ? (isReady ? t('property-detail.listing-info') : 'İlan Sahibinin İletişim Bilgileri') : (isReady ? t('property-detail.contact-info') : 'İlan Sahibinin İletişim Bilgileri')}
+                        </h3>
 
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                                        <UserIcon className="w-5 h-5 text-gray-600" />
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="font-medium text-gray-900">
-                                                {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
-                                            </div>
-                                            {isEncera && (
-                                                <CheckCircle className="w-4 h-4 text-blue-500" />
-                                            )}
-                                            {isOwner && (
-                                                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                                                    {isReady ? t('property-detail.you') : 'Siz'}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="text-sm text-gray-500">{isReady ? t('property-detail.listing-owner') : 'İlan Sahibi'}</div>
-                                    </div>
+                        <div className="space-y-4 mb-6">
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                                    <UserIcon className="w-5 h-5 text-gray-600" />
                                 </div>
-
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                                        <Phone className="w-5 h-5 text-gray-600" />
-                                    </div>
-                                    <div>
+                                <div>
+                                    <div className="flex items-center gap-2">
                                         <div className="font-medium text-gray-900">
-                                            {isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber || (isReady ? t('property-detail.phone-not-found') : 'Telefon bulunamadı')}
+                                            {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
                                         </div>
-                                        <div className="text-sm text-gray-500">{isReady ? t('property-detail.phone-number') : 'Telefon Numarası'}</div>
+                                        {isEncera && (
+                                            <CheckCircle className="w-4 h-4 text-blue-500" />
+                                        )}
+                                        {isOwner && (
+                                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                                                {isReady ? t('property-detail.you') : 'Siz'}
+                                            </span>
+                                        )}
                                     </div>
+                                    <div className="text-sm text-gray-500">{isReady ? t('property-detail.listing-owner') : 'İlan Sahibi'}</div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                                    <Phone className="w-5 h-5 text-gray-600" />
+                                </div>
+                                <div>
+                                    <div className="font-medium text-gray-900">
+                                        {isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber || (isReady ? t('property-detail.phone-not-found') : 'Telefon bulunamadı')}
+                                    </div>
+                                    <div className="text-sm text-gray-500">{isReady ? t('property-detail.phone-number') : 'Telefon Numarası'}</div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Action Buttons */}
-                        <div>
-                            <h3 className="font-semibold text-gray-900 mb-6 text-lg">
-                                {isOwner ? (isReady ? t('property-detail.listing-management') : 'İlan Yönetimi') : (isReady ? t('property-detail.get-in-touch') : 'İletişime Geç')}
-                            </h3>
+                        <div className="space-y-3">
+                            {!isOwner ? (
+                                <>
+                                    <a
+                                        href={`tel:${isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber}`}
+                                        className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
+                                    >
+                                        <Phone className="w-4 h-4 mr-2" />
+                                        {isReady ? t('property-detail.call-now') : 'Hemen Ara'}
+                                    </a>
 
-                            <div className="space-y-4">
-                                {!isOwner ? (
-                                    <>
-                                        <a
-                                            href={`tel:${isEncera ? ENCERA_CONFIG.PHONE : property.owner.phoneNumber}`}
-                                            className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
-                                        >
-                                            <Phone className="w-4 h-4 mr-2" />
-                                            {isReady ? t('property-detail.call-now') : 'Hemen Ara'}
-                                        </a>
+                                    <Link
+                                        href={`/messages?userId=${isEncera ? ENCERA_CONFIG.USER_ID : property.owner.id}&propertyId=${propertyId}`}
+                                        className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
+                                    >
+                                        <MessageSquare className="w-4 h-4 mr-2" />
+                                        {isReady ? t('property-detail.send-message') : 'Mesaj Gönder'}
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        href="/my-listings"
+                                        className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors rounded-lg border border-blue-200"
+                                    >
+                                        <Eye className="w-4 h-4 mr-2" />
+                                        {isReady ? t('property-detail.all-my-listings') : 'Tüm İlanlarım'}
+                                    </Link>
 
-                                        <Link
-                                            href={`/messages?userId=${isEncera ? ENCERA_CONFIG.USER_ID : property.owner.id}&propertyId=${propertyId}`}
-                                            className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg"
-                                        >
-                                            <MessageSquare className="w-4 h-4 mr-2" />
-                                            {isReady ? t('property-detail.send-message') : 'Mesaj Gönder'}
-                                        </Link>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Link
-                                            href="/my-listings"
-                                            className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors rounded-lg border border-blue-200"
-                                        >
-                                            <Eye className="w-4 h-4 mr-2" />
-                                            {isReady ? t('property-detail.all-my-listings') : 'Tüm İlanlarım'}
-                                        </Link>
-
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                            <div className="text-sm text-gray-600">
-                                                {isReady ? t('property-detail.owner-note') : 'Bu sizin ilanınız. Düzenlemek veya silmek için yukarıdaki butonları kullanabilirsiniz.'}
-                                            </div>
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <div className="text-sm text-gray-600">
+                                            {isReady ? t('property-detail.owner-note') : 'Bu sizin ilanınız. Düzenlemek veya silmek için yukarıdaki butonları kullanabilirsiniz.'}
                                         </div>
-                                    </>
-                                )}
-                            </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
