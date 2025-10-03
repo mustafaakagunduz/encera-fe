@@ -380,13 +380,12 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                         {/* Contact Info - Desktop only (below carousel) */}
                         <div className="hidden lg:block">
                             <div className="bg-white border border-gray-200 rounded-lg p-6">
-                                <h3 className="font-semibold text-gray-900 mb-6 text-lg">
-                                    {isOwner ? (isReady ? t('property-detail.listing-info') : 'İlan Sahibinin İletişim Bilgileri') : (isReady ? t('property-detail.contact-info') : 'İlan Sahibinin İletişim Bilgileri')}
-                                </h3>
-
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                     {/* Contact Details */}
                                     <div className="space-y-4">
+                                        <h3 className="font-semibold text-gray-900 text-lg mb-4">
+                                            {isOwner ? (isReady ? t('property-detail.listing-info') : 'İlan Sahibinin İletişim Bilgileri') : (isReady ? t('property-detail.contact-info') : 'İlan Sahibinin İletişim Bilgileri')}
+                                        </h3>
                                         <div className="flex items-center">
                                             <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
                                                 <UserIcon className="w-5 h-5 text-gray-600" />
