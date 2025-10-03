@@ -29,6 +29,89 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { getMessageUserId, isEnceraUser } from '@/utils/profileHelpers';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+// Conversation Item Component
+const ConversationItem: React.FC<{
+    conversation: ConversationResponse;
+    isSelected: boolean;
+    onClick: () => void;
+    onDelete: () => void;
+    formatTime: (timestamp: string) => string;
+    isReady: boolean;
+    t: any;
+}> = ({ conversation, isSelected, onClick, onDelete, formatTime, isReady, t }) => {
+    const { data: userData } = useGetUserByIdQuery(conversation.otherUserId);
+
+    return (
+        <div
+            onClick={onClick}
+            className={`w-full p-4 text-left hover:bg-gray-50 transition-colors cursor-pointer ${
+                isSelected
+                    ? 'bg-blue-50 border-r-2 border-blue-600'
+                    : conversation.hasUnreadMessages
+                    ? 'bg-red-50 border-l-2 border-red-400'
+                    : ''
+            }`}
+        >
+            <div className="flex items-start">
+                <div className="flex-shrink-0 mr-3">
+                    <Avatar className="w-10 h-10">
+                        <AvatarImage
+                            src={userData?.profilePictureUrl || ''}
+                            alt={conversation.otherUserName}
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                            {conversation.otherUserName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </AvatarFallback>
+                    </Avatar>
+                </div>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                            {conversation.otherUserName}
+                        </p>
+                        <div className="flex items-center gap-1">
+                            {conversation.hasUnreadMessages && (
+                                <div className="bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1 font-medium animate-pulse">
+                                    {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
+                                </div>
+                            )}
+                            <span className="text-xs text-gray-500">
+                                {formatTime(conversation.lastMessageTime)}
+                            </span>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete();
+                                }}
+                                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                title={isReady ? t('messages.delete-conversation') : 'Delete conversation'}
+                            >
+                                <Trash2 className="w-3 h-3" />
+                            </button>
+                        </div>
+                    </div>
+                    <p className={`text-sm truncate mt-1 ${
+                        conversation.hasUnreadMessages
+                            ? 'text-gray-900 font-medium'
+                            : 'text-gray-600'
+                    }`}>
+                        {conversation.lastMessage}
+                    </p>
+                    {conversation.propertyTitle && (
+                        <div className="flex items-center mt-2">
+                            <Home className="w-3 h-3 text-gray-400 mr-1" />
+                            <span className="text-xs text-gray-500 truncate">
+                                {conversation.propertyTitle}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export const Messages: React.FC = () => {
     const { user } = useAuth();
@@ -220,12 +303,6 @@ export const Messages: React.FC = () => {
             <div className="bg-white shadow-sm border-b">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-16">
-                        <button
-                            onClick={() => router.back()}
-                            className="mr-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
                         <MessageSquare className="w-6 h-6 text-blue-600 mr-2" />
                         <h1 className="text-xl font-semibold text-gray-900">
                             {isReady ? t('messages.title') : 'Messages'}
@@ -281,9 +358,15 @@ export const Messages: React.FC = () => {
                                         >
                                             <div className="flex items-start">
                                                 <div className="flex-shrink-0 mr-3">
-                                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                                        <User className="w-5 h-5 text-white" />
-                                                    </div>
+                                                    <Avatar className="w-10 h-10">
+                                                        <AvatarImage
+                                                            src={preselectedUser.profilePictureUrl || ''}
+                                                            alt={`${preselectedUser.firstName} ${preselectedUser.lastName}`}
+                                                        />
+                                                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                                                            {preselectedUser.firstName[0]}{preselectedUser.lastName[0]}
+                                                        </AvatarFallback>
+                                                    </Avatar>
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
@@ -323,68 +406,17 @@ export const Messages: React.FC = () => {
                                         </div>
                                     ) : (
                                         filteredConversations.map((conversation) => (
-                                        <div
-                                            key={conversation.otherUserId}
-                                            onClick={() => handleConversationSelect(conversation.otherUserId)}
-                                            className={`w-full p-4 text-left hover:bg-gray-50 transition-colors cursor-pointer ${
-                                                selectedConversation === conversation.otherUserId
-                                                    ? 'bg-blue-50 border-r-2 border-blue-600'
-                                                    : conversation.hasUnreadMessages
-                                                    ? 'bg-red-50 border-l-2 border-red-400'
-                                                    : ''
-                                            }`}
-                                        >
-                                            <div className="flex items-start">
-                                                <div className="flex-shrink-0 mr-3">
-                                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                                        <User className="w-5 h-5 text-white" />
-                                                    </div>
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="text-sm font-medium text-gray-900 truncate">
-                                                            {conversation.otherUserName}
-                                                        </p>
-                                                        <div className="flex items-center gap-1">
-                                                            {conversation.hasUnreadMessages && (
-                                                                <div className="bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1 font-medium animate-pulse">
-                                                                    {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
-                                                                </div>
-                                                            )}
-                                                            <span className="text-xs text-gray-500">
-                                                                {formatMessageTime(conversation.lastMessageTime)}
-                                                            </span>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleDeleteConversation(conversation.otherUserId);
-                                                                }}
-                                                                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                                                title={isReady ? t('messages.delete-conversation') : 'Delete conversation'}
-                                                            >
-                                                                <Trash2 className="w-3 h-3" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <p className={`text-sm truncate mt-1 ${
-                                                        conversation.hasUnreadMessages
-                                                            ? 'text-gray-900 font-medium'
-                                                            : 'text-gray-600'
-                                                    }`}>
-                                                        {conversation.lastMessage}
-                                                    </p>
-                                                    {conversation.propertyTitle && (
-                                                        <div className="flex items-center mt-2">
-                                                            <Home className="w-3 h-3 text-gray-400 mr-1" />
-                                                            <span className="text-xs text-gray-500 truncate">
-                                                                {conversation.propertyTitle}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
+                                            <ConversationItem
+                                                key={conversation.otherUserId}
+                                                conversation={conversation}
+                                                isSelected={selectedConversation === conversation.otherUserId}
+                                                onClick={() => handleConversationSelect(conversation.otherUserId)}
+                                                onDelete={() => handleDeleteConversation(conversation.otherUserId)}
+                                                formatTime={formatMessageTime}
+                                                isReady={isReady}
+                                                t={t}
+                                            />
+                                        ))
                                     )}
                                 </div>
                             )}
@@ -405,9 +437,29 @@ export const Messages: React.FC = () => {
                                         >
                                             <ArrowLeft className="w-5 h-5" />
                                         </button>
-                                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
-                                            <User className="w-4 h-4 text-white" />
-                                        </div>
+                                        <Avatar className="w-8 h-8 mr-3">
+                                            <AvatarImage
+                                                src={
+                                                    selectedUser?.profilePictureUrl ||
+                                                    preselectedUser?.profilePictureUrl ||
+                                                    ''
+                                                }
+                                                alt={
+                                                    selectedUser && isEnceraUser(selectedUser) ? 'Encera' :
+                                                    selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` :
+                                                    preselectedUser && isEnceraUser(preselectedUser) ? 'Encera' :
+                                                    preselectedUser ? `${preselectedUser.firstName} ${preselectedUser.lastName}` :
+                                                    conversations.find(c => c.otherUserId === selectedConversation)?.otherUserName || ''
+                                                }
+                                            />
+                                            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs">
+                                                {selectedUser && isEnceraUser(selectedUser) ? 'EN' :
+                                                 selectedUser ? `${selectedUser.firstName[0]}${selectedUser.lastName[0]}` :
+                                                 preselectedUser && isEnceraUser(preselectedUser) ? 'EN' :
+                                                 preselectedUser ? `${preselectedUser.firstName[0]}${preselectedUser.lastName[0]}` :
+                                                 conversations.find(c => c.otherUserId === selectedConversation)?.otherUserName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                            </AvatarFallback>
+                                        </Avatar>
                                         <div>
                                             <h3 className="font-semibold text-gray-900">
                                                 {selectedUser && isEnceraUser(selectedUser) ? 'Encera' :
