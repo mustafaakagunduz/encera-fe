@@ -384,7 +384,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     {isOwner ? (isReady ? t('property-detail.listing-info') : 'İlan Sahibinin İletişim Bilgileri') : (isReady ? t('property-detail.contact-info') : 'İlan Sahibinin İletişim Bilgileri')}
                                 </h3>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                     {/* Contact Details */}
                                     <div className="space-y-4">
                                         <div className="flex items-center">
@@ -423,7 +423,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="space-y-3">
+                                    <div className="space-y-3 flex flex-col justify-start">
                                         {!isOwner ? (
                                             <>
                                                 <a
@@ -440,6 +440,14 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                                 >
                                                     <MessageSquare className="w-4 h-4 mr-2" />
                                                     {isReady ? t('property-detail.send-message') : 'Mesaj Gönder'}
+                                                </Link>
+
+                                                <Link
+                                                    href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
+                                                    className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
+                                                >
+                                                    <UserIcon className="w-4 h-4 mr-2" />
+                                                    {isReady ? t('property-detail.view-profile') : 'Profili Görüntüle'}
                                                 </Link>
                                             </>
                                         ) : (
@@ -669,6 +677,14 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     >
                                         <MessageSquare className="w-4 h-4 mr-2" />
                                         {isReady ? t('property-detail.send-message') : 'Mesaj Gönder'}
+                                    </Link>
+
+                                    <Link
+                                        href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
+                                        className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg"
+                                    >
+                                        <UserIcon className="w-4 h-4 mr-2" />
+                                        {isReady ? t('property-detail.view-profile') : 'Profili Görüntüle'}
                                     </Link>
                                 </>
                             ) : (
@@ -1098,37 +1114,6 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     </p>
                                 </div>
                             )}
-                        </div>
-                    </div>
-                )}
-
-                {/* Property Owner Link */}
-                {!isOwner && (
-                    <div className="mt-8 pt-6 border-t border-gray-100">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <UserIcon className="w-6 h-6 text-gray-600" />
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="font-medium text-gray-900">
-                                            {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
-                                        </div>
-                                        {isEncera && (
-                                            <CheckCircle className="w-4 h-4 text-blue-500" />
-                                        )}
-                                    </div>
-                                    <div className="text-sm text-gray-500">{isReady ? t('property-detail.real-estate-expert') : 'Gayrimenkul Uzmanı'}</div>
-                                </div>
-                            </div>
-
-                            <Link
-                                href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
-                                className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                            >
-                                {isReady ? t('property-detail.view-profile') : 'Profili Görüntüle'} →
-                            </Link>
                         </div>
                     </div>
                 )}
