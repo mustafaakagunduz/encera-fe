@@ -43,6 +43,7 @@ export const Messages: React.FC = () => {
     const [selectedConversation, setSelectedConversation] = React.useState<number | null>(
         preselectedUserId ? parseInt(preselectedUserId) : null
     );
+    const [showMobileConversation, setShowMobileConversation] = React.useState(false);
     const [newMessage, setNewMessage] = React.useState('');
     const [searchTerm, setSearchTerm] = React.useState('');
     const messagesEndRef = React.useRef<HTMLDivElement>(null);
@@ -157,6 +158,7 @@ export const Messages: React.FC = () => {
         // Encera kullanıcısını kontrol et ve gerekirse ID'yi değiştir
         const actualUserId = getMessageUserId({ id: conversationUserId });
         setSelectedConversation(actualUserId);
+        setShowMobileConversation(true); // Mobilde konuşma ekranını göster
 
         // Mark conversation as read
         try {
@@ -164,6 +166,11 @@ export const Messages: React.FC = () => {
         } catch (error) {
             console.error('Error marking conversation as read:', error);
         }
+    };
+
+    const handleBackToConversations = () => {
+        setShowMobileConversation(false);
+        setSelectedConversation(null);
     };
 
     const formatMessageTime = (timestamp: string) => {
@@ -231,7 +238,7 @@ export const Messages: React.FC = () => {
             <div className="flex-1 flex overflow-hidden">
                 <div className="bg-white w-full flex">
                     {/* Conversations List */}
-                    <div className="w-1/3 border-r border-gray-200 flex flex-col">
+                    <div className={`w-full lg:w-1/3 border-r border-gray-200 flex flex-col ${showMobileConversation ? 'hidden lg:flex' : 'flex'}`}>
                         <div className="p-4 border-b border-gray-200">
                             <h2 className="font-semibold text-gray-900 mb-3">
                                 {isReady ? t('messages.conversations') : 'Conversations'}
@@ -385,12 +392,19 @@ export const Messages: React.FC = () => {
                     </div>
 
                     {/* Messages Area */}
-                    <div className="flex-1 flex flex-col">
+                    <div className={`flex-1 flex flex-col ${!showMobileConversation ? 'hidden lg:flex' : 'flex'}`}>
                         {selectedConversation ? (
                             <>
                                 {/* Messages Header */}
                                 <div className="p-4 border-b border-gray-200">
                                     <div className="flex items-center">
+                                        {/* Mobil geri butonu */}
+                                        <button
+                                            onClick={handleBackToConversations}
+                                            className="lg:hidden mr-3 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+                                        >
+                                            <ArrowLeft className="w-5 h-5" />
+                                        </button>
                                         <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
                                             <User className="w-4 h-4 text-white" />
                                         </div>
@@ -441,13 +455,13 @@ export const Messages: React.FC = () => {
                                             >
                                                 <div className={`flex items-start gap-2 ${message.senderId === user.id ? 'flex-row-reverse' : 'flex-row'}`}>
                                                     <div
-                                                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                                                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg break-words ${
                                                             message.senderId === user.id
                                                                 ? 'bg-blue-600 text-white'
                                                                 : 'bg-gray-100 text-gray-900'
                                                         }`}
                                                     >
-                                                        <p className="text-sm">{message.content}</p>
+                                                        <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                                                         <div className="flex items-center justify-between mt-1">
                                                             <span
                                                                 className={`text-xs ${
