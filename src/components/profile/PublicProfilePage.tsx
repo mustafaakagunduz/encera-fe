@@ -36,14 +36,22 @@ interface PublicProfilePageProps {
 
 export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) => {
     const { t, isReady } = useAppTranslation();
-    const { user } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const router = useRouter();
 
-    // Backend API calls
-    const { data: profileUser, isLoading: profileLoading } = useGetUserByIdQuery(userId);
-    const { data: reviews, isLoading: reviewsLoading } = useGetProfileReviewsQuery(userId);
-    const { data: reviewStats, isLoading: statsLoading } = useGetReviewStatsQuery(userId);
-    const { data: propertiesData, isLoading: propertiesLoading } = useGetAllPropertiesQuery({ page: 0, size: 50 });
+    // Backend API calls - skip if not authenticated (backend requires auth)
+    const { data: profileUser, isLoading: profileLoading } = useGetUserByIdQuery(userId, {
+        skip: !isAuthenticated
+    });
+    const { data: reviews, isLoading: reviewsLoading } = useGetProfileReviewsQuery(userId, {
+        skip: !isAuthenticated
+    });
+    const { data: reviewStats, isLoading: statsLoading } = useGetReviewStatsQuery(userId, {
+        skip: !isAuthenticated
+    });
+    const { data: propertiesData, isLoading: propertiesLoading } = useGetAllPropertiesQuery({ page: 0, size: 50 }, {
+        skip: !isAuthenticated
+    });
 
     const [createReview] = useCreateReviewMutation();
 
@@ -117,6 +125,55 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
             setReviewError(errorMessage);
         }
     };
+
+    // If not authenticated, show login prompt
+    if (!isAuthenticated) {
+        return (
+            <div className="min-h-screen bg-gray-50">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    {/* Header with back button */}
+                    <div className="flex items-center mb-6">
+                        <button
+                            onClick={() => router.back()}
+                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                        >
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            {isReady ? t('common.back') : 'Geri'}
+                        </button>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+                        <div className="mb-6">
+                            <UserIcon className="w-16 h-16 mx-auto text-gray-400" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                            Profili Görüntülemek İçin Giriş Yapın
+                        </h2>
+                        <p className="text-gray-600 mb-2">
+                            Kullanıcı profillerini görüntülemek için üye girişi yapmanız gerekmektedir.
+                        </p>
+                        <p className="text-gray-500 text-sm mb-6">
+                            Giriş yaparak profilleri inceleyebilir, ilanları görebilir, yorum ve değerlendirme yapabilirsiniz.
+                        </p>
+                        <div className="flex gap-3 justify-center">
+                            <Link
+                                href="/authentication"
+                                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                            >
+                                Giriş Yap
+                            </Link>
+                            <button
+                                onClick={() => router.back()}
+                                className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                                Geri Dön
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (profileLoading) {
         return (
@@ -286,97 +343,113 @@ export const PublicProfilePage: React.FC<PublicProfilePageProps> = ({ userId }) 
                         </div>
 
                         {/* Reviews Form - Only for logged in users who haven't reviewed yet */}
-                        {user && user.id !== userId && (
-                            <div className="bg-white rounded-lg shadow-sm border p-6 mt-6">
-                                {userHasReviewed ? (
-                                    <div className="text-center py-6">
-                                        <div className="text-green-600 mb-2">
-                                            ✓ Değerlendirme Tamamlandı
-                                        </div>
-                                        <p className="text-gray-600 text-sm">
-                                            Bu kullanıcı hakkında daha önce değerlendirme yapmışsınız.
-                                        </p>
-                                        <p className="text-gray-500 text-xs mt-1">
-                                            Her kullanıcı için sadece bir değerlendirme yapabilirsiniz.
-                                        </p>
+                        <div className="bg-white rounded-lg shadow-sm border p-6 mt-6">
+                            {!user ? (
+                                <div className="text-center py-6">
+                                    <div className="text-blue-600 mb-2">
+                                        ℹ️ Bilgilendirme
                                     </div>
-                                ) : (
-                                    <>
-                                        <h3 className="font-medium text-gray-900 mb-4">
-                                            {isReady ? 'Değerlendirme Yap' : 'Leave a Review'}
-                                        </h3>
-
-                                <form onSubmit={handleCommentSubmit} className="space-y-4">
-                                    {/* Rating */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            {isReady ? 'Puan' : 'Rating'}
-                                        </label>
-                                        <div className="flex items-center gap-1">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <button
-                                                    key={star}
-                                                    type="button"
-                                                    onClick={() => setNewRating(star)}
-                                                    className={`w-6 h-6 ${
-                                                        star <= newRating ? 'text-yellow-400' : 'text-gray-300'
-                                                    } hover:text-yellow-400 transition-colors`}
-                                                >
-                                                    <Star className={`w-6 h-6 ${star <= newRating ? 'fill-current' : ''}`} />
-                                                </button>
-                                            ))}
-                                            <span className="ml-2 text-sm text-gray-600">
-                                                {newRating}/5
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Comment */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            {isReady ? 'Yorumunuz' : 'Your Review'}
-                                        </label>
-                                        <textarea
-                                            value={newComment}
-                                            onChange={(e) => setNewComment(e.target.value)}
-                                            rows={3}
-                                            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                                reviewError ? 'border-red-300' : 'border-gray-300'
-                                            }`}
-                                            placeholder={isReady ? 'Deneyiminizi paylaşın...' : 'Share your experience...'}
-                                            required
-                                        />
-                                        <div className="flex justify-between items-center mt-1">
-                                            <div className={`text-xs ${
-                                                newComment.length < 10 ? 'text-red-500' : 'text-gray-500'
-                                            }`}>
-                                                {newComment.length}/1000 karakter {newComment.length < 10 && '(en az 10 karakter gerekli)'}
-                                            </div>
-                                        </div>
-                                        {reviewError && (
-                                            <div className="text-red-500 text-sm mt-1">
-                                                {reviewError}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={newComment.trim().length < 10}
-                                        className={`w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors ${
-                                            newComment.trim().length < 10
-                                                ? 'text-gray-500 bg-gray-300 cursor-not-allowed'
-                                                : 'text-white bg-green-600 hover:bg-green-700'
-                                        }`}
+                                    <p className="text-gray-600 text-sm mb-2">
+                                        Yorum ve değerlendirme yapmak için giriş yapmanız gerekmektedir.
+                                    </p>
+                                    <p className="text-gray-500 text-xs">
+                                        Profili görüntüleyebilirsiniz ancak yorum ve değerlendirme yapabilmek için üye olmalısınız.
+                                    </p>
+                                    <Link
+                                        href="/authentication"
+                                        className="inline-flex items-center justify-center px-4 py-2 mt-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                                     >
-                                        <MessageCircle className="w-4 h-4 mr-2" />
-                                        {isReady ? 'Değerlendirme Gönder' : 'Submit Review'}
-                                    </button>
-                                </form>
-                                    </>
-                                )}
-                            </div>
-                        )}
+                                        Giriş Yap
+                                    </Link>
+                                </div>
+                            ) : user.id === userId ? null : userHasReviewed ? (
+                                <div className="text-center py-6">
+                                    <div className="text-green-600 mb-2">
+                                        ✓ Değerlendirme Tamamlandı
+                                    </div>
+                                    <p className="text-gray-600 text-sm">
+                                        Bu kullanıcı hakkında daha önce değerlendirme yapmışsınız.
+                                    </p>
+                                    <p className="text-gray-500 text-xs mt-1">
+                                        Her kullanıcı için sadece bir değerlendirme yapabilirsiniz.
+                                    </p>
+                                </div>
+                            ) : (
+                                <>
+                                    <h3 className="font-medium text-gray-900 mb-4">
+                                        {isReady ? 'Değerlendirme Yap' : 'Leave a Review'}
+                                    </h3>
+
+                                    <form onSubmit={handleCommentSubmit} className="space-y-4">
+                                        {/* Rating */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                {isReady ? 'Puan' : 'Rating'}
+                                            </label>
+                                            <div className="flex items-center gap-1">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        key={star}
+                                                        type="button"
+                                                        onClick={() => setNewRating(star)}
+                                                        className={`w-6 h-6 ${
+                                                            star <= newRating ? 'text-yellow-400' : 'text-gray-300'
+                                                        } hover:text-yellow-400 transition-colors`}
+                                                    >
+                                                        <Star className={`w-6 h-6 ${star <= newRating ? 'fill-current' : ''}`} />
+                                                    </button>
+                                                ))}
+                                                <span className="ml-2 text-sm text-gray-600">
+                                                    {newRating}/5
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Comment */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                {isReady ? 'Yorumunuz' : 'Your Review'}
+                                            </label>
+                                            <textarea
+                                                value={newComment}
+                                                onChange={(e) => setNewComment(e.target.value)}
+                                                rows={3}
+                                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                                                    reviewError ? 'border-red-300' : 'border-gray-300'
+                                                }`}
+                                                placeholder={isReady ? 'Deneyiminizi paylaşın...' : 'Share your experience...'}
+                                                required
+                                            />
+                                            <div className="flex justify-between items-center mt-1">
+                                                <div className={`text-xs ${
+                                                    newComment.length < 10 ? 'text-red-500' : 'text-gray-500'
+                                                }`}>
+                                                    {newComment.length}/1000 karakter {newComment.length < 10 && '(en az 10 karakter gerekli)'}
+                                                </div>
+                                            </div>
+                                            {reviewError && (
+                                                <div className="text-red-500 text-sm mt-1">
+                                                    {reviewError}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            disabled={newComment.trim().length < 10}
+                                            className={`w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors ${
+                                                newComment.trim().length < 10
+                                                    ? 'text-gray-500 bg-gray-300 cursor-not-allowed'
+                                                    : 'text-white bg-green-600 hover:bg-green-700'
+                                            }`}
+                                        >
+                                            <MessageCircle className="w-4 h-4 mr-2" />
+                                            {isReady ? 'Değerlendirme Gönder' : 'Submit Review'}
+                                        </button>
+                                    </form>
+                                </>
+                            )}
+                        </div>
                     </div>
 
                     {/* Main Content */}
