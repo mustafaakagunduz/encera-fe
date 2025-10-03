@@ -166,7 +166,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                                     e.stopPropagation();
                                     prevImage();
                                 }}
-                                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all opacity-0 group-hover:opacity-100"
+                                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                             >
                                 <ChevronLeft className="w-5 h-5" />
                             </button>
@@ -175,7 +175,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                                     e.stopPropagation();
                                     nextImage();
                                 }}
-                                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all opacity-0 group-hover:opacity-100"
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                             >
                                 <ChevronRight className="w-5 h-5" />
                             </button>
