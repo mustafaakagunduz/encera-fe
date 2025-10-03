@@ -471,12 +471,11 @@
     position: fixed;
     top: 0; /* Ekranın en üstünden başla */
     right: 0; /* Sağdan konumlandır */
-    width: 85%; /* Mobilde ekranın %85'i kadar genişlik */
-    max-width: 400px; /* Maksimum genişlik */
+    width: 100%; /* Ekranın tamamı */
     max-height: 100vh; /* Ekran yüksekliğini geçmesin */
     background-color: rgba(30, 58, 138, 0.95); /* blue-900 with transparency */
     backdrop-filter: blur(10px);
-    padding: 20px;
+    padding: 32px 28px; /* Daha geniş padding */
     overflow-y: auto;
     z-index: inherit; /* Parent'tan z-index al */
     height: auto; /* İçeriğe göre otomatik yükseklik */
@@ -510,7 +509,7 @@
 .mobile-menu-close-container {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
 }
 
 .mobile-menu-close-button {
@@ -518,12 +517,17 @@
     border: none;
     color: white;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 6px;
+    padding: 12px;
+    border-radius: 8px;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.mobile-menu-close-button svg {
+    width: 28px;
+    height: 28px;
 }
 
 .mobile-menu-close-button:hover {
@@ -537,22 +541,33 @@
 
 /* Mobile Menu Sections */
 .mobile-menu-section {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .mobile-menu-section-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     width: 100%;
-    padding: 10px 0;
+    padding: 14px 0;
     background: transparent;
     border: none;
     color: white;
-    font-size: 1rem;
+    font-size: 1.125rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+.mobile-menu-section-header svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.mobile-menu-section-header .w-5 {
+    width: 24px !important;
+    height: 24px !important;
 }
 
 .mobile-menu-section-header:hover {
@@ -560,20 +575,20 @@
 }
 
 .mobile-menu-section-content {
-    padding-left: 29px; /* Align with icon */
-    margin-top: 4px;
+    padding-left: 40px; /* Align with icon */
+    margin-top: 8px;
 }
 
 /* Mobile Menu Items */
 .mobile-menu-item {
     display: block;
     width: 100%;
-    padding: 10px 0;
+    padding: 12px 0;
     color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
     border: none;
     background: transparent;
-    font-size: 0.9rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;
@@ -581,7 +596,7 @@
 
 .mobile-menu-item:hover {
     color: #93c5fd; /* blue-200 */
-    padding-left: 8px;
+    padding-left: 12px;
 }
 
 .mobile-menu-item.active {
@@ -591,33 +606,41 @@
 
 .mobile-menu-item.admin-item {
     background-color: rgba(59, 130, 246, 0.2);
-    border-radius: 6px;
-    padding: 10px 16px;
-    margin: 4px 0;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 8px 0;
     font-weight: 600;
+    font-size: 1rem;
 }
 
 .mobile-menu-item.logout-item {
     color: #f87171; /* red-400 */
-    margin-top: 4px;
+    margin-top: 8px;
 }
 
 /* Mobile Menu Links */
 .mobile-menu-link {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     width: 100%;
-    padding: 10px 0;
+    padding: 14px 0;
     color: white;
     text-decoration: none;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     transition: all 0.2s ease;
+    font-size: 1.125rem;
+}
+
+.mobile-menu-link svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
 }
 
 .mobile-menu-link:hover {
     color: #93c5fd; /* blue-200 */
-    padding-left: 8px;
+    padding-left: 12px;
 }
 
 /* Mobile CTA Button */
@@ -625,14 +648,14 @@
     width: 100%;
     background-color: #dc2626; /* red-600 */
     color: white;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1rem;
+    padding: 16px;
+    border-radius: 10px;
+    font-size: 1.125rem;
     font-weight: 600;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-top: 12px;
+    margin-top: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 

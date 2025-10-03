@@ -440,7 +440,7 @@ const Navbar: React.FC = () => {
                                 className="mobile-menu-close-button"
                                 aria-label="Close menu"
                             >
-                                <ArrowRight className="w-6 h-6" />
+                                <ArrowRight />
                             </button>
                         </div>
 
