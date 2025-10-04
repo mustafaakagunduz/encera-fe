@@ -300,7 +300,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
     return (
         <div className="min-h-screen bg-white">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 py-8">
                 {/* Header with back button and actions */}
                 <div className="flex items-center justify-between mb-6">
                     <button
@@ -366,10 +366,10 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                 </div>
 
                 {/* Main Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-16 mb-8">
 
                     {/* Left Column - Image Gallery & Contact (Desktop) */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-3 space-y-8">
                         {/* Image Gallery */}
                         <PropertyImageGallery
                             images={property.imageUrls || []}
@@ -387,14 +387,28 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                             {isOwner ? (isReady ? t('property-detail.listing-info') : 'İlan Sahibinin İletişim Bilgileri') : (isReady ? t('property-detail.contact-info') : 'İlan Sahibinin İletişim Bilgileri')}
                                         </h3>
                                         <div className="flex items-center">
-                                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                                                <UserIcon className="w-5 h-5 text-gray-600" />
-                                            </div>
+                                            <Link
+                                                href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
+                                                className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4 overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+                                            >
+                                                {property.owner.profileImageUrl ? (
+                                                    <img
+                                                        src={property.owner.profileImageUrl}
+                                                        alt={`${property.owner.firstName} ${property.owner.lastName}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <UserIcon className="w-5 h-5 text-gray-600" />
+                                                )}
+                                            </Link>
                                             <div>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="font-medium text-gray-900">
+                                                    <Link
+                                                        href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
+                                                        className="font-medium text-gray-900 hover:text-blue-600 transition-colors cursor-pointer"
+                                                    >
                                                         {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
-                                                    </div>
+                                                    </Link>
                                                     {isEncera && (
                                                         <CheckCircle className="w-4 h-4 text-blue-500" />
                                                     )}
@@ -473,7 +487,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                     </div>
 
                     {/* Right Column - Property Info */}
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-2">
                         <div className="sticky top-8">
                             {/* Status Badge - Sadece ilan sahibi görür */}
                             {isOwner && (
@@ -531,28 +545,19 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                 <div className="space-y-4">
                                     {property.grossArea && (
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center">
-                                                <Square className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">{isReady ? t('property-detail.gross-area') : 'Brüt Alan'}</span>
-                                            </div>
+                                            <span className="text-gray-600">{isReady ? t('property-detail.gross-area') : 'Brüt Alan'}</span>
                                             <span className="font-medium text-gray-900">{property.grossArea} m²</span>
                                         </div>
                                     )}
                                     {property.netArea && (
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center">
-                                                <Square className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">{isReady ? t('property-detail.net-area') : 'Net Alan'}</span>
-                                            </div>
+                                            <span className="text-gray-600">{isReady ? t('property-detail.net-area') : 'Net Alan'}</span>
                                             <span className="font-medium text-gray-900">{property.netArea} m²</span>
                                         </div>
                                     )}
                                     {property.roomConfiguration && (
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center">
-                                                <Home className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">{isReady ? t('property-detail.room-count') : 'Oda Sayısı'}</span>
-                                            </div>
+                                            <span className="text-gray-600">{isReady ? t('property-detail.room-count') : 'Oda Sayısı'}</span>
                                             <span className="font-medium text-gray-900">
                                                 {property.roomConfiguration.roomCount}+{property.roomConfiguration.hallCount}
                                             </span>
@@ -560,37 +565,25 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                     )}
                                     {(property.bathroomCount !== undefined && property.bathroomCount !== null) && (
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center">
-                                                <Coffee className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">{isReady ? t('property-detail.bathroom-count') : 'Banyo Sayısı'}</span>
-                                            </div>
+                                            <span className="text-gray-600">{isReady ? t('property-detail.bathroom-count') : 'Banyo Sayısı'}</span>
                                             <span className="font-medium text-gray-900">{property.bathroomCount}</span>
                                         </div>
                                     )}
                                     {(property.buildingAge !== undefined && property.buildingAge !== null) && (
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center">
-                                                <Calendar className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">{isReady ? t('property-detail.building-age') : 'Bina Yaşı'}</span>
-                                            </div>
-                                            <span className="font-medium text-gray-900">{property.buildingAge} {isReady ? t('property-detail.years-old') : 'yıl'}</span>
+                                            <span className="text-gray-600">{isReady ? t('property-detail.building-age') : 'Bina Yaşı'}</span>
+                                            <span className="font-medium text-gray-900">{property.buildingAge}</span>
                                         </div>
                                     )}
                                     {(property.currentFloor !== undefined && property.currentFloor !== null) && (
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center">
-                                                <TrendingUp className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">{isReady ? t('property-detail.current-floor') : 'Bulunduğu Kat'}</span>
-                                            </div>
+                                            <span className="text-gray-600">{isReady ? t('property-detail.current-floor') : 'Bulunduğu Kat'}</span>
                                             <span className="font-medium text-gray-900">{property.currentFloor}. {isReady ? t('property-detail.floor') : 'kat'}</span>
                                         </div>
                                     )}
                                     {(property.totalFloors !== undefined && property.totalFloors !== null) && (
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center">
-                                                <TrendingUp className="w-4 h-4 mr-3 text-gray-400" />
-                                                <span className="text-gray-600">{isReady ? t('property-detail.total-floors') : 'Toplam Kat'}</span>
-                                            </div>
+                                            <span className="text-gray-600">{isReady ? t('property-detail.total-floors') : 'Toplam Kat'}</span>
                                             <span className="font-medium text-gray-900">{property.totalFloors} {isReady ? t('property-detail.floors') : 'kat'}</span>
                                         </div>
                                     )}
@@ -598,15 +591,15 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             </div>
 
                             {/* Stats */}
-                            <div className="text-sm text-gray-500">
+                            <div className="text-base text-gray-600">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center">
-                                        <Eye className="w-4 h-4 mr-2" />
+                                        <Eye className="w-5 h-5 mr-2" />
                                         <span>{property.viewCount} {isReady ? t('property-detail.view-count') : 'görüntülenme'}</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center">
-                                    <Calendar className="w-4 h-4 mr-2" />
+                                    <Calendar className="w-5 h-5 mr-2" />
                                     <span>{formatDate(property.createdAt)}</span>
                                 </div>
                             </div>
@@ -624,14 +617,28 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
 
                         <div className="space-y-4 mb-6">
                             <div className="flex items-center">
-                                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                                    <UserIcon className="w-5 h-5 text-gray-600" />
-                                </div>
+                                <Link
+                                    href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
+                                    className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4 overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+                                >
+                                    {property.owner.profileImageUrl ? (
+                                        <img
+                                            src={property.owner.profileImageUrl}
+                                            alt={`${property.owner.firstName} ${property.owner.lastName}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <UserIcon className="w-5 h-5 text-gray-600" />
+                                    )}
+                                </Link>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <div className="font-medium text-gray-900">
+                                        <Link
+                                            href={isEncera ? '/profile/1' : getProfileUrl(property.owner)}
+                                            className="font-medium text-gray-900 hover:text-blue-600 transition-colors cursor-pointer"
+                                        >
                                             {isEncera ? 'Encera' : `${property.owner.firstName} ${property.owner.lastName}`}
-                                        </div>
+                                        </Link>
                                         {isEncera && (
                                             <CheckCircle className="w-4 h-4 text-blue-500" />
                                         )}
@@ -711,8 +718,8 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                 <div className="mt-12 pt-8 border-t border-gray-100">
                     <h2 className="text-2xl font-bold text-gray-900 mb-8">{isReady ? t('property-detail.property-details') : 'İlan Detayları'}</h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                        {/* Left Column - Basic Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-12 mb-8">
+                        {/* First Column - Basic Info */}
                         <div>
                             <h3 className="font-semibold text-gray-900 mb-6">{isReady ? t('property-detail.basic-info') : 'Temel Bilgiler'}</h3>
                             <div className="space-y-4">
@@ -728,50 +735,13 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                                         <span className="font-medium text-gray-900">{getPropertyTypeText(property.propertyType)}</span>
                                     </div>
                                 )}
-                                {property.grossArea && (
-                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">{isReady ? t('property-detail.gross-area') : 'Brüt Alan'}</span>
-                                        <span className="font-medium text-gray-900">{property.grossArea} m²</span>
-                                    </div>
-                                )}
-                                {property.netArea && (
-                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">{isReady ? t('property-detail.net-area') : 'Net Alan'}</span>
-                                        <span className="font-medium text-gray-900">{property.netArea} m²</span>
-                                    </div>
-                                )}
-                                {property.roomConfiguration && (
-                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">{isReady ? t('property-detail.room-count') : 'Oda Sayısı'}</span>
-                                        <span className="font-medium text-gray-900">
-                                            {property.roomConfiguration.roomCount}+{property.roomConfiguration.hallCount}
-                                        </span>
-                                    </div>
-                                )}
-                                {property.bathroomCount !== undefined && property.bathroomCount !== null && (
-                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">{isReady ? t('property-detail.bathroom-count') : 'Banyo Sayısı'}</span>
-                                        <span className="font-medium text-gray-900">{property.bathroomCount}</span>
-                                    </div>
-                                )}
-                                {property.buildingAge !== undefined && property.buildingAge !== null && (
-                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">{isReady ? t('property-detail.building-age') : 'Bina Yaşı'}</span>
-                                        <span className="font-medium text-gray-900">{property.buildingAge} {isReady ? t('property-detail.years-old') : 'yıl'}</span>
-                                    </div>
-                                )}
-                                {property.totalFloors !== undefined && property.totalFloors !== null && (
-                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">{isReady ? t('property-detail.total-floors') : 'Toplam Kat Sayısı'}</span>
-                                        <span className="font-medium text-gray-900">{property.totalFloors} {isReady ? t('property-detail.floors') : 'kat'}</span>
-                                    </div>
-                                )}
-                                {property.currentFloor !== undefined && property.currentFloor !== null && (
-                                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                                        <span className="text-gray-600">{isReady ? t('property-detail.current-floor') : 'Bulunduğu Kat'}</span>
-                                        <span className="font-medium text-gray-900">{property.currentFloor}. {isReady ? t('property-detail.floor') : 'kat'}</span>
-                                    </div>
-                                )}
+                            </div>
+                        </div>
+
+                        {/* Second Column - Additional Info */}
+                        <div>
+                            <h3 className="font-semibold text-gray-900 mb-6">{isReady ? t('property-detail.additional-info') : 'Ek Bilgiler'}</h3>
+                            <div className="space-y-4">
                                 {property.heatingTypes && property.heatingTypes.length > 0 && (
                                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
                                         <span className="text-gray-600">{isReady ? t('property-detail.heating-type') : 'Isıtma Türü'}</span>
@@ -803,50 +773,50 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({ propertyId }) =>
                             </div>
                         </div>
 
-                        {/* Right Column - Features */}
+                        {/* Third Column - Features */}
                         <div>
                             <h3 className="font-semibold text-gray-900 mb-6">{isReady ? t('property-detail.features') : 'Özellikler'}</h3>
                             <div className="grid grid-cols-1 gap-3">
                                 {property.elevator && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                                        <Briefcase className="w-4 h-4 mr-2 text-green-600" />
+
                                         <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.elevator') : 'Asansör'}</span>
                                     </div>
                                 )}
                                 {property.parking && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                                        <Car className="w-4 h-4 mr-2 text-green-600" />
+
                                         <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.parking') : 'Otopark'}</span>
                                     </div>
                                 )}
                                 {property.balcony && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                                        <Home className="w-4 h-4 mr-2 text-green-600" />
+
                                         <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.balcony') : 'Balkon'}</span>
                                     </div>
                                 )}
                                 {property.security && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                                        <Shield className="w-4 h-4 mr-2 text-green-600" />
+
                                         <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.security') : 'Güvenlik'}</span>
                                     </div>
                                 )}
                                 {property.furnished && (
                                     <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                                        <Coffee className="w-4 h-4 mr-2 text-green-600" />
+
                                         <span className="text-sm text-green-800 font-medium">{isReady ? t('property-detail.furnished') : 'Eşyalı'}</span>
                                     </div>
                                 )}
                                 {property.featured && (
                                     <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
-                                        <Star className="w-4 h-4 mr-2 text-yellow-600" />
+
                                         <span className="text-sm text-yellow-800 font-medium">{isReady ? t('property-detail.vip-listing') : 'VIP İlan'}</span>
                                     </div>
                                 )}
                                 {property.pappSellable && (
                                     <div className="flex items-center p-3 bg-blue-50 rounded-lg">
-                                        <CheckCircle className="w-4 h-4 mr-2 text-blue-600" />
-                                        <span className="text-sm text-blue-800 font-medium">{isReady ? t('property-detail.encera-guaranteed') : 'Encera Garantili'}</span>
+
+                                        <span className="text-sm text-blue-800 font-medium">{isReady ? t('property-detail.encera-guaranteed') : 'Encera Güvencesi'}</span>
                                     </div>
                                 )}
                                 {!property.elevator && !property.parking && !property.balcony && !property.security && !property.furnished && !property.featured && !property.pappSellable && (

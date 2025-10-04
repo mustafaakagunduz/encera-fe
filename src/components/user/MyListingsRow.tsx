@@ -255,9 +255,20 @@ export const MyListingsRow: React.FC<MyListingsRowProps> = ({ property }) => {
                                 e.stopPropagation();
                                 if (!showDropdown && buttonRef.current) {
                                     const rect = buttonRef.current.getBoundingClientRect();
+                                    const dropdownWidth = 224; // w-56 = 14rem = 224px
+
+                                    // Butonun altına yerleştir
+                                    const top = rect.bottom + 8;
+
+                                    // Sağa taşarsa sola hizala
+                                    let left = rect.left;
+                                    if (left + dropdownWidth > window.innerWidth) {
+                                        left = rect.right - dropdownWidth;
+                                    }
+
                                     setDropdownPosition({
-                                        top: rect.bottom + window.scrollY + 8,
-                                        right: window.innerWidth - rect.right
+                                        top: top,
+                                        right: window.innerWidth - (left + dropdownWidth)
                                     });
                                 }
                                 setShowDropdown(!showDropdown);

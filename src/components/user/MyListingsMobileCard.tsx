@@ -249,9 +249,31 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
                         onClick={() => {
                             if (!showDropdown && buttonRef.current) {
                                 const rect = buttonRef.current.getBoundingClientRect();
+                                const dropdownWidth = 224; // w-56 = 14rem = 224px
+                                const dropdownHeight = 160; // Yaklaşık dropdown yüksekliği
+
+                                // Yukarı mı aşağı mı açılacak kontrol et
+                                const spaceBelow = window.innerHeight - rect.bottom;
+                                const spaceAbove = rect.top;
+
+                                let top;
+                                if (spaceBelow >= dropdownHeight || spaceBelow > spaceAbove) {
+                                    // Aşağı aç
+                                    top = rect.bottom + 8;
+                                } else {
+                                    // Yukarı aç
+                                    top = rect.top - dropdownHeight - 8;
+                                }
+
+                                // Sağa taşarsa sola hizala
+                                let left = rect.left;
+                                if (left + dropdownWidth > window.innerWidth) {
+                                    left = rect.right - dropdownWidth;
+                                }
+
                                 setDropdownPosition({
-                                    top: rect.top + window.scrollY - 8,
-                                    right: window.innerWidth - rect.right
+                                    top: top,
+                                    right: window.innerWidth - (left + dropdownWidth)
                                 });
                             }
                             setShowDropdown(!showDropdown);
@@ -266,7 +288,7 @@ export const MyListingsMobileCard: React.FC<MyListingsMobileCardProps> = ({ prop
                         <div
                             className="fixed w-56 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
                             style={{
-                                bottom: `${window.innerHeight - dropdownPosition.top}px`,
+                                top: `${dropdownPosition.top}px`,
                                 right: `${dropdownPosition.right}px`,
                                 zIndex: 9999
                             }}

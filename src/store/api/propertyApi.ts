@@ -168,6 +168,7 @@ export interface PropertyResponse {
         firstName: string;
         lastName: string;
         phoneNumber: string;
+        profileImageUrl?: string;
     };
 
 
