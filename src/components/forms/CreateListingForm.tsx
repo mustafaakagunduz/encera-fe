@@ -446,6 +446,16 @@ export const CreateListingForm: React.FC = () => {
             newErrors.netArea = isReady ? t('common.error') : 'Bu alan zorunludur';
         }
 
+        // Konut için oda-salon zorunlu
+        if (formData.propertyType === PropertyType.RESIDENTIAL) {
+            if (!formData.roomCount || formData.roomCount === '' || Number(formData.roomCount) <= 0) {
+                newErrors.roomCount = isReady ? t('common.error') : 'Bu alan zorunludur';
+            }
+            if (!formData.hallCount || formData.hallCount === '' || Number(formData.hallCount) <= 0) {
+                newErrors.hallCount = isReady ? t('common.error') : 'Bu alan zorunludur';
+            }
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -729,7 +739,7 @@ export const CreateListingForm: React.FC = () => {
                             {/* Oda Sayısı - Konut için aktif */}
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-900'}`}>
-                                    {isReady ? t('listing.create.room-config') : 'Oda + Salon'}
+                                    {isReady ? t('listing.create.room-config') : 'Oda + Salon'}{formData.propertyType === PropertyType.RESIDENTIAL && <span className="text-black font-bold">(*)</span>}
                                 </label>
                                 <div className="flex gap-2">
                                     <input
@@ -742,7 +752,9 @@ export const CreateListingForm: React.FC = () => {
                                         className={`w-1/2 px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                             formData.propertyType !== PropertyType.RESIDENTIAL
                                                 ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                                                : 'border-gray-300 bg-white'
+                                                : errors.roomCount
+                                                    ? 'border-red-500 bg-white'
+                                                    : 'border-gray-300 bg-white'
                                         }`}
                                     />
                                     <span className={`flex items-center ${formData.propertyType !== PropertyType.RESIDENTIAL ? 'text-gray-400' : 'text-gray-500'}`}>+</span>
@@ -756,7 +768,9 @@ export const CreateListingForm: React.FC = () => {
                                         className={`w-1/2 px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                             formData.propertyType !== PropertyType.RESIDENTIAL
                                                 ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                                                : 'border-gray-300 bg-white'
+                                                : errors.hallCount
+                                                    ? 'border-red-500 bg-white'
+                                                    : 'border-gray-300 bg-white'
                                         }`}
                                     />
                                 </div>
@@ -766,6 +780,9 @@ export const CreateListingForm: React.FC = () => {
                                             ? 'İş yeri için uygulanmaz.'
                                             : 'Arsa için uygulanmaz.'}
                                     </p>
+                                )}
+                                {(errors.roomCount || errors.hallCount) && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.roomCount || errors.hallCount}</p>
                                 )}
                             </div>
 

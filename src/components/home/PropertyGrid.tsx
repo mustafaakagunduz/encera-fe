@@ -170,10 +170,12 @@ const PropertyCard: React.FC<{
 
                 {/* Property Details */}
                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                    <div className="flex items-center gap-1">
-                        <Bed className="w-4 h-4" />
-                        <span>{property.roomConfiguration?.displayFormat || `${property.roomConfiguration?.roomCount}+${property.roomConfiguration?.hallCount}`}</span>
-                    </div>
+                    {property.propertyType === 'RESIDENTIAL' && (
+                        <div className="flex items-center gap-1">
+                            <Bed className="w-4 h-4" />
+                            <span>{property.roomConfiguration?.displayFormat || `${property.roomConfiguration?.roomCount}+${property.roomConfiguration?.hallCount}`}</span>
+                        </div>
+                    )}
                     <div className="flex items-center gap-1">
                         <Square className="w-4 h-4" />
                         <span>{property.grossArea || property.area} m²</span>
